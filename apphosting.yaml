@@ -6,10 +6,23 @@ runConfig:
   memoryMiB: 512
   cpu: 1
 env:
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: "AIzaSyDO2NZuvolZfnk-zS-z3s3TKs5miLYfz04"
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: "chancescribe.firebaseapp.com"
+  - variable: NEXT_PUBLIC_FIREBASE_DATABASE_URL
+    value: "https://chancescribe-default-rtdb.firebaseio.com"
   - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
-    value: "chancescribe" # Update if different
+    value: "chancescribe"
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: "chancescribe.firebasestorage.app"
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: "424174249269"
   - variable: NEXT_PUBLIC_FIREBASE_APP_ID
     value: "1:424174249269:web:846deaaab4d4a8b49a987c"
+  - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+    value: "G-GZJ66X1F68"
+
 # Secrets should be managed in the Firebase Console and will be available to Cloud Run
 secrets:
   - variable: OPENAI_API_KEY
