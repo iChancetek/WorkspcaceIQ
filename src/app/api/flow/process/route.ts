@@ -23,7 +23,7 @@ Your task is to rewrite the provided raw transcript.
     });
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o", // Fallback to stable edge model for live testing, originally mapped to GPT-5.4
+      model: "gpt-5.4",
       max_completion_tokens: 1500, // Adhering to the 5.x series max_completion_tokens standard
       messages: [
         { role: "system", content: systemPrompt },

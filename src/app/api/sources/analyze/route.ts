@@ -47,7 +47,7 @@ ${sourcesContext}`;
     }
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-5.4",
       max_completion_tokens: 4000,
       messages,
       stream: true,

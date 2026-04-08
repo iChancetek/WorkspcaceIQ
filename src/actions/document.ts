@@ -17,7 +17,8 @@ export async function extractDocumentText(formData: FormData): Promise<string> {
 
   // PDF
   if (fileName.endsWith(".pdf")) {
-    const pdfParse = (await import("pdf-parse")).default;
+    // @ts-ignore - Dynamic import typing for pdf-parse can be inconsistent across environments
+    const pdfParse = (await import("pdf-parse")) as any;
     const data = await pdfParse(fileBuffer);
     return data.text;
   }

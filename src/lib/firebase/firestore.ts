@@ -21,7 +21,7 @@ export async function saveSession(data: SessionDoc) {
   }
 }
 
-export function subscribeToSessions(callback: (sessions: SessionDoc[]) => void) {
+export function subscribeToSessions(callback: (sessions: (SessionDoc & { time: string })[]) => void) {
   const q = query(collection(db, "sessions"), orderBy("createdAt", "desc"), limit(20));
   
   return onSnapshot(q, (snapshot) => {

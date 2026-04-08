@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
 
     // Step 1: Generate the podcast script
     const scriptCompletion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-5.4",
       max_completion_tokens: 4000,
       messages: [
         {

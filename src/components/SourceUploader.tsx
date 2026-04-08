@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, Link, Loader2, FileText, Globe, Youtube, Music, X } from "lucide-react";
+import { Upload, Link, Loader2, FileText, Globe, Video, Music, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { extractDocumentText } from "@/actions/document";
 
@@ -95,7 +95,7 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
     docx: <FileText className="w-4 h-4 text-blue-500" />,
     txt: <FileText className="w-4 h-4 text-foreground/50" />,
     audio: <Music className="w-4 h-4 text-purple-500" />,
-    youtube: <Youtube className="w-4 h-4 text-red-500" />,
+    youtube: <Video className="w-4 h-4 text-red-500" />,
     website: <Globe className="w-4 h-4 text-green-500" />,
   };
 
