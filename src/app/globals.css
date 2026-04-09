@@ -39,10 +39,15 @@
 
 @layer utilities {
   .flow-glass {
-    @apply bg-white/70 backdrop-blur-xl border border-black/5 shadow-sm;
+    @apply bg-white/[0.04] backdrop-blur-xl border border-white/8 shadow-sm;
   }
   
   .writing-pad {
-    @apply max-w-4xl mx-auto w-full bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-2xl border border-black/5 p-12;
+    @apply max-w-4xl mx-auto w-full bg-white/[0.03] shadow-none rounded-2xl border border-white/8 p-10 backdrop-blur-sm;
+  }
+
+  .dark-card {
+    @apply bg-white/[0.04] border border-white/8 rounded-2xl backdrop-blur-sm hover:bg-white/[0.07] transition-all duration-200;
   }
 }
+
