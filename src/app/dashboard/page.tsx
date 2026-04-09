@@ -14,6 +14,7 @@ import { VoiceJournal } from "@/components/VoiceJournal";
 import { Library as LibraryView } from "@/components/Library";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { FileText, StickyNote } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
 
