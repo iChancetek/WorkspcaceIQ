@@ -24,8 +24,8 @@ export function LanguageSelector({ activeLanguage, onLanguageChange }: LanguageS
           className={cn(
             "flex items-center gap-2 px-3 py-2 rounded-full text-xs font-medium transition-all",
             activeLanguage === lang.id
-              ? "bg-white text-primary shadow-sm"
-              : "text-foreground/50 hover:text-foreground/80 opacity-70"
+              ? "bg-white text-black shadow-sm"
+              : "text-white/50 hover:text-white/80"
           )}
           title={lang.label}
         >

@@ -8,9 +8,10 @@ import { Source } from "./SourceUploader";
 interface DeepDiveProps {
   sources: Source[];
   language: string;
+  onTranscriptGenerated?: (transcript: string) => void;
 }
 
-export function DeepDive({ sources, language }: DeepDiveProps) {
+export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
@@ -38,6 +39,11 @@ export function DeepDive({ sources, language }: DeepDiveProps) {
       const url = URL.createObjectURL(blob);
       setAudioUrl(url);
       setAudioBlob(blob);
+
+      const encodedTranscript = res.headers.get("x-transcript");
+      if (encodedTranscript && onTranscriptGenerated) {
+        onTranscriptGenerated(decodeURIComponent(encodedTranscript));
+      }
     } catch (err) {
       console.error("Deep Dive error:", err);
     }

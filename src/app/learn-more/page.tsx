@@ -1,13 +1,13 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Mic, BookOpen, Headphones, Globe, Shield, Sparkles, Zap, FileText, Video, Music, Brain, MessageCircle, Volume2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Mic, BookOpen, Headphones, Globe, Shield, Sparkles, Zap, FileText, Video, Music, Brain, MessageCircle, Volume2, Layout, CreditCard, HelpCircle, GitBranch, BarChart3, Table2, Save, Download, RotateCcw, Trash2 } from "lucide-react";
 import { IChancellor } from "@/components/IChancellor";
 import { BrandLogo } from "@/components/BrandLogo";
 
 const heroFeatures = [
   { icon: Mic, label: "Flow Dictation", color: "text-blue-400", bg: "from-blue-500/20 to-blue-600/5" },
   { icon: BookOpen, label: "Research Mode", color: "text-violet-400", bg: "from-violet-500/20 to-violet-600/5" },
-  { icon: Headphones, label: "Deep Dive Audio", color: "text-emerald-400", bg: "from-emerald-500/20 to-emerald-600/5" },
-  { icon: Brain, label: "iChancellor AI", color: "text-pink-400", bg: "from-pink-500/20 to-pink-600/5" },
+  { icon: Layout, label: "Studio Module", color: "text-blue-400", bg: "from-blue-500/15 to-blue-600/5" },
+  { icon: Headphones, label: "Deep Dive Audio", color: "text-emerald-400", bg: "from-emerald-500/15 to-emerald-600/5" },
 ];
 
 const flowFeatures = [
@@ -24,6 +24,30 @@ const researchFeatures = [
   { icon: Music, title: "Audio File Analysis", desc: "Upload MP3, WAV, and M4A files. Whisper AI transcribes them and they become fully searchable research sources." },
   { icon: Sparkles, title: "Citation Grounding", desc: "Every AI response explicitly cites its source using [Source N] notation. Always know where your answers come from." },
   { icon: BookOpen, title: "5 Analysis Modes", desc: "Summarize, Study, Organize, Create, and Rewrite. Every mode unlocks a different way of understanding your content." },
+  { icon: Table2, title: "Spreadsheet Support", desc: "Native ingestion of XLSX, CSV, and Google Sheets. Turn numeric data into actionable insights instantly." },
+];
+
+const studioFeatures = [
+  { icon: FileText, title: "Executive Reports", desc: "Generate professional markdown reports covering every aspect of your research with formal structure and depth." },
+  { icon: Layout, title: "Presentation Slides", desc: "Instantly create slide-by-slide outlines with talking points and key takeaways for any meeting." },
+  { icon: CreditCard, title: "Interactive Flashcards", desc: "Turn sources into clickable flip-cards with questions and answers for rapid study and memorization." },
+  { icon: HelpCircle, title: "AI-Generated Quizzes", desc: "Test your knowledge with multiple-choice quizzes that include instant grading and correct-answer reveals." },
+  { icon: GitBranch, title: "Visual Mind Maps", desc: "Visualize complex concepts with hierarchical data trees that show how different ideas connect." },
+  { icon: BarChart3, title: "Infographic Summaries", desc: "Get high-level statistics, pull quotes, and key facts in a visually striking, condensed format." },
+];
+
+const dashboardFeatures = [
+  { icon: BarChart3, title: "Automated Visualizations", desc: "Upload a spreadsheet and get instant Bar, Line, and Pie charts plotted from your numeric data using Recharts." },
+  { icon: Brain, title: "CEO Briefing", desc: "Strategic summaries focused on the 'big picture', bottom lines, and high-level decisions for executives." },
+  { icon: Zap, title: "Manager Briefing", desc: "Actionable takeaways and operational insights focused on implementation and team priorities." },
+  { icon: GitBranch, title: "Analyst Briefing", desc: "Deep technical dives into data patterns, correlations, and granular evidence for thorough review." },
+];
+
+const projectFeatures = [
+  { icon: Save, title: "Project Library", desc: "Save your entire research workspace — including sources and analysis — to your personal library." },
+  { icon: RotateCcw, title: "Instant Restoration", desc: "Restore any saved project to your active workspace with one click. Pick up exactly where you left off." },
+  { icon: Download, title: "Markdown Export", desc: "Export your entire research project, including all sources and AI work, into a professional .md document." },
+  { icon: Trash2, title: "Soft Delete & Recovery", desc: "Accidentally trashed a project? You have 30 days to recover it before it is permanently purged." },
 ];
 
 const deepDiveFeatures = [
@@ -116,8 +140,10 @@ export default function LearnMorePage() {
           {[
             { href: "#flow", label: "Flow", color: "border-blue-400/30 text-blue-400" },
             { href: "#research", label: "Research", color: "border-violet-400/30 text-violet-400" },
-            { href: "#deepdive", label: "Deep Dive", color: "border-emerald-400/30 text-emerald-400" },
-            { href: "#ichancellor", label: "iChancellor AI", color: "border-pink-400/30 text-pink-400" },
+            { href: "#studio", label: "Studio Module", color: "border-blue-400/30 text-blue-400" },
+            { href: "#dashboard", label: "Data Dashboards", color: "border-amber-400/30 text-amber-400" },
+            { href: "#library", label: "Project Library", color: "border-rose-400/30 text-rose-400" },
+            { href: "#ichancellor", label: "iChancellor", color: "border-pink-400/30 text-pink-400" },
           ].map(({ href, label, color }) => (
             <a key={href} href={href} className={`px-5 py-2 rounded-full border text-sm font-semibold bg-white/[0.03] hover:bg-white/[0.08] transition-all ${color}`}>
               {label}
@@ -162,6 +188,33 @@ export default function LearnMorePage() {
         subtitle="Generate an AI podcast from your research — one click, zero effort."
         features={deepDiveFeatures}
         accent="text-emerald-400"
+      />
+
+      <FeatureSection
+        id="studio"
+        badge="Studio Module"
+        title="Analyze. Visualize. Create."
+        subtitle="9 specialized AI generators to transform your research into any format imaginable."
+        features={studioFeatures}
+        accent="text-blue-400"
+      />
+
+      <FeatureSection
+        id="dashboard"
+        badge="Data Dashboard"
+        title="Your data, visualized."
+        subtitle="Automatic charts and persona-based briefings from your spreadsheets."
+        features={dashboardFeatures}
+        accent="text-amber-400"
+      />
+
+      <FeatureSection
+        id="library"
+        badge="Project Library"
+        title="Never lose a breakthrough."
+        subtitle="Save your entire research history, restore projects instantly, and export to Markdown."
+        features={projectFeatures}
+        accent="text-rose-400"
       />
 
       <FeatureSection

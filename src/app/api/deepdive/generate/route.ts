@@ -74,6 +74,7 @@ ${sourcesContext}`
         "Content-Type": "audio/mpeg",
         "Content-Length": fullAudio.byteLength.toString(),
         "Content-Disposition": "attachment; filename=deep-dive.mp3",
+        "x-transcript": encodeURIComponent(script),
       },
     });
   } catch (err: any) {

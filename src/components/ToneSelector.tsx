@@ -24,8 +24,8 @@ export function ToneSelector({ activeTone, onToneChange }: ToneSelectorProps) {
           className={cn(
             "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all",
             activeTone === tone.id
-              ? "bg-white text-primary shadow-sm"
-              : "text-foreground/50 hover:text-foreground/80"
+              ? "bg-white text-black shadow-sm"
+              : "text-white/50 hover:text-white/80"
           )}
         >
           <span>{tone.icon}</span>

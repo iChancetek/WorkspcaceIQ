@@ -39,5 +39,18 @@ export async function extractDocumentText(formData: FormData): Promise<string> {
     return transcription.text;
   }
 
+  // XLSX / XLS / CSV → xlsx parser
+  if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls") || fileName.endsWith(".csv")) {
+    const XLSX = await import("xlsx");
+    const workbook = XLSX.read(fileBuffer, { type: "buffer" });
+    const lines: string[] = [];
+    for (const sheetName of workbook.SheetNames) {
+      const sheet = workbook.Sheets[sheetName];
+      const csv = XLSX.utils.sheet_to_csv(sheet);
+      lines.push(`## Sheet: ${sheetName}\n${csv}`);
+    }
+    return lines.join("\n\n");
+  }
+
   throw new Error(`Unsupported file type: ${fileName}`);
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, Link, Loader2, FileText, Globe, Video, Music, X, AlertCircle } from "lucide-react";
+import { Upload, Link, Loader2, FileText, Globe, Video, Music, X, AlertCircle, Table2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { extractDocumentText } from "@/actions/document";
 
@@ -9,7 +9,7 @@ export interface Source {
   id: string;
   title: string;
   text: string;
-  type: "pdf" | "docx" | "txt" | "audio" | "youtube" | "website";
+  type: "pdf" | "docx" | "txt" | "audio" | "youtube" | "website" | "spreadsheet";
 }
 
 interface SourceUploaderProps {
@@ -41,6 +41,7 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
         const typeMap: Record<string, Source["type"]> = {
           pdf: "pdf", docx: "docx", txt: "txt",
           mp3: "audio", wav: "audio", webm: "audio", m4a: "audio",
+          xlsx: "spreadsheet", xls: "spreadsheet", csv: "spreadsheet",
         };
 
         onSourcesChange([
@@ -63,7 +64,27 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
     if (!urlInput.trim() || sources.length >= maxSources) return;
     setIsExtractingUrl(true);
     setError("");
+
+    // Detect Google Sheets / CSV export URLs
+    const isSheetsCsv = urlInput.includes("docs.google.com") || urlInput.endsWith(".csv");
+
     try {
+      if (isSheetsCsv) {
+        // Directly fetch the CSV
+        const csvRes = await fetch(urlInput);
+        if (!csvRes.ok) throw new Error("Could not fetch the spreadsheet. Make sure it is published to the web.");
+        const csv = await csvRes.text();
+        onSourcesChange([
+          ...sources,
+          {
+            id: crypto.randomUUID(),
+            title: urlInput.includes("docs.google.com") ? "Google Sheet" : urlInput.split("/").pop() || "Spreadsheet",
+            text: csv,
+            type: "spreadsheet",
+          },
+        ]);
+        setUrlInput("");
+      } else {
       const res = await fetch("/api/sources/extract-url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -84,6 +105,7 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
       } else if (data.error) {
         setError(data.error);
       }
+      } // end isSheetsCsv else block
     } catch (err) {
       console.error("URL extraction error:", err);
       setError("Failed to extract content from this URL. Please ensure it is publicly accessible.");
@@ -102,6 +124,7 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
     audio: <Music className="w-4 h-4 text-purple-500" />,
     youtube: <Video className="w-4 h-4 text-red-500" />,
     website: <Globe className="w-4 h-4 text-green-500" />,
+    spreadsheet: <Table2 className="w-4 h-4 text-emerald-500" />,
   };
 
   return (
@@ -123,22 +146,22 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
           ref={fileInputRef}
           type="file"
           multiple
-          accept=".pdf,.docx,.txt,.mp3,.wav,.webm,.m4a"
+          accept=".pdf,.docx,.txt,.mp3,.wav,.webm,.m4a,.xlsx,.xls,.csv"
           className="hidden"
           onChange={(e) => e.target.files && handleFiles(e.target.files)}
         />
         <div className="flex flex-col items-center gap-3">
           {isUploading ? (
-            <Loader2 className="w-8 h-8 text-accent animate-spin" />
+            <Loader2 className="w-8 h-8 text-white/50 animate-spin" />
           ) : (
-            <Upload className="w-8 h-8 text-foreground/25" />
+            <Upload className="w-8 h-8 text-white/50" />
           )}
           <div>
-            <p className="text-sm font-semibold text-foreground/60">
+            <p className="text-sm font-semibold text-white/80">
               {isUploading ? "Processing..." : "Drop files here or click to upload"}
             </p>
-            <p className="text-[10px] uppercase tracking-widest text-foreground/30 mt-1">
-              PDF · DOCX · TXT · MP3 · WAV · WEBM
+            <p className="text-[10px] uppercase tracking-widest text-white/40 mt-1">
+              PDF · DOCX · TXT · MP3 · WAV · XLSX · CSV
             </p>
           </div>
         </div>
@@ -177,7 +200,7 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
       {/* Source cards */}
       {sources.length > 0 && (
         <div className="space-y-2">
-          <p className="text-[10px] uppercase tracking-widest font-bold text-foreground/30">
+          <p className="text-[10px] uppercase tracking-widest font-bold text-white/40">
             {sources.length} / {maxSources} Sources
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -190,8 +213,8 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
                   {typeIcons[source.type]}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-primary/80 truncate">{source.title}</p>
-                  <p className="text-[10px] text-foreground/40 mt-0.5 line-clamp-2">
+                  <p className="text-xs font-bold text-primary/90 truncate">{source.title}</p>
+                  <p className="text-[10px] text-black/60 mt-0.5 line-clamp-2">
                     {source.text.substring(0, 120)}...
                   </p>
                 </div>

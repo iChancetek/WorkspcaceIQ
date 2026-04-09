@@ -13,6 +13,7 @@ import {
   softDeleteItem, recoverItem, hardDeleteItem, updateItem, purgeExpiredItems
 } from "@/lib/firebase/items";
 import { Timestamp } from "firebase/firestore";
+import { generateProjectMarkdown, downloadFile } from "@/lib/export";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -60,6 +61,7 @@ function ItemCard({
   onDelete: (id: string) => void;
   onRecover?: (id: string) => void;
   onUpdate: (id: string, title: string, content: string) => void;
+  onRestore?: (project: SavedItem) => void;
   isTrash?: boolean;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -77,6 +79,16 @@ function ItemCard({
     await onUpdate(item.id, editTitle, editContent);
     setIsEditing(false);
     setIsSaving(false);
+  };
+
+  const handleExport = () => {
+    const md = generateProjectMarkdown({
+      title: item.title,
+      sources: item.metadata?.sources || [],
+      studioOutputs: item.metadata?.studioOutput ? { [item.metadata.studioOutput.mode]: item.metadata.studioOutput.json || item.metadata.studioOutput.text } : {},
+      createdAt: (item.createdAt as any)?.toDate?.()?.toISOString() || new Date().toISOString(),
+    });
+    downloadFile(md, `${item.title.toLowerCase().replace(/\s+/g, "-")}.md`, "text/markdown");
   };
 
   const days = daysUntilPurge(item.deletedAt);
@@ -123,6 +135,24 @@ function ItemCard({
 
         {/* Actions */}
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+          {item.type === "research" && !isTrash && onRestore && (
+            <button
+              onClick={() => onRestore(item)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 transition-all text-[10px] font-bold mr-1"
+            >
+              <RotateCcw className="w-3 h-3" />
+              Restore
+            </button>
+          )}
+          {item.type === "research" && !isTrash && (
+            <button
+              onClick={handleExport}
+              className="p-1.5 rounded-lg hover:bg-white/8 text-white/30 hover:text-white/70 transition-colors"
+              title="Export Markdown"
+            >
+              <Download className="w-3.5 h-3.5" />
+            </button>
+          )}
           {!isTrash && !isEditing && (
             <button onClick={() => setIsEditing(true)} className="p-1.5 rounded-lg hover:bg-white/8 text-white/30 hover:text-white/70 transition-colors">
               <Pencil className="w-3.5 h-3.5" />
@@ -184,7 +214,7 @@ function ItemCard({
 
 type LibraryView = "all" | ItemType | "trash";
 
-export function Library() {
+export function Library({ onRestoreProject }: { onRestoreProject?: (project: SavedItem) => void }) {
   const { user } = useAuth();
   const [view, setView] = useState<LibraryView>("all");
   const [items, setItems] = useState<SavedItem[]>([]);
@@ -321,6 +351,7 @@ export function Library() {
               onDelete={handleDelete}
               onRecover={view === "trash" ? handleRecover : undefined}
               onUpdate={handleUpdate}
+              onRestore={onRestoreProject}
               isTrash={view === "trash"}
             />
           ))}
