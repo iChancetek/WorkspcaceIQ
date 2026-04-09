@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Mic, BookOpen, Headphones, Sparkles } from "lucide-react";
+import { Mic, BookOpen, Headphones, Sparkles, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { StreamingAudioRecorder } from "@/components/StreamingAudioRecorder";
 import { SourceUploader, Source } from "@/components/SourceUploader";
@@ -10,6 +10,9 @@ import { DeepDive } from "@/components/DeepDive";
 import { HistoryDashboard } from "@/components/HistoryDashboard";
 import { ToneSelector } from "@/components/ToneSelector";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { AuthGuard } from "@/components/AuthGuard";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const TABS = [
@@ -23,10 +26,22 @@ export default function Dashboard() {
   const [sources, setSources] = useState<Source[]>([]);
   const [activeTone, setActiveTone] = useState("professional");
   const [activeLanguage, setActiveLanguage] = useState("English");
+  const { user, logout } = useAuth();
+  const router = useRouter();
 
   const activeTabConfig = TABS.find(t => t.id === activeTab)!;
 
+  const handleLogout = async () => {
+    await logout();
+    router.push("/login");
+  };
+
+  const initials = user?.displayName
+    ? user.displayName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
+    : user?.email?.[0]?.toUpperCase() ?? "C";
+
   return (
+    <AuthGuard>
     <main className="min-h-screen bg-[#050508] text-white relative overflow-x-hidden">
       {/* Aurora backgrounds */}
       <div className="pointer-events-none fixed inset-0 z-0">
@@ -45,14 +60,25 @@ export default function Dashboard() {
             </div>
             <span className="text-base font-semibold tracking-tight text-white">ChanceScribe</span>
           </Link>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <span className="hidden sm:flex items-center gap-1.5 text-xs font-medium text-blue-400/80 bg-blue-400/10 border border-blue-400/20 px-3 py-1.5 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
               GPT-5.4
             </span>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 via-violet-400 to-emerald-400 flex items-center justify-center text-xs font-bold shadow-lg">
-              C
-            </div>
+            {user?.photoURL ? (
+              <img src={user.photoURL} alt={initials} className="w-8 h-8 rounded-full object-cover shadow-lg ring-2 ring-white/10" />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 via-violet-400 to-emerald-400 flex items-center justify-center text-xs font-bold shadow-lg">
+                {initials}
+              </div>
+            )}
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/70 transition-colors px-2 py-1 rounded-lg hover:bg-white/5"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Sign out</span>
+            </button>
           </div>
         </header>
 
@@ -128,5 +154,6 @@ export default function Dashboard() {
         )}
       </div>
     </main>
+    </AuthGuard>
   );
 }
