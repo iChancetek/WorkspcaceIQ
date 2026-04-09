@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ingestDocument } from "@/lib/rag/pinecone";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 // Seed ChanceScribe's knowledge base — v3: comprehensive full-app encyclopedia
 const CHANCESCRIBE_KNOWLEDGE = `

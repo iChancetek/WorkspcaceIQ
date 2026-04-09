@@ -3,6 +3,7 @@ import { openai } from "@/agents/core/openai-client";
 import { queryKnowledgeBase } from "@/lib/rag/pinecone";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const ICHANCELLOR_SYSTEM = `You are iChancellor — ChanceScribe's intelligent, conversational AI assistant.
 You are warm, sharp, and concise. You help users understand ChanceScribe's features and answer their questions.

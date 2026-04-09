@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { openai } from "@/agents/core/openai-client";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export type EnhanceMode = "polish" | "grammar" | "expand" | "summarize" | "formal" | "casual";
 

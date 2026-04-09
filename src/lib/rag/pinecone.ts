@@ -1,9 +1,25 @@
 import { Pinecone } from "@pinecone-database/pinecone";
 import { openai } from "@/agents/core/openai-client";
 
-const pinecone = new Pinecone({ apiKey: process.env.PINECONE_API_KEY! });
+let pineconeClient: Pinecone | null = null;
 
-export const pineconeIndex = pinecone.index("chancescribe", process.env.PINECONE_INDEX_HOST!);
+function getPineconeClient() {
+  if (!pineconeClient) {
+    if (!process.env.PINECONE_API_KEY) {
+      throw new Error("PINECONE_API_KEY is not set");
+    }
+    pineconeClient = new Pinecone({ apiKey: process.env.PINECONE_API_KEY });
+  }
+  return pineconeClient;
+}
+
+export function getPineconeIndex() {
+  const client = getPineconeClient();
+  if (!process.env.PINECONE_INDEX_HOST) {
+    throw new Error("PINECONE_INDEX_HOST is not set");
+  }
+  return client.index("chancescribe", process.env.PINECONE_INDEX_HOST);
+}
 
 /** Embed a piece of text using text-embedding-3-small (1536 dims) */
 export async function embedText(text: string): Promise<number[]> {
@@ -30,7 +46,7 @@ export function chunkText(text: string, chunkSize = 500, overlap = 80): string[]
 /** Embed a query and search Pinecone for top-k matching chunks */
 export async function queryKnowledgeBase(query: string, topK = 5): Promise<string[]> {
   const embedding = await embedText(query);
-  const results = await pineconeIndex.query({
+  const results = await getPineconeIndex().query({
     vector: embedding,
     topK,
     includeMetadata: true,
@@ -54,6 +70,6 @@ export async function ingestDocument(
     }))
   );
   // Pinecone SDK v4: upsert accepts { records: [...] }
-  await (pineconeIndex as any).upsert(vectors);
+  await (getPineconeIndex() as any).upsert(vectors);
   return vectors.length;
 }

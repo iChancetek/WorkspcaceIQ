@@ -1,6 +1,9 @@
 import { NextRequest } from "next/server";
 import { openai } from "@/agents/core/openai-client";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   try {
     const { sources, mode, tone, language, question } = await req.json();
