@@ -27,4 +27,8 @@ env:
 secrets:
   - variable: OPENAI_API_KEY
     secret: OPENAI_API_KEY
+  - variable: PINECONE_API_KEY
+    secret: PINECONE_API_KEY
+  - variable: PINECONE_INDEX_HOST
+    secret: PINECONE_INDEX_HOST
 

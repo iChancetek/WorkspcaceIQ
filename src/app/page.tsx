@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ArrowRight, Mic, BookOpen, Headphones, Sparkles, Globe, Shield } from 'lucide-react';
+import { IChancellor } from '@/components/IChancellor';
 
 const features = [
   {
@@ -99,18 +100,17 @@ export default function Home() {
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row items-center gap-4 mb-16">
           <Link
-            href="/dashboard"
+            href="/login"
             className="group flex items-center gap-2.5 px-8 py-4 bg-[#1a73e8] hover:bg-[#1a73e8]/90 text-white text-base font-semibold rounded-full transition-all duration-200 shadow-xl shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-[1.02]"
           >
             Start for free
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </Link>
           <Link
-            href="/dashboard"
+            href="/learn-more"
             className="flex items-center gap-2 px-8 py-4 text-white/70 hover:text-white text-base font-medium rounded-full border border-white/10 hover:border-white/20 transition-all duration-200 backdrop-blur-sm hover:bg-white/5"
           >
-            See how it works
-            <ArrowRight className="w-4 h-4" />
+            Learn more <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
@@ -197,6 +197,9 @@ export default function Home() {
           ))}
         </div>
       </footer>
+
+      {/* iChancellor floating agent */}
+      <IChancellor />
 
     </div>
   );
