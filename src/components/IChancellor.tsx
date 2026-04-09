@@ -32,7 +32,7 @@ export function IChancellor() {
 
   // Auto-seed knowledge base on first open (version-gated so re-seeds on content updates)
   useEffect(() => {
-    const SEED_VERSION = "cs-kb-v2"; // Bump this string whenever knowledge content changes
+    const SEED_VERSION = "cs-kb-v3"; // Bump this string whenever knowledge content changes
     const alreadySeeded = typeof window !== "undefined" && localStorage.getItem("ichancellor_seed") === SEED_VERSION;
 
     if (isOpen && !alreadySeeded) {

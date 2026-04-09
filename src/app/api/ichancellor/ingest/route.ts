@@ -3,138 +3,330 @@ import { ingestDocument } from "@/lib/rag/pinecone";
 
 export const runtime = "nodejs";
 
-// Seed ChanceScribe's knowledge base with full platform documentation (mirrors /learn-more page)
+// Seed ChanceScribe's knowledge base — v3: comprehensive full-app encyclopedia
 const CHANCESCRIBE_KNOWLEDGE = `
-ChanceScribe is an AI-powered research and dictation platform built for anyone who needs to think, write, and understand faster. It combines voice dictation, document research, AI podcast generation, and a RAG-powered conversational assistant — all in one place, powered by GPT-5.4.
+=== CHANCESCRIBE: COMPLETE KNOWLEDGE BASE v3 ===
 
-PLATFORM OVERVIEW:
-ChanceScribe has four core product areas: Flow, Research, Deep Dive, and iChancellor AI. These are accessible from the main dashboard via a tab navigation: Flow, Research, and Deep Dive.
+WHAT IS CHANCESCRIBE?
+ChanceScribe is an AI-powered research, dictation, and understanding platform. It is built for professionals, students, researchers, writers, and anyone who needs to think smarter, write faster, and understand deeper. It is powered by OpenAI GPT-5.4 and hosted on Firebase App Hosting (Google Cloud Run, us-east4 region).
 
---- FLOW MODE ---
+COMPANY AND BRAND:
+Product name: ChanceScribe
+Brand tagline: Power your thinking with ChanceScribe AI
+Secondary tagline: Frictionless Intelligence, Privacy-Native
+Creator / Owner: iChancetek
+Website: chancescribe--chancescribe.us-east4.hosted.app
+Contact: DevOps@ichancetek.com
 
-Flow Mode: Real-Time Dictation
-ChanceScribe's Flow mode is a real-time AI dictation tool. Users speak naturally and GPT-5.4 instantly transforms their speech into polished, structured text — removing filler words, false starts, and hesitations. No editing required.
+HOW TO GET STARTED:
+1. Visit the ChanceScribe landing page.
+2. Click Start for free or Sign in to go to the login page.
+3. Sign in with Google or create an email/password account.
+4. After login, you are taken to the dashboard.
+5. The dashboard opens on the Flow tab by default.
 
-Flow Mode: Tone Engine
-Users can switch between four writing tones with one click: Professional, Casual, Legal, and Academic. The Tone Engine reshapes the same content to match any context — an email, a legal memo, a school assignment, or a casual message.
+NAVIGATION OVERVIEW:
+Landing page (/) - Introduction, feature overview, CTAs with Start for free and Learn more buttons.
+Login page (/login) - Authentication with Google or email/password.
+Learn More page (/learn-more) - Full feature documentation with anchor nav pills.
+Dashboard (/dashboard) - Main workspace with three tabs: Flow, Research, Deep Dive.
+Back button - Every page except the landing page has a floating back arrow in the top-left corner.
+iChancellor widget - Floating chat button in the bottom-right corner of landing and learn-more pages.
 
-Flow Mode: Multi-Language Output
-ChanceScribe supports dictation and output in four languages: English, Spanish, French, and Chinese. Users select their desired output language before recording. The AI will also translate content from one language to another automatically.
+=== FLOW MODE ===
 
-Flow Mode: 6 AI Voices and MP3 Export
-After generating polished text, users can listen to it read aloud by any of six OpenAI TTS voices: Nova (calm female), Alloy, Echo, Fable, Onyx, and Shimmer. The generated audio can be downloaded as an MP3 file for sharing or archiving.
+WHAT IS FLOW?
+Flow is ChanceScribe's core dictation product. It turns spoken words into polished professional writing using GPT-5.4. Flow is the default tab when you open the dashboard.
 
-Flow Mode: Type or Paste
-Users don't need a microphone to use Flow. They can type directly into the writing pad or paste any raw text. The AI polishes it instantly using the selected tone and language settings.
+HOW TO USE FLOW:
+1. Open the dashboard - you land on the Flow tab.
+2. Click the microphone button to begin recording, or type/paste text into the writing pad.
+3. Speak naturally. ChanceScribe records your voice in real time.
+4. Click Stop. Whisper AI transcribes your speech.
+5. GPT-5.4 polishes the raw transcript - removing filler words, correcting structure, applying your chosen tone.
+6. The polished text appears in the writing pad.
+7. You can copy the text, listen to it, or download it as MP3.
 
---- RESEARCH MODE ---
+FLOW: WRITING TONES
+Four tones are available:
+Professional - Clear, confident, and business-appropriate. Ideal for emails, reports, presentations.
+Casual - Warm, conversational, and friendly. Good for messages, social posts, informal notes.
+Legal - Precise, formal, and structured. Suitable for legal memos, contracts, compliance notes.
+Academic - Scholarly, well-structured, and citation-friendly. Perfect for essays, research, academic writing.
 
-Research Mode: PDF and DOCX Ingestion
-Research mode lets users upload research papers, contracts, articles, or notes in PDF or DOCX format. ChanceScribe reads and indexes the entire document instantly, making it searchable and queryable.
+FLOW: LANGUAGE SUPPORT
+ChanceScribe supports four output languages: English (default), Spanish, French, Chinese.
+Users select their target language before processing. The AI polishes AND translates the content into the chosen language.
 
-Research Mode: YouTube and Web URLs
-Users can paste any YouTube video link or website URL directly into Research mode. ChanceScribe extracts the transcript or article content and adds it to the research workspace as a fully searchable source.
+FLOW: VOICE PLAYBACK (TEXT-TO-SPEECH)
+After generating polished text, users can listen to it in any of six OpenAI TTS voices:
+Nova - Calm, natural female voice (default)
+Alloy - Neutral, balanced voice
+Echo - Deep male voice
+Fable - Warm storytelling voice
+Onyx - Strong, authoritative voice
+Shimmer - Soft, gentle voice
+Users select their preferred voice with the Voice Selector dropdown before clicking Play.
 
-Research Mode: Audio File Analysis
-Users can upload audio files including MP3, WAV, M4A, and WEBM formats. OpenAI Whisper transcribes the audio and the result becomes a searchable research source, just like a document.
+FLOW: MP3 DOWNLOAD
+Users can download the TTS audio as an MP3 file. Click the Download button after audio is generated.
 
-Research Mode: Citation Grounding
-Every AI response in Research mode explicitly cites the source using [Source N] notation (for example, [Source 1], [Source 2]). Users always know exactly where information comes from. This prevents hallucinations and builds trust in AI output.
+FLOW: COPY TO CLIPBOARD
+A Copy button appears below the writing pad. Clicking it copies the polished text and shows a checkmark confirmation.
 
-Research Mode: 5 Analysis Modes
-Research chat supports five specialized AI modes:
-- Summarize: Extracts comprehensive key takeaways, main themes, and action items from uploaded sources.
-- Study: Acts as a patient tutor, explaining concepts in simple terms with real-world examples and quiz questions.
-- Organize: Creates a polished presentation outline with sections, talking points, and supporting evidence.
-- Create: Analyzes sources for hidden patterns, emerging trends, and creative ideas.
-- Rewrite: Restructures and polishes content from multiple sources into a cohesive document.
+FLOW: PAST SESSIONS (HISTORY)
+Below the writing pad, the Flow tab shows a history grid of past dictation sessions from Firebase Firestore. Each card shows a session snippet. Click View All to see more.
 
-Research Mode: Source Limits
-Users can upload up to 10 sources per session. Sources can be a mix of files and URLs.
+FLOW: TYPE OR PASTE
+Users can type directly into the writing pad or paste any raw text. No microphone is required.
 
---- DEEP DIVE AUDIO ---
+=== RESEARCH MODE ===
 
-Deep Dive: One-Click AI Podcast
-Deep Dive generates an AI podcast from uploaded research sources with one click. Users upload their sources in the Research tab, then switch to Deep Dive and click Generate Deep Dive.
+WHAT IS RESEARCH MODE?
+Research mode is ChanceScribe's document intelligence workspace. Users upload multiple sources (files, URLs, YouTube videos), then ask questions and get AI-generated answers with explicit citations. It is inspired by Google NotebookLM.
 
-Deep Dive: Dual-Voice Narration
-Two AI hosts — Nova and Echo — take turns discussing the research content in a natural, engaging conversational format. It sounds like a real podcast episode about your specific content.
+HOW TO USE RESEARCH MODE:
+1. Click the Research tab in the dashboard.
+2. Upload sources using the Source Uploader panel.
+3. The Research Chat panel appears below.
+4. Ask a question in the chat box, or click a preset mode button.
+5. GPT-5.4 answers using only your uploaded sources and cites them with [Source N] notation.
 
-Deep Dive: Download as MP3
-Every Deep Dive episode is downloadable as an MP3 file. Users can listen while commuting, working out, or reviewing material on the go. The audio is fully offline-compatible once downloaded.
+RESEARCH: SUPPORTED SOURCE TYPES
+PDF files - parsed with pdf-parse library
+DOCX files - parsed with mammoth library
+TXT files - read directly
+Audio files (MP3, WAV, M4A, WEBM) - transcribed with OpenAI Whisper
+YouTube URLs - transcript extracted with youtube-transcript library
+Website URLs - content scraped via the /api/sources/extract-url endpoint
 
---- ICHANCELLOR AI ASSISTANT ---
+RESEARCH: SOURCE LIMITS
+Maximum 10 sources per research session. Sources can be a mix of files and URLs.
 
-iChancellor: Who is iChancellor?
-iChancellor is ChanceScribe's intelligent, conversational AI assistant. It lives in the bottom-right corner of the landing page and Learn More page as a floating chat widget. It answers questions about ChanceScribe features and capabilities.
+RESEARCH: ANALYSIS MODES
+Five analysis modes are available in the Research Chat:
+1. Summarize - Creates a comprehensive summary with key takeaways, themes, and action items.
+2. Study - Acts as a patient tutor. Explains concepts simply with analogies and generates 3 quiz questions.
+3. Organize - Creates a polished presentation outline with sections, talking points, evidence, and conclusion.
+4. Create - Analyzes sources for hidden patterns, emerging trends, and suggests creative ideas.
+5. Rewrite - Restructures all source content into a single cohesive, polished document.
 
-iChancellor: RAG-Powered Intelligence
-iChancellor uses Retrieval-Augmented Generation (RAG). When a user asks a question, iChancellor first embeds the query using OpenAI's text-embedding-3-small model (1536 dimensions), searches the Pinecone vector database for the most relevant knowledge chunks, then injects that context into the GPT-5.4 prompt before answering. This means responses are grounded in real knowledge — not hallucinations.
+RESEARCH: CITATION GROUNDING
+Every AI response explicitly cites its source using [Source N] notation. For example: According to [Source 1], the main finding is... This prevents hallucinations.
 
-iChancellor: OpenAI Embeddings and Pinecone
-The knowledge base is powered by Pinecone, hosted on AWS us-east-1. Documents are chunked into 500-word segments with 80-word overlapping windows, then embedded with OpenAI text-embedding-3-small (1536 dimensions) and stored as dense vectors. At query time, the top 5 most semantically similar chunks are retrieved.
+RESEARCH: TONE AND LANGUAGE IN RESEARCH
+The Tone Selector and Language Selector appear above the source uploader when in Research mode. These apply to all analysis outputs.
 
-iChancellor: Voice Interaction
-Users can speak to iChancellor directly using their browser's built-in speech recognition (Web Speech API). iChancellor also reads short responses aloud automatically using browser text-to-speech synthesis.
+RESEARCH: SOURCE UPLOADER UI
+The SourceUploader shows: a drag-and-drop area for files, a text field for pasting URLs, a list of uploaded sources with filenames and sizes, and a delete button on each source card.
 
-iChancellor: Conversational Memory
-iChancellor maintains full conversation history within a session (up to 10 turns). Users can ask follow-up questions naturally without repeating context.
+=== DEEP DIVE AUDIO ===
 
-iChancellor: Quick Suggestions
-On first open, iChancellor shows four clickable suggestion chips to help users get started quickly: "What is ChanceScribe?", "How does Flow mode work?", "Tell me about Deep Dive", and "How do I upload research sources?"
+WHAT IS DEEP DIVE?
+Deep Dive generates a full AI podcast episode from uploaded research sources. Two AI hosts discuss your content in a natural conversation. The result is a downloadable MP3.
 
---- AUTHENTICATION ---
+HOW TO USE DEEP DIVE:
+1. Upload sources in the Research tab first. Deep Dive uses the same source list.
+2. Click the Deep Dive tab in the dashboard.
+3. Select output language using the Language Selector.
+4. Click Generate Deep Dive. This may take 30-60 seconds.
+5. Two AI voices (Nova and Echo) create a conversational podcast script about your content.
+6. The audio player appears with Play button and Download button.
+7. Download the episode as an MP3.
 
-Authentication: Google Sign-In
-ChanceScribe supports one-click Google Sign-In via Firebase Authentication. Users click "Continue with Google" and are signed in instantly with their Google account. Their Google profile photo is displayed in the dashboard header.
+DEEP DIVE: AI HOSTS
+Nova is the primary host - calm, clear female voice.
+Echo is the co-host - deep, engaging male voice.
+They alternate turns discussing content naturally, asking each other questions and explaining key points.
 
-Authentication: Email and Password
-Users can also create an account or sign in using email and password. New users can sign up with their full name, email, and a password of at least 6 characters.
+DEEP DIVE: LANGUAGE SUPPORT
+Deep Dive supports all four platform languages: English, Spanish, French, Chinese. The hosts will speak in the selected language.
 
-Authentication: Password Reset
-Users who forget their password can click "Forgot password?" on the login page to receive a reset link via email.
+DEEP DIVE: SOURCE REQUIREMENT
+Deep Dive requires at least one source to be uploaded. If no sources exist, a message prompts the user to go to Research tab and add sources first.
 
-Authentication: Auth Guard
-The dashboard is protected. Unauthenticated users who navigate directly to /dashboard are automatically redirected to /login.
+=== ICHANCELLOR AI ASSISTANT ===
 
---- TECHNOLOGY STACK ---
+WHAT IS ICHANCELLOR?
+iChancellor is ChanceScribe's intelligent, always-on AI assistant. It is a floating chat widget in the bottom-right corner of the landing page and the learn-more page. It answers any question about ChanceScribe features and helps users navigate the app.
 
-Technology: Core Framework
-ChanceScribe is built with Next.js 16 (App Router), React 19, and TypeScript. It uses Tailwind CSS v4 for styling.
+HOW TO USE ICHANCELLOR:
+1. Click the sparkling floating button in the bottom-right corner.
+2. A chat panel slides open with a greeting message.
+3. Click a suggestion chip or type your own question.
+4. You can also click the microphone icon to speak your question.
+5. iChancellor responds in real time with streaming text.
+6. Short responses are read aloud automatically via browser TTS.
+7. Click the speaker icon to stop audio playback.
+8. Click the refresh icon to start a new conversation.
+9. Click the chevron or X button to close the panel.
 
-Technology: AI and ML
-ChanceScribe uses OpenAI's GPT-5.4 for text generation, Whisper for speech-to-text transcription, text-embedding-3-small for vector embeddings, and TTS-1 for voice synthesis.
+ICHANCELLOR: HOW IT WORKS (RAG PIPELINE)
+iChancellor uses Retrieval-Augmented Generation (RAG):
+Step 1 - Query Embedding: The question is embedded using OpenAI text-embedding-3-small (1536 dimensions).
+Step 2 - Vector Search: Pinecone searches the knowledge base and returns the top 5 most semantically similar document chunks.
+Step 3 - Context Injection: The retrieved chunks are injected into the GPT-5.4 system prompt.
+Step 4 - Streaming Generation: GPT-5.4 generates a response grounded in the retrieved context and streams it back.
 
-Technology: Vector Database
-Pinecone (Dense index, AWS us-east-1, 1536 dimensions, cosine similarity metric) powers the knowledge retrieval system used by iChancellor.
+ICHANCELLOR: KNOWLEDGE BASE DETAILS
+Provider: Pinecone Dense index
+Region: AWS us-east-1
+Dimensions: 1536 using text-embedding-3-small
+Metric: Cosine similarity
+Host: chancescribe-413tz05.svc.aped-4627-b74a.pinecone.io
+Chunking: 500 words per chunk, 80-word overlap
+Seeding: Knowledge base auto-seeds when the widget is first opened (version-gated via localStorage key ichancellor_seed)
 
-Technology: Backend and Hosting
-ChanceScribe is hosted on Firebase App Hosting with Google Cloud Run and Google Cloud Build in the us-east4 region. The backend uses Next.js API routes and server actions.
+ICHANCELLOR: VOICE INPUT
+Click the microphone icon in the chat input to activate browser speech recognition (Web Speech API). Speak your question and iChancellor will send it automatically.
 
-Technology: Database
-Firebase Firestore stores user session history. Firebase Storage handles file uploads.
+ICHANCELLOR: VOICE OUTPUT
+iChancellor reads short responses (under 300 characters) aloud automatically using the browser SpeechSynthesis API. The header shows Speaking... when active.
 
---- PAGES AND NAVIGATION ---
+ICHANCELLOR: CONVERSATION MEMORY
+iChancellor keeps the last 10 conversation turns in memory for the current session. Memory resets when you close the widget or click the reset button.
 
-Landing Page (/):
-The landing page introduces ChanceScribe with a hero section, three feature cards (Flow, Research, Deep Dive), a "Start for free" button that goes to /login, and a "Learn more" button that goes to /learn-more. iChancellor is available in the bottom-right corner.
+ICHANCELLOR: SUGGESTION CHIPS
+Four pre-built question suggestions appear on first open: What is ChanceScribe?, How does Flow mode work?, Tell me about Deep Dive, How do I upload research sources?
 
-Learn More Page (/learn-more):
-The Learn More page provides detailed documentation of all ChanceScribe features, organized by section: Flow Mode, Research Mode, Deep Dive Audio, and iChancellor AI. It includes anchor navigation pills for quick access to each section.
+=== AUTHENTICATION SYSTEM ===
 
-Login Page (/login):
-The login page allows users to sign in with Google or email/password, create a new account, or reset their password.
+LOGIN PAGE:
+The login page has three modes that switch without page navigation:
+1. Sign In - Email + password fields, Sign in button, Forgot password? link.
+2. Sign Up - Full name + email + password fields, Create account button.
+3. Reset Password - Email field, Send reset link button. On success, shows a green confirmation banner.
 
-Dashboard Page (/dashboard):
-The dashboard is the main application workspace. It has three tabs: Flow (dictation), Research (document analysis), and Deep Dive (podcast generation). The header shows the user's profile photo and name, GPT-5.4 status indicator, and a Sign Out button.
+GOOGLE SIGN-IN:
+Click Continue with Google on the login page. A Google account picker popup appears. After selecting an account, the user is signed in and redirected to the dashboard.
+
+EMAIL / PASSWORD SIGN-IN:
+Enter email and password and click Sign in. The show/hide password toggle (eye icon) reveals/hides the password.
+
+CREATE ACCOUNT:
+Click Sign up free at the bottom of the sign-in form. The form switches to sign-up mode. Fill in full name, email, and password (minimum 6 characters) and click Create account.
+
+PASSWORD RESET:
+Click Forgot password? from the sign-in form. Enter your email and click Send reset link. A reset email is sent via Firebase. A green banner confirms success.
+
+ERROR MESSAGES:
+No account found with this email - The email is not registered.
+Incorrect email or password - Wrong credentials.
+An account with this email already exists - Trying to sign up with an already-registered email.
+Password must be at least 6 characters - Password is too short.
+Sign-in window was closed - User closed the Google popup.
+Too many attempts. Please wait and try again - Account temporarily locked.
+
+DASHBOARD AUTH GUARD:
+If a user navigates directly to /dashboard while not signed in, they are automatically redirected to /login.
+
+USER PROFILE IN DASHBOARD:
+Google users see their Google profile photo as a circular avatar in the top-right of the dashboard header.
+Email users see their initials (up to 2 characters) in a gradient avatar.
+Sign out button (with LogOut icon) is next to the avatar. Clicking it logs out and returns to /login.
+
+=== BACK NAVIGATION ===
+
+BACK BUTTON:
+Every page except the landing page has a floating Back button in the top-left corner. It is a frosted glass pill with a left arrow icon. On mobile, only the arrow is shown. On desktop, the arrow and Back label are shown. Clicking it returns to the previous page using browser history. This allows seamless navigation between pages: login to landing, dashboard to landing, learn-more to landing or login.
+
+=== DESIGN AND UI ===
+
+VISUAL DESIGN LANGUAGE:
+Background: Pitch black (#050508) matching Google AI / Gemini aesthetic
+Aurora glows: Blue on the left, Violet on the right, Teal/Emerald at the bottom as soft radial gradients
+Cards: Dark glassmorphism with bg-white/[0.03], border border-white/8, backdrop-blur-sm
+Primary button color: Google blue (#1a73e8) with blue glow shadow
+Text colors: White for headings, white/50 for body, white/25 for muted details
+Brand gradient: Blue to Violet to Emerald, used on the logo icon, avatar, and highlights
+Typography: Inter Variable (sans-serif) for all text
+Icons: lucide-react library
+
+=== TECHNICAL ARCHITECTURE ===
+
+FRONTEND:
+Framework: Next.js 16.2.3 (App Router)
+UI: React 19.2.4
+Styling: Tailwind CSS v4 with custom @theme tokens
+PWA: next-pwa v5 with service worker auto-registration
+
+BACKEND API ROUTES:
+/api/flow/process - Polishes dictated text with GPT-5.4 using tone and language
+/api/flow/tts - Generates audio using OpenAI TTS-1 model
+/api/sources/analyze - Analyzes uploaded research sources (streaming)
+/api/sources/extract-url - Extracts content from YouTube/website URLs
+/api/deepdive/generate - Generates dual-voice podcast audio from sources
+/api/ichancellor/chat - RAG chat endpoint: embed to Pinecone to GPT-5.4 stream
+/api/ichancellor/ingest - Ingests documents into Pinecone knowledge base
+
+AI MODELS:
+Text generation: gpt-5.4 with max_completion_tokens parameter
+Speech-to-text: Whisper via openai.audio.transcriptions.create
+Text-to-speech: tts-1 model via openai.audio.speech.create
+Embeddings: text-embedding-3-small (1536 dimensions)
+
+DATABASE AND STORAGE:
+Session history: Firebase Firestore (real-time subscription)
+File storage: Firebase Storage
+Auth: Firebase Authentication (Google OAuth and email/password)
+Vector search: Pinecone dense index, AWS us-east-1
+
+HOSTING:
+Platform: Firebase App Hosting
+Engine: Google Cloud Run
+CI/CD: Google Cloud Build triggered by GitHub push to main branch
+Region: us-east4
+Repository: github.com/iChancetek/ChanceScribe
+
+=== FREQUENTLY ASKED QUESTIONS ===
+
+Q: Is ChanceScribe free?
+A: Yes, ChanceScribe offers a free tier. Premium features may be available in a Pro plan in the future.
+
+Q: Do I need to create an account?
+A: Yes. You must sign in to access the dashboard. The landing page and learn-more page are public.
+
+Q: Can I use ChanceScribe without a microphone?
+A: Yes. Flow mode lets you type or paste text directly. Only recording requires a microphone.
+
+Q: What file types can I upload for research?
+A: PDF, DOCX, TXT, MP3, WAV, M4A, WEBM audio files. You can also paste YouTube and website URLs.
+
+Q: How many sources can I upload?
+A: Up to 10 sources per research session.
+
+Q: What languages does ChanceScribe support?
+A: English, Spanish, French, and Chinese across Flow, Research, and Deep Dive.
+
+Q: How do I download my audio?
+A: After generating TTS audio in Flow or a Deep Dive episode, click the Download button to save the MP3.
+
+Q: Can I speak to iChancellor?
+A: Yes. Click the microphone icon in the iChancellor chat input bar to use voice input.
+
+Q: How do I go back to the previous page?
+A: Every page has a Back button in the top-left corner (a left-arrow floating pill). Click it to return to the previous page.
+
+Q: Where is ChanceScribe hosted?
+A: Firebase App Hosting on Google Cloud Run in the us-east4 region.
+
+Q: What AI model powers ChanceScribe?
+A: OpenAI GPT-5.4 for text generation, Whisper for speech recognition, TTS-1 for voice synthesis, text-embedding-3-small for vector embeddings.
+
+Q: Is my data private?
+A: Yes. Firebase Authentication encrypts user credentials. Research sources are processed server-side. Session history is saved to your personal Firestore account.
+
+Q: Who built ChanceScribe?
+A: ChanceScribe is built by iChancetek. Contact: DevOps@ichancetek.com.
+
+Q: What is the ChanceScribe URL?
+A: The live app is at chancescribe--chancescribe.us-east4.hosted.app.
 `;
-
 
 export async function POST(req: NextRequest) {
   try {
     const { text, source, trigger } = await req.json();
 
-    // Allow manual ingestion or auto-seeding
     const contentToIngest = text ?? (trigger === "seed" ? CHANCESCRIBE_KNOWLEDGE : null);
 
     if (!contentToIngest) {
@@ -142,7 +334,7 @@ export async function POST(req: NextRequest) {
     }
 
     const count = await ingestDocument(contentToIngest, {
-      source: source ?? "chancescribe-learn-more-v2",
+      source: source ?? "chancescribe-kb-v3",
       type: "platform-docs",
       ingestedAt: new Date().toISOString(),
     });
