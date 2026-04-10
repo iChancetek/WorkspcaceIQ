@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 
 export const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || process.env["OPENAI_API_KEY "] || "dummy_build_key",
 });
 
 export interface GPT54Input {
