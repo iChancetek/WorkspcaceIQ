@@ -81,7 +81,7 @@ export function ProjectSidebar({
           onClick={handleCreate}
           disabled={isCreating}
           className="p-1.5 rounded-xl bg-violet-500/10 hover:bg-violet-500/20 text-violet-400 transition-all border border-violet-500/20"
-          title="New Project"
+          title="Create WorkSpace"
         >
           {isCreating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
         </button>
@@ -143,7 +143,7 @@ export function ProjectSidebar({
           ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
           : <Plus className="w-3.5 h-3.5" />
         }
-        New Project
+        Create WorkSpace
       </button>
 
       {/* Project list */}
@@ -152,7 +152,7 @@ export function ProjectSidebar({
           <div className="text-center py-10 space-y-2">
             <FolderOpen className="w-5 h-5 text-white/15 mx-auto" />
             <p className="text-[11px] text-white/25">No projects yet</p>
-            <p className="text-[10px] text-white/15">Click New Project to begin</p>
+            <p className="text-[10px] text-white/15">Click Create WorkSpace to begin</p>
           </div>
         )}
 

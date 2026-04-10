@@ -110,12 +110,25 @@ export default function Dashboard() {
   const [workspaceName, setWorkspaceName] = useState("My Workspace");
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "unsaved">("saved");
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasAutoLoadedRef = useRef(false);
 
   // ── Subscriptions ──────────────────────────────────────────────────────────
 
   useEffect(() => {
     if (!user) return;
-    return subscribeToProjects(user.uid, setProjects);
+    return subscribeToProjects(user.uid, (data) => {
+      setProjects(data);
+      // Auto-load most recently active project only once on initial mount
+      if (!hasAutoLoadedRef.current && data.length > 0) {
+        hasAutoLoadedRef.current = true;
+        const recent = data.sort((a, b) => b.updatedAt.toMillis() - a.updatedAt.toMillis())[0];
+        setActiveProjectId(recent.id);
+        setSources(recent.sources ?? []);
+        setActiveTone(recent.tone ?? "professional");
+        setActiveLanguage(recent.language ?? "English");
+        setDeepDiveTranscript(recent.deepDiveTranscript ?? null);
+      }
+    });
   }, [user]);
 
   useEffect(() => {
@@ -379,32 +392,27 @@ export default function Dashboard() {
           )}
 
           {/* ── JOURNAL TAB ─────────────────────────────────────────────────── */}
-          {activeTab === "journal" && (
-            <section className="space-y-10">
-              <div className="text-center space-y-2">
+          <section className={cn("space-y-10", activeTab !== "journal" && "hidden")}>
+            <div className="text-center space-y-2">
                 <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white">Voice Journal</h2>
                 <p className="text-white/70 font-light">Record your thoughts, enhance with AI, and save privately.</p>
               </div>
               <VoiceJournal entryType="journal" />
-            </section>
-          )}
+          </section>
 
           {/* ── MEMO TAB ────────────────────────────────────────────────────── */}
-          {activeTab === "memo" && (
-            <section className="space-y-10">
-              <div className="text-center space-y-2">
+          <section className={cn("space-y-10", activeTab !== "memo" && "hidden")}>
+            <div className="text-center space-y-2">
                 <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white">Voice Memo</h2>
                 <p className="text-white/70 font-light">Record a quick thought or note and save it in seconds.</p>
               </div>
               <VoiceJournal entryType="memo" />
             </section>
-          )}
 
-          {/* ── RESEARCH TAB ─────────────────────────────────────────────────── */}
-          {activeTab === "research" && (
-            <section className="space-y-6">
-              {/* Research header */}
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          {/* ── RESEARCH TAB (Hidden vs Unmounted to preserve state) ───────── */}
+          <section className={cn("space-y-6", activeTab !== "research" && "hidden")}>
+            {/* Research header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white">Research</h2>
                   <p className="text-white/70 font-light">Upload sources and let AI become your research partner.</p>
@@ -603,13 +611,11 @@ export default function Dashboard() {
                   )}
                 </div>
               </div>
-            </section>
-          )}
+          </section>
 
           {/* ── DEEP DIVE TAB ────────────────────────────────────────────────── */}
-          {activeTab === "deepdive" && (
-            <section className="space-y-8">
-              <div className="text-center space-y-2">
+          <section className={cn("space-y-8", activeTab !== "deepdive" && "hidden")}>
+            <div className="text-center space-y-2">
                 <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white">Deep Dive</h2>
                 <p className="text-white/70 font-light">Generate an AI podcast discussion from your research sources.</p>
               </div>
@@ -619,7 +625,6 @@ export default function Dashboard() {
                 onTranscriptGenerated={setDeepDiveTranscript}
               />
             </section>
-          )}
 
           {/* ── LIBRARY TAB ──────────────────────────────────────────────────── */}
           {activeTab === "library" && (
