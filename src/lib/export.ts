@@ -38,7 +38,7 @@ export function generateProjectMarkdown(project: ProjectData): string {
     });
   }
 
-  md += `\n*Produced with WorkspaceIQ*`;
+  md += `\n*Produced with WorkSpaceIQ*`;
   return md;
 }
 

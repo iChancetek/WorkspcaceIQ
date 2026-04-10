@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
     const activeMode = question ? "ask" : (mode || "summarize");
     
-    const systemPrompt = `You are WorkspaceIQ's AI Research Assistant powered by GPT-5.4.
+    const systemPrompt = `You are WorkSpaceIQ's AI Research Assistant powered by GPT-5.4.
 
 INSTRUCTIONS:
 ${modeInstructions[activeMode] || modeInstructions.summarize}

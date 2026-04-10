@@ -1,7 +1,7 @@
 {
-  "name": "WorkspaceIQ",
-  "short_name": "WorkspaceIQ",
-  "description": "Power your thinking with WorkspaceIQ",
+  "name": "WorkSpaceIQ",
+  "short_name": "WorkSpaceIQ",
+  "description": "Power your thinking with WorkSpaceIQ",
   "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#050508",

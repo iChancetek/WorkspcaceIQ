@@ -27,7 +27,7 @@ export const BrandIdentifier = ({
       <BrandLogo size={size} />
       {showText && (
         <span className="text-base font-semibold tracking-tight text-white">
-          WorkspaceIQ
+          WorkSpaceIQ
         </span>
       )}
     </Link>

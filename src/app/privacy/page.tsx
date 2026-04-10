@@ -44,7 +44,7 @@ export default function PrivacyPage() {
               Overview
             </h2>
             <p>
-              At WorkspaceIQ, privacy is not a feature; it is our foundation. We believe your thoughts, research, and voice are yours alone. This policy outlines how Chancellor Minus | ChanceTEK LLC ("we", "us", or "our") collects, uses, and protects your data when you use WorkspaceIQ.
+              At WorkSpaceIQ, privacy is not a feature; it is our foundation. We believe your thoughts, research, and voice are yours alone. This policy outlines how Chancellor Minus | ChanceTEK LLC ("we", "us", or "our") collects, uses, and protects your data when you use WorkSpaceIQ.
             </p>
           </section>
 
@@ -124,7 +124,7 @@ export default function PrivacyPage() {
       {/* ── Simple Footer ── */}
       <footer className="relative z-10 border-t border-white/5 py-12 max-w-5xl mx-auto px-8 text-center sm:text-left">
         <p className="text-xs text-white/20">
-          © {new Date().getFullYear()} WorkspaceIQ | Chancellor Minus | ChanceTEK LLC. All rights reserved.
+          © {new Date().getFullYear()} WorkSpaceIQ | Chancellor Minus | ChanceTEK LLC. All rights reserved.
         </p>
       </footer>
 

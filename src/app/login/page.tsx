@@ -70,7 +70,7 @@ export default function LoginPage() {
   };
 
   const subtitles: Record<Mode, string> = {
-    signin: "Sign in to WorkspaceIQ",
+    signin: "Sign in to WorkSpaceIQ",
     signup: "Start researching and dictating with AI",
     reset: "We'll send a reset link to your email",
   };
@@ -232,7 +232,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-xs text-white/15 mt-6">
-          By continuing, you agree to WorkspaceIQ&apos;s{" "}
+          By continuing, you agree to WorkSpaceIQ&apos;s{" "}
           <a href="#" className="underline hover:text-white/40 transition-colors">Terms</a>
           {" "}and{" "}
           <a href="#" className="underline hover:text-white/40 transition-colors">Privacy Policy</a>.

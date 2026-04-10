@@ -6,11 +6,11 @@ import { IChancellor } from "@/components/IChancellor";
 const faqs = [
   {
     q: "How does the AI podcast (Deep Dive) work?",
-    a: "WorkspaceIQ analyzes your uploaded sources, identifies key themes, and generates a structured transcript that is read aloud by two specialized AI voices (Nova and Echo). You can download the final discussion as an MP3."
+    a: "WorkSpaceIQ analyzes your uploaded sources, identifies key themes, and generates a structured transcript that is read aloud by two specialized AI voices (Nova and Echo). You can download the final discussion as an MP3."
   },
   {
     q: "Is my data used to train AI models?",
-    a: "No. WorkspaceIQ is privacy-native. We use enterprise-grade APIs where your data is processed for inference only and is not used for future model training."
+    a: "No. WorkSpaceIQ is privacy-native. We use enterprise-grade APIs where your data is processed for inference only and is not used for future model training."
   },
   {
     q: "What file types can I upload?",
@@ -18,7 +18,7 @@ const faqs = [
   },
   {
     q: "How accurate are the citations?",
-    a: "WorkspaceIQ uses RAG (Retrieval-Augmented Generation) with Pinecone vector search. This ensures the AI only speaks from your sources, and every claim is backed by a specific [Source N] citation."
+    a: "WorkSpaceIQ uses RAG (Retrieval-Augmented Generation) with Pinecone vector search. This ensures the AI only speaks from your sources, and every claim is backed by a specific [Source N] citation."
   }
 ];
 
@@ -55,7 +55,7 @@ export default function SupportPage() {
             How can we help?
           </h1>
           <p className="text-xl text-white/50 font-light leading-relaxed">
-            From technical support to maximizing your research efficiency — we're here to ensure your WorkspaceIQ experience is seamless.
+            From technical support to maximizing your research efficiency — we're here to ensure your WorkSpaceIQ experience is seamless.
           </p>
         </div>
 
@@ -72,7 +72,7 @@ export default function SupportPage() {
               </div>
               <h3 className="text-2xl font-bold text-white mb-3">Ask iChancellor First</h3>
               <p className="text-sm text-white/45 leading-relaxed max-w-sm mb-8">
-                Your always-on AI advisor. iChancellor knows everything about WorkspaceIQ's features, privacy model, and usage tips. 
+                Your always-on AI advisor. iChancellor knows everything about WorkSpaceIQ's features, privacy model, and usage tips. 
               </p>
               <p className="text-xs font-semibold text-blue-400 flex items-center gap-2">
                 Click the blue icon in the bottom right <ArrowLeft className="w-3 h-3 rotate-45" />
@@ -139,7 +139,7 @@ export default function SupportPage() {
       {/* ── Footer ── */}
       <footer className="relative z-10 border-t border-white/5 py-12 max-w-5xl mx-auto px-8 text-center sm:text-left">
         <p className="text-xs text-white/20">
-          © {new Date().getFullYear()} WorkspaceIQ | Chancellor Minus | ChanceTEK LLC. All rights reserved.
+          © {new Date().getFullYear()} WorkSpaceIQ | Chancellor Minus | ChanceTEK LLC. All rights reserved.
         </p>
       </footer>
 

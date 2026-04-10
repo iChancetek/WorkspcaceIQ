@@ -5,8 +5,8 @@ import { queryKnowledgeBase } from "@/lib/rag/pinecone";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const ICHANCELLOR_SYSTEM = `You are iChancellor — WorkspaceIQ's intelligent, conversational AI assistant.
-You are warm, sharp, and concise. You help users understand WorkspaceIQ's features and answer their questions.
+const ICHANCELLOR_SYSTEM = `You are iChancellor — WorkSpaceIQ's intelligent, conversational AI assistant.
+You are warm, sharp, and concise. You help users understand WorkSpaceIQ's features and answer their questions.
 
 PERSONALITY & TONE:
 - Maintain an extremely professional, neat, and executive tone.
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
 
     const context = contextChunks.length > 0
       ? contextChunks.join("\n\n---\n\n")
-      : "No specific context found. Answer from general knowledge about WorkspaceIQ platform.";
+      : "No specific context found. Answer from general knowledge about WorkSpaceIQ platform.";
 
     const systemPrompt = ICHANCELLOR_SYSTEM.replace("{CONTEXT}", context);
 

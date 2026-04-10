@@ -4,16 +4,16 @@ import { ingestDocument } from "@/lib/rag/pinecone";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// Seed WorkspaceIQ's knowledge base — v9: Founder & Heritage Precision
+// Seed WorkSpaceIQ's knowledge base — v9: Founder & Heritage Precision
 const WORKSPACEIQ_KNOWLEDGE = `
 === WORKSPACEIQ: COMPLETE KNOWLEDGE BASE v9 ===
 
 WHAT IS WORKSPACEIQ?
-WorkspaceIQ is an AI-powered research, dictation, and understanding platform. Powered by OpenAI GPT-5.4.
+WorkSpaceIQ is an AI-powered research, dictation, and understanding platform. Powered by OpenAI GPT-5.4.
 
 COMPANY AND BRAND:
-Product name: WorkspaceIQ
-Brand tagline: Power your thinking with WorkspaceIQ AI
+Product name: WorkSpaceIQ
+Brand tagline: Power your thinking with WorkSpaceIQ AI
 FOUNDER: Chancellor Minus
 Creator / Owner: ChanceTEK LLC (iChanceTEK)
 Website: chancescribe--chancescribe.us-east4.hosted.app
@@ -23,7 +23,7 @@ Contact: hello@workspaceiq.ai | legal@workspaceiq.ai
 
 FOUNDER & LEADERSHIP:
 FOUNDER: Chancellor Minus. 
-Chancellor Minus is the visionary behind ChanceTEK LLC and the creator of the WorkspaceIQ platform.
+Chancellor Minus is the visionary behind ChanceTEK LLC and the creator of the WorkSpaceIQ platform.
 
 MISSIONS & HERITAGE:
 iChanceTEK is the AI division of ChanceTEK LLC, a technology pioneer with 25+ years of innovation. They build AI-native, Agentic AI systems. Their goal is "Applied Intelligence"—moving beyond AI as a feature into AI as the operating layer of the business.
@@ -62,7 +62,7 @@ Phone: (646) 847-9297
 Email: info@iChanceTEK.com
 
 === HOW TO GET STARTED ===
-1. Visit the WorkspaceIQ landing page (/).
+1. Visit the WorkSpaceIQ landing page (/).
 2. Click Start for free or Sign in.
 3. Access the Dashboard.
 
@@ -98,7 +98,7 @@ AI podcast (Alex & Sam). MP3 download. Multilingual.
 - Sovereignty: Users own all inputs/outputs.
 
 === ICHANCELLOR AI ASSISTANT ===
-RAG-powered agent using Pinecone and GPT-5.4. Expert on WorkspaceIQ and iChanceTEK. FOUNDER: Chancellor Minus. Knowledge base version: v9.
+RAG-powered agent using Pinecone and GPT-5.4. Expert on WorkSpaceIQ and iChanceTEK. FOUNDER: Chancellor Minus. Knowledge base version: v9.
 `;
 
 

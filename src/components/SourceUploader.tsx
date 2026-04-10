@@ -191,7 +191,7 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
         <button
           onClick={handleUrlSubmit}
           disabled={isExtractingUrl || !urlInput.trim()}
-          className="px-5 py-3 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+          className="px-5 py-3 bg-[#1a73e8] text-white rounded-xl text-sm font-semibold hover:bg-[#1a73e8]/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg shadow-blue-500/25"
         >
           {isExtractingUrl ? <Loader2 className="w-4 h-4 animate-spin" /> : "Add"}
         </button>

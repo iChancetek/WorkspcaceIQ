@@ -15,10 +15,29 @@ export async function POST(req: NextRequest) {
         const text = transcript.map((t: any) => t.text).join(" ");
         return NextResponse.json({ text, type: "youtube", title: `YouTube: ${ytMatch[1]}` });
       } catch (err: any) {
-        console.warn("YouTube transcript fetch failed:", err);
-        return NextResponse.json({ 
-          error: "This YouTube video has no accessible transcript. Please try a different video or an article." 
-        }, { status: 400 });
+        console.warn("YouTube transcript fetch failed, falling back to OpenAI:", err);
+        try {
+          const { openai } = await import("@/agents/core/openai-client");
+          const completion = await openai.chat.completions.create({
+            model: "gpt-5.4",
+            messages: [
+              { role: "system", content: "You are an AI research assistant. Provide a highly detailed summary and breakdown of the contents of the provided YouTube video URL. Extract any known key points, segments, or factual information available about this specific video based on its ID/URL." },
+              { role: "user", content: `Please transcribe or summarize the contents of this YouTube video: ${url}` }
+            ]
+          });
+          
+          const fallbackText = completion.choices[0]?.message?.content || "Could not retrieve summary via fallback.";
+          return NextResponse.json({ 
+            text: fallbackText + "\n\n[Note: This is an AI-generated summary as the exact transcript was unavailable.]", 
+            type: "youtube", 
+            title: `YouTube: ${ytMatch[1]}` 
+          });
+        } catch (fallbackErr: any) {
+           console.error("OpenAI fallback also failed:", fallbackErr);
+           return NextResponse.json({ 
+             error: "This YouTube video has no accessible transcript, and the AI fallback failed. Please try a different video or an article." 
+           }, { status: 400 });
+        }
       }
     }
 

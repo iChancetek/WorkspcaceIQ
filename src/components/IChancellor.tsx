@@ -11,7 +11,7 @@ interface Message {
 }
 
 const GREETINGS = [
-  "Hi! I'm iChancellor, your WorkspaceIQ guide. What can I help you discover today?",
+  "Hi! I'm iChancellor, your WorkSpaceIQ guide. What can I help you discover today?",
 ];
 
 export function IChancellor() {
@@ -171,7 +171,7 @@ export function IChancellor() {
   };
 
   const suggestions = [
-    "What is WorkspaceIQ?",
+    "What is WorkSpaceIQ?",
     "How does Flow mode work?",
     "Tell me about Deep Dive",
     "How do I upload research sources?",

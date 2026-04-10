@@ -223,7 +223,7 @@ export default function Dashboard() {
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <div className="h-px flex-1 bg-white/8" />
-                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/25">Also available in WorkspaceIQ</p>
+                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/25">Also available in WorkSpaceIQ</p>
                 <div className="h-px flex-1 bg-white/8" />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -364,7 +364,7 @@ export default function Dashboard() {
 
         {/* Footer */}
         <footer className="pt-12 pb-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-white/20">© {new Date().getFullYear()} WorkspaceIQ | Chancellor Minus</p>
+          <p className="text-xs text-white/20">© {new Date().getFullYear()} WorkSpaceIQ | Chancellor Minus</p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="text-[10px] uppercase tracking-widest font-bold text-white/20 hover:text-white/60 transition-colors">Privacy</Link>
             <Link href="/terms" className="text-[10px] uppercase tracking-widest font-bold text-white/20 hover:text-white/60 transition-colors">Terms</Link>

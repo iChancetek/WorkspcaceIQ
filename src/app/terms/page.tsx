@@ -44,7 +44,7 @@ export default function TermsPage() {
               1. Acceptance of Terms
             </h2>
             <p>
-              By accessing or using WorkspaceIQ, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services. WorkspaceIQ is owned and operated by Chancellor Minus | ChanceTEK LLC.
+              By accessing or using WorkSpaceIQ, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services. WorkSpaceIQ is owned and operated by Chancellor Minus | ChanceTEK LLC.
             </p>
           </section>
 
@@ -54,7 +54,7 @@ export default function TermsPage() {
               2. Description of Service
             </h2>
             <p>
-              WorkspaceIQ provides an AI-native research and dictation workspace powered by LLMs (GPT-5.4). Features include real-time dictation, multi-source ingestion, RAG-grounded responses, and automated audio generation (collectively, the "Services").
+              WorkSpaceIQ provides an AI-native research and dictation workspace powered by LLMs (GPT-5.4). Features include real-time dictation, multi-source ingestion, RAG-grounded responses, and automated audio generation (collectively, the "Services").
             </p>
           </section>
 
@@ -64,7 +64,7 @@ export default function TermsPage() {
               3. AI Disclaimer & Reliability
             </h2>
             <p>
-              <strong className="text-white italic underline">Important:</strong> WorkspaceIQ utilizes cutting-edge Artificial Intelligence. You acknowledge that:
+              <strong className="text-white italic underline">Important:</strong> WorkSpaceIQ utilizes cutting-edge Artificial Intelligence. You acknowledge that:
             </p>
             <ul className="list-disc pl-5 space-y-2 text-white/60">
               <li>AI outputs may occasionally contain factual inaccuracies or "hallucinations."</li>
@@ -82,10 +82,10 @@ export default function TermsPage() {
               <strong className="text-white">Your Content:</strong> You retain full ownership and intellectual property rights over any materials you upload, dictate, or input into the Service.
             </p>
             <p>
-              <strong className="text-white">Generated Content:</strong> WorkspaceIQ and Chancellor Minus | ChanceTEK LLC assign all rights, title, and interest in and to AI outputs generated specifically for you to you, provided you comply with these terms.
+              <strong className="text-white">Generated Content:</strong> WorkSpaceIQ and Chancellor Minus | ChanceTEK LLC assign all rights, title, and interest in and to AI outputs generated specifically for you to you, provided you comply with these terms.
             </p>
             <p>
-              <strong className="text-white">Platform Property:</strong> The software, branding, training datasets (proprietary), and visual design of WorkspaceIQ are the exclusive property of Chancellor Minus | ChanceTEK LLC.
+              <strong className="text-white">Platform Property:</strong> The software, branding, training datasets (proprietary), and visual design of WorkSpaceIQ are the exclusive property of Chancellor Minus | ChanceTEK LLC.
             </p>
           </section>
 
@@ -95,7 +95,7 @@ export default function TermsPage() {
               5. User Conduct
             </h2>
             <p>
-              You agree not to use WorkspaceIQ to:
+              You agree not to use WorkSpaceIQ to:
             </p>
             <ul className="list-disc pl-5 space-y-2">
               <li>Generate or upload harmful, illegal, or harassing content.</li>
@@ -138,7 +138,7 @@ export default function TermsPage() {
       {/* ── Simple Footer ── */}
       <footer className="relative z-10 border-t border-white/5 py-12 max-w-5xl mx-auto px-8 text-center sm:text-left">
         <p className="text-xs text-white/20">
-          © {new Date().getFullYear()} WorkspaceIQ | Chancellor Minus | ChanceTEK LLC. All rights reserved.
+          © {new Date().getFullYear()} WorkSpaceIQ | Chancellor Minus | ChanceTEK LLC. All rights reserved.
         </p>
       </footer>
 
