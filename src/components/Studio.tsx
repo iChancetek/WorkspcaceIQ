@@ -187,7 +187,7 @@ function MindMapViz({ node, depth = 0 }: { node: MindMapNode; depth?: number }) 
   );
 }
 
-export function Studio({ sources, tone, language, onNavigateToDeepDive, onOutputChange }: StudioProps) {
+export function Studio({ sources, tone, language, studioOutputs, onNavigateToDeepDive, onOutputChange, onManualSave }: StudioProps) {
   const [activeMode, setActiveMode] = useState("report");
   const [isGenerating, setIsGenerating] = useState(false);
   const [streamText, setStreamText] = useState("");
