@@ -138,8 +138,8 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
         className={cn(
           "border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all",
           dragActive
-            ? "border-accent bg-accent/5 scale-[1.01]"
-            : "border-black/10 hover:border-black/20 hover:bg-secondary/30"
+            ? "border-blue-500 bg-blue-500/5 scale-[1.01]"
+            : "border-foreground/10 dark:border-white/10 hover:border-foreground/20 dark:hover:border-white/20 hover:bg-foreground/5 dark:hover:bg-white/5"
         )}
       >
         <input
@@ -152,15 +152,15 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
         />
         <div className="flex flex-col items-center gap-3">
           {isUploading ? (
-            <Loader2 className="w-8 h-8 text-white/50 animate-spin" />
+            <Loader2 className="w-8 h-8 text-foreground/40 dark:text-white/50 animate-spin" />
           ) : (
-            <Upload className="w-8 h-8 text-white/50" />
+            <Upload className="w-8 h-8 text-foreground/40 dark:text-white/50" />
           )}
           <div>
-            <p className="text-sm font-semibold text-white/80">
+            <p className="text-sm font-semibold text-foreground/80 dark:text-white/80">
               {isUploading ? "Processing..." : "Drop files here or click to upload"}
             </p>
-            <p className="text-[10px] uppercase tracking-widest text-white/40 mt-1">
+            <p className="text-[10px] uppercase tracking-widest text-foreground/30 dark:text-white/40 mt-1">
               PDF · DOCX · TXT · MP3 · WAV · XLSX · CSV
             </p>
           </div>
@@ -177,15 +177,15 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
 
       {/* URL input */}
       <div className="flex gap-2">
-        <div className="flex-1 flex items-center gap-2 px-4 py-3 bg-white/[0.04] border border-white/8 rounded-xl backdrop-blur-sm">
-          <Link className="w-4 h-4 text-white/40 shrink-0" />
+        <div className="flex-1 flex items-center gap-2 px-4 py-3 bg-foreground/5 dark:bg-white/[0.04] border border-foreground/10 dark:border-white/8 rounded-xl backdrop-blur-sm">
+          <Link className="w-4 h-4 text-foreground/40 dark:text-white/40 shrink-0" />
           <input
             type="url"
             value={urlInput}
             onChange={(e) => setUrlInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleUrlSubmit()}
             placeholder="Paste a website or YouTube URL..."
-            className="flex-1 bg-transparent text-sm font-medium text-white placeholder:text-white/30 focus:outline-none"
+            className="flex-1 bg-transparent text-sm font-medium text-foreground dark:text-white placeholder:text-foreground/30 dark:placeholder:text-white/30 focus:outline-none"
           />
         </div>
         <button
@@ -200,21 +200,21 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
       {/* Source cards */}
       {sources.length > 0 && (
         <div className="space-y-2">
-          <p className="text-[10px] uppercase tracking-widest font-bold text-white/40">
+          <p className="text-[10px] uppercase tracking-widest font-bold text-foreground/30 dark:text-white/40">
             {sources.length} / {maxSources} Sources
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {sources.map((source) => (
               <div
                 key={source.id}
-                className="flex items-start gap-3 p-4 bg-white/60 border border-black/5 rounded-xl group hover:shadow-md transition-all"
+                className="flex items-start gap-3 p-4 bg-foreground/5 dark:bg-white/[0.04] border border-foreground/10 dark:border-white/8 rounded-xl group hover:shadow-md transition-all"
               >
-                <div className="p-2 bg-secondary/50 rounded-lg shrink-0 mt-0.5">
+                <div className="p-2 bg-foreground/5 dark:bg-white/5 rounded-lg shrink-0 mt-0.5">
                   {typeIcons[source.type]}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-primary/90 truncate">{source.title}</p>
-                  <p className="text-[10px] text-black/60 mt-0.5 line-clamp-2">
+                  <p className="text-xs font-bold text-foreground/90 dark:text-white/90 truncate">{source.title}</p>
+                  <p className="text-[10px] text-foreground/50 dark:text-white/40 mt-0.5 line-clamp-2 leading-relaxed">
                     {source.text.substring(0, 120)}...
                   </p>
                 </div>

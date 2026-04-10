@@ -31,9 +31,9 @@ interface DashboardData {
 }
 
 const PERSONA_CONFIG: Record<Persona, { label: string; color: string; bg: string; border: string }> = {
-  ceo: { label: "CEO View", color: "text-amber-400", bg: "from-amber-500/15 to-amber-600/5", border: "border-amber-500/25" },
-  manager: { label: "Manager View", color: "text-blue-400", bg: "from-blue-500/15 to-blue-600/5", border: "border-blue-500/25" },
-  analyst: { label: "Analyst View", color: "text-violet-400", bg: "from-violet-500/15 to-violet-600/5", border: "border-violet-500/25" },
+  ceo: { label: "CEO View", color: "text-amber-600 dark:text-amber-400", bg: "from-amber-500/10 to-amber-600/5 dark:from-amber-500/15 dark:to-amber-600/5", border: "border-amber-500/20 dark:border-amber-500/25" },
+  manager: { label: "Manager View", color: "text-blue-600 dark:text-blue-400", bg: "from-blue-500/10 to-blue-600/5 dark:from-blue-500/15 dark:to-blue-600/5", border: "border-blue-500/20 dark:border-blue-500/25" },
+  analyst: { label: "Analyst View", color: "text-violet-600 dark:text-violet-400", bg: "from-violet-500/10 to-violet-600/5 dark:from-violet-500/15 dark:to-violet-600/5", border: "border-violet-500/20 dark:border-violet-500/25" },
 };
 
 const CHART_COLORS = ["#60a5fa", "#a78bfa", "#34d399", "#fb923c", "#f472b6", "#facc15"];
@@ -115,9 +115,9 @@ export function DataDashboard({ sources, tone }: DataDashboardProps) {
   const currentBriefing = dashData?.[persona];
 
   const TrendIcon = ({ trend }: { trend: string }) =>
-    trend === "up" ? <TrendingUp className="w-3.5 h-3.5 text-emerald-400" /> :
-    trend === "down" ? <TrendingDown className="w-3.5 h-3.5 text-red-400" /> :
-    <Minus className="w-3.5 h-3.5 text-white/40" />;
+    trend === "up" ? <TrendingUp className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> :
+    trend === "down" ? <TrendingDown className="w-3.5 h-3.5 text-red-600 dark:text-red-400" /> :
+    <Minus className="w-3.5 h-3.5 text-foreground/30 dark:text-white/40" />;
 
   return (
     <div className="space-y-6">
@@ -125,17 +125,17 @@ export function DataDashboard({ sources, tone }: DataDashboardProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="p-2 rounded-xl bg-amber-500/10">
-            <BarChart3 className="w-5 h-5 text-amber-400" />
+            <BarChart3 className="w-5 h-5 text-amber-600 dark:text-amber-400" />
           </div>
           <div>
-            <p className="text-sm font-bold text-white">Data Dashboard</p>
-            <p className="text-[10px] text-white/70">AI-powered analytics from your spreadsheet</p>
+            <p className="text-sm font-bold text-foreground dark:text-white">Data Dashboard</p>
+            <p className="text-[10px] text-foreground/40 dark:text-white/70">AI-powered analytics from your spreadsheet</p>
           </div>
         </div>
         <button
           onClick={generateDashboard}
           disabled={isLoading}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white/50 hover:text-white transition-all"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 border border-foreground/10 dark:border-white/10 text-xs font-semibold text-foreground/40 dark:text-white/50 hover:text-foreground dark:hover:text-white transition-all shadow-sm dark:shadow-none"
         >
           <RefreshCw className={cn("w-3.5 h-3.5", isLoading && "animate-spin")} />
           Refresh
@@ -149,10 +149,10 @@ export function DataDashboard({ sources, tone }: DataDashboardProps) {
             key={p}
             onClick={() => setPersona(p)}
             className={cn(
-              "flex-1 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide border transition-all",
+              "flex-1 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide border transition-all shadow-sm dark:shadow-none",
               persona === p
-                ? cn("bg-white text-black shadow-lg", PERSONA_CONFIG[p].border)
-                : "border-white/10 text-white/50 hover:text-white/80 hover:bg-white/5"
+                ? "bg-foreground dark:bg-white text-background dark:text-black"
+                : "bg-foreground/5 dark:bg-transparent border-foreground/5 dark:border-white/10 text-foreground/40 dark:text-white/50 hover:text-foreground/80 dark:hover:text-white/80 hover:bg-foreground/10 dark:hover:bg-white/5"
             )}
           >
             {PERSONA_CONFIG[p].label}
@@ -165,22 +165,22 @@ export function DataDashboard({ sources, tone }: DataDashboardProps) {
         {isLoading ? (
           <div className="flex items-center gap-3 py-4">
             <Loader2 className={cn("w-5 h-5 animate-spin", currentPersona.color)} />
-            <p className="text-sm text-white/50">Generating {currentPersona.label} briefing...</p>
+            <p className="text-sm text-foreground/50 dark:text-white/50">Generating {currentPersona.label} briefing...</p>
           </div>
         ) : error ? (
           <p className="text-sm text-red-400">{error}</p>
         ) : currentBriefing ? (
           <div className="space-y-4">
             <p className={cn("text-xs font-bold uppercase tracking-widest", currentPersona.color)}>{currentBriefing.title}</p>
-            <p className="text-sm text-white/80 leading-relaxed">{currentBriefing.summary}</p>
+            <p className="text-sm text-foreground/80 dark:text-white/80 leading-relaxed font-medium">{currentBriefing.summary}</p>
 
             {/* KPIs (CEO) */}
             {currentBriefing.kpis && (
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-3">
                 {currentBriefing.kpis.map((kpi, i) => (
-                  <div key={i} className="p-3 bg-white/5 rounded-xl border border-white/8">
+                  <div key={i} className="p-3 bg-white/10 dark:bg-white/5 rounded-xl border border-foreground/5 dark:border-white/8 shadow-sm dark:shadow-none">
                     <div className="flex items-center justify-between mb-1">
-                      <p className="text-[10px] text-white/60 font-medium">{kpi.label}</p>
+                      <p className="text-[10px] text-foreground/50 dark:text-white/60 font-medium">{kpi.label}</p>
                       <TrendIcon trend={kpi.trend} />
                     </div>
                     <p className={cn("text-lg font-black", currentPersona.color)}>{kpi.value}</p>
@@ -193,7 +193,7 @@ export function DataDashboard({ sources, tone }: DataDashboardProps) {
             {currentBriefing.actions && (
               <ul className="space-y-1.5 mt-2">
                 {currentBriefing.actions.map((action, i) => (
-                  <li key={i} className="flex items-start gap-2 text-xs text-white/70">
+                  <li key={i} className="flex items-start gap-2 text-xs text-foreground/70 dark:text-white/70 font-medium">
                     <span className={cn("font-bold mt-0.5", currentPersona.color)}>→</span>
                     {action}
                   </li>
@@ -223,17 +223,26 @@ export function DataDashboard({ sources, tone }: DataDashboardProps) {
       {/* Charts */}
       {chartData.length > 1 && numericHeaders.length > 0 && (
         <div className="space-y-4">
-          <p className="text-[10px] uppercase tracking-widest font-bold text-white/25">Data Visualization</p>
+          <p className="text-[10px] uppercase tracking-widest font-bold text-foreground/20 dark:text-white/25">Data Visualization</p>
 
           {/* Bar Chart */}
-          <div className="p-4 bg-white/[0.03] border border-white/8 rounded-2xl">
-            <p className="text-xs font-bold text-white/50 mb-4">Bar Chart — {numericHeaders[0]}</p>
+          <div className="p-4 bg-foreground/[0.02] dark:bg-white/[0.03] border border-foreground/10 dark:border-white/8 rounded-2xl shadow-sm dark:shadow-none">
+            <p className="text-xs font-bold text-foreground/40 dark:text-white/50 mb-4">Bar Chart — {numericHeaders[0]}</p>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={chartData.slice(0, 12)}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                <XAxis dataKey={labelHeader} tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 10 }} />
-                <YAxis tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 10 }} />
-                <Tooltip contentStyle={{ background: "#0d0d12", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", color: "white", fontSize: "12px" }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-foreground/5 dark:text-white/5" />
+                <XAxis dataKey={labelHeader} tick={{ fill: "currentColor", fontSize: 10 }} className="text-foreground/30 dark:text-white/30" />
+                <YAxis tick={{ fill: "currentColor", fontSize: 10 }} className="text-foreground/30 dark:text-white/30" />
+                <Tooltip 
+                  contentStyle={{ 
+                    background: "canvas", 
+                    border: "1px solid currentColor", 
+                    borderRadius: "12px", 
+                    fontSize: "12px",
+                    boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)"
+                  }} 
+                  className="text-foreground/10"
+                />
                 {numericHeaders.slice(0, 3).map((h, i) => (
                   <Bar key={h} dataKey={h} fill={CHART_COLORS[i]} radius={[4, 4, 0, 0]} />
                 ))}

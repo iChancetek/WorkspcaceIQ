@@ -50,11 +50,11 @@ const TYPE_ICONS: Record<ItemType, any> = {
 };
 
 const TYPE_COLORS: Record<ItemType, string> = {
-  flow: "text-blue-400",
-  journal: "text-amber-400",
-  memo: "text-sky-400",
-  research: "text-violet-400",
-  deepdive: "text-emerald-400",
+  flow: "text-blue-600 dark:text-blue-400",
+  journal: "text-amber-600 dark:text-amber-400",
+  memo: "text-sky-600 dark:text-sky-400",
+  research: "text-violet-600 dark:text-violet-400",
+  deepdive: "text-emerald-600 dark:text-emerald-400",
 };
 
 const TYPE_LABELS: Record<ItemType, string> = {
@@ -112,11 +112,11 @@ function ItemCard({
     <div className={cn(
       "group rounded-2xl border transition-all duration-200",
       isTrash
-        ? "bg-red-500/[0.03] border-red-500/10 hover:border-red-500/20"
-        : "bg-white/[0.03] border-white/8 hover:border-white/15 hover:bg-white/[0.05]"
+        ? "bg-red-500/[0.03] border-red-500/10 hover:border-red-500/20 shadow-sm dark:shadow-none"
+        : "bg-foreground/[0.02] dark:bg-white/[0.03] border-foreground/5 dark:border-white/8 hover:border-foreground/10 dark:hover:border-white/15 hover:bg-foreground/5 dark:hover:bg-white/[0.05] shadow-sm dark:shadow-none"
     )}>
       <div className="flex items-start gap-3 p-5">
-        <div className={cn("w-8 h-8 rounded-xl bg-white/5 border border-white/8 flex items-center justify-center shrink-0 mt-0.5", color)}>
+        <div className={cn("w-8 h-8 rounded-xl bg-foreground/5 dark:bg-white/5 border border-foreground/10 dark:border-white/8 flex items-center justify-center shrink-0 mt-0.5 shadow-sm dark:shadow-none", color)}>
           <Icon className="w-4 h-4" />
         </div>
         <div className="flex-1 min-w-0">
@@ -124,22 +124,22 @@ function ItemCard({
             <input
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm font-semibold text-white focus:outline-none focus:border-blue-400/50 mb-2"
+              className="w-full bg-foreground/5 dark:bg-white/5 border border-foreground/10 dark:border-white/10 rounded-lg px-3 py-1.5 text-sm font-semibold text-foreground dark:text-white focus:outline-none focus:border-blue-500/50 dark:focus:border-blue-400/50 mb-2"
             />
           ) : (
-            <h4 className="text-sm font-semibold text-white truncate pr-2">{item.title}</h4>
+            <h4 className="text-sm font-semibold text-foreground dark:text-white truncate pr-2">{item.title}</h4>
           )}
           <div className="flex items-center gap-2 mt-1">
             <span className={cn("text-[10px] font-bold uppercase tracking-widest", color)}>{TYPE_LABELS[item.type]}</span>
-            <span className="text-[10px] text-white/40">·</span>
-            <span className="text-[10px] text-white/45">{formatDate(item.updatedAt)}</span>
+            <span className="text-[10px] text-foreground/40 dark:text-white/40">·</span>
+            <span className="text-[10px] text-foreground/40 dark:text-white/45">{formatDate(item.updatedAt)}</span>
             {isTrash && days <= 3 && (
-              <span className="flex items-center gap-1 text-[10px] text-red-400/80">
+              <span className="flex items-center gap-1 text-[10px] text-red-500 dark:text-red-400/80">
                 <AlertTriangle className="w-3 h-3" /> {days}d left
               </span>
             )}
             {isTrash && days > 3 && (
-              <span className="text-[10px] text-white/40 flex items-center gap-1">
+              <span className="text-[10px] text-foreground/40 dark:text-white/40 flex items-center gap-1">
                 <Clock className="w-3 h-3" /> {days}d left
               </span>
             )}
@@ -155,12 +155,12 @@ function ItemCard({
             </button>
           )}
           {item.type === "research" && !isTrash && (
-            <button onClick={handleExport} className="p-1.5 rounded-lg hover:bg-white/8 text-white/30 hover:text-white/70 transition-colors" title="Export Markdown">
+            <button onClick={handleExport} className="p-1.5 rounded-lg hover:bg-foreground/5 dark:hover:bg-white/8 text-foreground/30 dark:text-white/30 hover:text-foreground/70 dark:hover:text-white/70 transition-colors" title="Export Markdown">
               <Download className="w-3.5 h-3.5" />
             </button>
           )}
           {!isTrash && !isEditing && (
-            <button onClick={() => setIsEditing(true)} className="p-1.5 rounded-lg hover:bg-white/8 text-white/30 hover:text-white/70 transition-colors">
+            <button onClick={() => setIsEditing(true)} className="p-1.5 rounded-lg hover:bg-foreground/5 dark:hover:bg-white/8 text-foreground/30 dark:text-white/30 hover:text-foreground/70 dark:hover:text-white/70 transition-colors">
               <Pencil className="w-3.5 h-3.5" />
             </button>
           )}
@@ -175,12 +175,12 @@ function ItemCard({
             </>
           )}
           {isTrash && onRecover && (
-            <button onClick={() => onRecover(item.id)} className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors" title="Recover">
+            <button onClick={() => onRecover(item.id)} className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors" title="Recover">
               <RotateCcw className="w-3.5 h-3.5" />
             </button>
           )}
           {!isEditing && !confirmDelete && (
-            <button onClick={() => setConfirmDelete(true)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-white/30 hover:text-red-400 transition-colors" title={isTrash ? "Delete permanently" : "Move to trash"}>
+            <button onClick={() => setConfirmDelete(true)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-foreground/30 dark:text-white/30 hover:text-red-500 dark:hover:text-red-400 transition-colors" title={isTrash ? "Delete permanently" : "Move to trash"}>
               <Trash2 className="w-3.5 h-3.5" />
             </button>
           )}
@@ -191,13 +191,13 @@ function ItemCard({
               <button onClick={() => setConfirmDelete(false)} className="px-2 py-1 rounded-lg hover:bg-white/8 text-white/30 text-[10px] font-bold transition-colors">No</button>
             </div>
           )}
-          <button onClick={() => setIsExpanded((o) => !o)} className="p-1.5 rounded-lg hover:bg-white/8 text-white/30 hover:text-white/70 transition-colors">
+          <button onClick={() => setIsExpanded((o) => !o)} className="p-1.5 rounded-lg hover:bg-foreground/5 dark:hover:bg-white/8 text-foreground/30 dark:text-white/30 hover:text-foreground/70 dark:hover:text-white/70 transition-colors">
             {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
           </button>
         </div>
       </div>
       {isExpanded && (
-        <div className="px-5 pb-5 border-t border-white/5 pt-4">
+        <div className="px-5 pb-5 border-t border-foreground/5 dark:border-white/5 pt-4">
           {isEditing ? (
             <textarea
               value={editContent}
@@ -436,7 +436,7 @@ export function Library({
   );
 
   const NAV: { id: LibraryView; label: string; icon: any; color: string }[] = [
-    { id: "projects", label: "Projects", icon: FolderOpen, color: "text-violet-400" },
+    { id: "projects", label: "WorkSpaces", icon: FolderOpen, color: "text-violet-400" },
     { id: "all",      label: "All",      icon: BookOpen,   color: "text-white/60" },
     { id: "flow",     label: "Flow",     icon: Mic,        color: "text-blue-400" },
     { id: "journal",  label: "Journal",  icon: BookOpen,   color: "text-amber-400" },
@@ -450,8 +450,8 @@ export function Library({
 
       {/* Header */}
       <div className="text-center space-y-1">
-        <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white">Library</h2>
-        <p className="text-white/50 font-light">Review, edit, and manage all your saved content.</p>
+        <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground dark:text-white">Library</h2>
+        <p className="text-foreground/50 dark:text-white/50 font-light">Review, edit, and manage all your saved content.</p>
       </div>
 
       {/* Filter Nav */}
@@ -461,10 +461,10 @@ export function Library({
             key={id}
             onClick={() => setView(id)}
             className={cn(
-              "flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all",
+              "flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all shadow-sm dark:shadow-none",
               view === id
-                ? "bg-white/10 text-white border border-white/15"
-                : "text-white/30 hover:text-white/60 hover:bg-white/5 border border-transparent"
+                ? "bg-foreground/10 dark:bg-white/10 text-foreground dark:text-white border border-foreground/20 dark:border-white/15"
+                : "text-foreground/30 dark:text-white/30 hover:text-foreground/60 dark:hover:text-white/60 hover:bg-foreground/5 dark:hover:bg-white/5 border border-transparent"
             )}
           >
             <Icon className={cn("w-3.5 h-3.5", view === id ? color : "")} />
@@ -475,13 +475,13 @@ export function Library({
 
       {/* Search */}
       <div className="relative max-w-md mx-auto">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 dark:text-white/20" />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search your library…"
-          className="w-full bg-white/[0.04] border border-white/8 rounded-full pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-white/20 transition-colors"
+          className="w-full bg-foreground/[0.04] dark:bg-white/[0.04] border border-foreground/10 dark:border-white/8 rounded-full pl-10 pr-4 py-2.5 text-sm text-foreground dark:text-white placeholder:text-foreground/20 dark:placeholder:text-white/20 focus:outline-none focus:border-foreground/20 dark:focus:border-white/20 transition-colors shadow-inner"
         />
       </div>
 
@@ -500,14 +500,14 @@ export function Library({
         <div className="space-y-3">
           {loading ? (
             <div className="flex justify-center pt-12">
-              <Loader2 className="w-6 h-6 text-white/20 animate-spin" />
+              <Loader2 className="w-6 h-6 text-foreground/20 dark:text-white/20 animate-spin" />
             </div>
           ) : filteredProjects.length === 0 ? (
             <div className="text-center pt-16 space-y-3">
-              <div className="w-14 h-14 rounded-2xl bg-white/[0.04] border border-white/8 flex items-center justify-center mx-auto">
-                <FolderOpen className="w-6 h-6 text-white/20" />
+              <div className="w-14 h-14 rounded-2xl bg-foreground/[0.04] dark:bg-white/[0.04] border border-foreground/10 dark:border-white/8 flex items-center justify-center mx-auto shadow-sm dark:shadow-none">
+                <FolderOpen className="w-6 h-6 text-foreground/20 dark:text-white/20" />
               </div>
-              <p className="text-white/30 text-sm font-medium">
+              <p className="text-foreground/30 dark:text-white/30 text-sm font-medium">
                 {searchQuery ? "No projects match your search." : "No projects yet. Start a research session to create one."}
               </p>
             </div>
@@ -523,7 +523,7 @@ export function Library({
             ))
           )}
           {filteredProjects.length > 0 && (
-            <p className="text-center text-xs text-white/20">{filteredProjects.length} project{filteredProjects.length !== 1 ? "s" : ""}</p>
+            <p className="text-center text-xs text-foreground/20 dark:text-white/20">{filteredProjects.length} WorkSpace{filteredProjects.length !== 1 ? "s" : ""}</p>
           )}
         </div>
       )}
@@ -560,10 +560,10 @@ export function Library({
               ))}
               {filteredDeletedProjects.length === 0 && filtered.length === 0 && (
                 <div className="text-center pt-16 space-y-3">
-                  <div className="w-14 h-14 rounded-2xl bg-white/[0.04] border border-white/8 flex items-center justify-center mx-auto">
-                    <Trash2 className="w-6 h-6 text-white/20" />
+                  <div className="w-14 h-14 rounded-2xl bg-foreground/[0.04] dark:bg-white/[0.04] border border-foreground/10 dark:border-white/8 flex items-center justify-center mx-auto shadow-sm dark:shadow-none">
+                    <Trash2 className="w-6 h-6 text-foreground/20 dark:text-white/20" />
                   </div>
-                  <p className="text-white/30 text-sm font-medium">Your trash is empty.</p>
+                  <p className="text-foreground/30 dark:text-white/30 text-sm font-medium">Your trash is empty.</p>
                 </div>
               )}
             </>
@@ -579,10 +579,10 @@ export function Library({
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center pt-16 space-y-3">
-            <div className="w-14 h-14 rounded-2xl bg-white/[0.04] border border-white/8 flex items-center justify-center mx-auto">
-              <BookOpen className="w-6 h-6 text-white/20" />
+            <div className="w-14 h-14 rounded-2xl bg-foreground/[0.04] dark:bg-white/[0.04] border border-foreground/10 dark:border-white/8 flex items-center justify-center mx-auto shadow-sm dark:shadow-none">
+              <BookOpen className="w-6 h-6 text-foreground/20 dark:text-white/20" />
             </div>
-            <p className="text-white/30 text-sm font-medium">
+            <p className="text-foreground/30 dark:text-white/30 text-sm font-medium">
               {searchQuery ? "No results found." : "Nothing saved yet. Start creating!"}
             </p>
           </div>

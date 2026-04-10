@@ -4,7 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import {
   Headphones, CreditCard, HelpCircle, GitBranch, FileText,
   Layout, Table2, BarChart3, Video, Loader2,
-  Download, RefreshCw, ChevronRight, ChevronLeft, Sparkles, X, Square
+  Download, RefreshCw, ChevronRight, ChevronLeft, Sparkles, X, Square,
+  Save, Check
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Source } from "./SourceUploader";
@@ -14,20 +15,22 @@ interface StudioProps {
   sources: Source[];
   tone: string;
   language: string;
+  studioOutputs?: Record<string, any>;
   onNavigateToDeepDive?: () => void;
   onOutputChange?: (output: { text?: string; json?: any; mode: string }) => void;
+  onManualSave?: () => void;
 }
 
 const MODES = [
-  { id: "report",      label: "Report",      icon: FileText,   color: "text-blue-400",    bg: "from-blue-500/20 to-blue-600/5",    border: "border-blue-500/20",    desc: "Full executive report" },
-  { id: "slides",      label: "Slide Deck",  icon: Layout,     color: "text-violet-400",  bg: "from-violet-500/20 to-violet-600/5",border: "border-violet-500/20",  desc: "Presentation outline" },
-  { id: "flashcards",  label: "Flashcards",  icon: CreditCard, color: "text-pink-400",    bg: "from-pink-500/20 to-pink-600/5",    border: "border-pink-500/20",    desc: "Q&A study cards" },
-  { id: "quiz",        label: "Quiz",        icon: HelpCircle, color: "text-amber-400",   bg: "from-amber-500/20 to-amber-600/5",  border: "border-amber-500/20",   desc: "Multiple choice test" },
-  { id: "mindmap",     label: "Mind Map",    icon: GitBranch,  color: "text-teal-400",    bg: "from-teal-500/20 to-teal-600/5",    border: "border-teal-500/20",    desc: "Visual knowledge tree" },
-  { id: "infographic", label: "Infographic", icon: BarChart3,  color: "text-orange-400",  bg: "from-orange-500/20 to-orange-600/5",border: "border-orange-500/20",  desc: "Key facts & stats" },
-  { id: "datatable",   label: "Data Table",  icon: Table2,     color: "text-emerald-400", bg: "from-emerald-500/20 to-emerald-600/5",border: "border-emerald-500/20",desc: "Structured data view" },
-  { id: "audio",       label: "Audio Overview", icon: Headphones, color: "text-green-400", bg: "from-green-500/20 to-green-600/5", border: "border-green-500/20",  desc: "AI podcast discussion" },
-  { id: "video",       label: "Video Overview", icon: Video,   color: "text-red-400",     bg: "from-red-500/20 to-red-600/5",      border: "border-red-500/20",     desc: "Coming soon", comingSoon: true },
+  { id: "report",      label: "Report",      icon: FileText,   color: "text-blue-600 dark:text-blue-400",    bg: "from-blue-500/10 to-blue-600/5",    border: "border-blue-500/20",    desc: "Full executive report" },
+  { id: "slides",      label: "Slide Deck",  icon: Layout,     color: "text-violet-600 dark:text-violet-400",  bg: "from-violet-500/10 to-violet-600/5",border: "border-violet-500/20",  desc: "Presentation outline" },
+  { id: "flashcards",  label: "Flashcards",  icon: CreditCard, color: "text-pink-600 dark:text-pink-400",    bg: "from-pink-500/10 to-pink-600/5",    border: "border-pink-500/20",    desc: "Q&A study cards" },
+  { id: "quiz",        label: "Quiz",        icon: HelpCircle, color: "text-amber-600 dark:text-amber-400",   bg: "from-amber-500/10 to-amber-600/5",  border: "border-amber-500/20",   desc: "Multiple choice test" },
+  { id: "mindmap",     label: "Mind Map",    icon: GitBranch,  color: "text-teal-600 dark:text-teal-400",    bg: "from-teal-500/10 to-teal-600/5",    border: "border-teal-500/20",    desc: "Visual knowledge tree" },
+  { id: "infographic", label: "Infographic", icon: BarChart3,  color: "text-orange-600 dark:text-orange-400",  bg: "from-orange-500/10 to-orange-600/5",border: "border-orange-500/20",  desc: "Key facts & stats" },
+  { id: "datatable",   label: "Data Table",  icon: Table2,     color: "text-emerald-600 dark:text-emerald-400", bg: "from-emerald-500/10 to-emerald-600/5",border: "border-emerald-500/20",desc: "Structured data view" },
+  { id: "audio",       label: "Audio Overview", icon: Headphones, color: "text-green-600 dark:text-green-400", bg: "from-green-500/10 to-green-600/5", border: "border-green-500/20",  desc: "AI podcast discussion" },
+  { id: "video",       label: "Video Overview", icon: Video,   color: "text-red-600 dark:text-red-400",     bg: "from-red-500/10 to-red-600/5",      border: "border-red-500/20",     desc: "Coming soon", comingSoon: true },
 ];
 
 interface Flashcard { question: string; answer: string; }
@@ -99,13 +102,13 @@ function SlideCard({ slide, total, onPrev, onNext }: {
       className="flex flex-col gap-4"
     >
       {/* Slide card */}
-      <div className="relative rounded-2xl bg-gradient-to-br from-violet-500/10 to-violet-600/5 border border-violet-500/20 p-8 min-h-[280px] flex flex-col">
+      <div className="relative rounded-2xl bg-foreground/5 dark:bg-violet-950/10 border border-foreground/10 dark:border-violet-500/20 p-8 min-h-[280px] flex flex-col shadow-sm dark:shadow-none">
         {/* Slide number badge */}
-        <span className="absolute top-4 right-4 text-[10px] font-black uppercase tracking-widest text-violet-400/50 bg-violet-500/10 px-2.5 py-1 rounded-full border border-violet-500/15">
+        <span className="absolute top-4 right-4 text-[10px] font-black uppercase tracking-widest text-violet-600/50 dark:text-violet-400/50 bg-violet-500/10 px-2.5 py-1 rounded-full border border-violet-500/15">
           {slide.number} / {total}
         </span>
         {/* Title */}
-        <h3 className="text-xl font-black text-white leading-tight mb-5 pr-16">{slide.title}</h3>
+        <h3 className="text-xl font-black text-foreground dark:text-white leading-tight mb-5 pr-16">{slide.title}</h3>
         {/* Bullet points */}
         {slide.bullets.length > 0 && (
           <ul className="flex-1 space-y-2.5">
@@ -117,8 +120,8 @@ function SlideCard({ slide, total, onPrev, onNext }: {
                 transition={{ delay: i * 0.1 }}
                 className="flex items-start gap-3"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-violet-400/70 shrink-0 mt-2" />
-                <span className="text-sm text-white/80 leading-relaxed">{b}</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-violet-500 dark:bg-violet-400/70 shrink-0 mt-2" />
+                <span className="text-sm text-foreground/80 dark:text-white/80 leading-relaxed">{b}</span>
               </motion.li>
             ))}
           </ul>
@@ -129,10 +132,10 @@ function SlideCard({ slide, total, onPrev, onNext }: {
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-start gap-3 px-4 py-3 bg-white/[0.03] border border-white/8 rounded-xl"
+          className="flex items-start gap-3 px-4 py-3 bg-foreground/5 dark:bg-white/[0.03] border border-foreground/10 dark:border-white/8 rounded-xl"
         >
-          <span className="text-[10px] font-black uppercase tracking-widest text-white/25 mt-0.5 shrink-0">Note</span>
-          <p className="text-xs text-white/50 leading-relaxed italic">{slide.speakerNote}</p>
+          <span className="text-[10px] font-black uppercase tracking-widest text-foreground/30 dark:text-white/25 mt-0.5 shrink-0">Note</span>
+          <p className="text-xs text-foreground/60 dark:text-white/50 leading-relaxed italic">{slide.speakerNote}</p>
         </motion.div>
       )}
       {/* Navigation */}
@@ -177,7 +180,7 @@ function MindMapViz({ node, depth = 0 }: { node: MindMapNode; depth?: number }) 
     >
       <div className={cn("flex items-center gap-2 group", colors[depth % colors.length])}>
         {depth > 0 && <ChevronRight className="w-3 h-3 opacity-40 shrink-0" />}
-        <span className={cn("font-semibold text-white", depth === 0 ? "text-base" : depth === 1 ? "text-sm" : "text-xs text-white/70")}>{node.label}</span>
+        <span className={cn("font-semibold text-foreground dark:text-white", depth === 0 ? "text-base" : depth === 1 ? "text-sm" : "text-xs text-foreground/70 dark:text-white/70")}>{node.label}</span>
       </div>
       {node.children?.map((child, i) => <MindMapViz key={i} node={child} depth={depth + 1} />)}
     </motion.div>
@@ -198,16 +201,28 @@ export function Studio({ sources, tone, language, onNavigateToDeepDive, onOutput
   const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    setStreamText("");
-    setJsonData(null);
+    // Restore existing content for this mode if available
+    const existing = studioOutputs?.[activeMode];
+    if (existing) {
+      if (typeof existing === "string") {
+        setStreamText(existing);
+        setJsonData(null);
+      } else {
+        setJsonData(existing);
+        setStreamText("");
+      }
+    } else {
+      setStreamText("");
+      setJsonData(null);
+    }
+    
     setError("");
     setQuizSelected({});
     setQuizRevealed(false);
     setFlippedCard(null);
-  }, [activeMode]);
+  }, [activeMode, studioOutputs]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     if (onOutputChange && (streamText || jsonData)) {
       onOutputChange({ text: streamText, json: jsonData, mode: activeMode });
     }
@@ -319,13 +334,13 @@ export function Studio({ sources, tone, language, onNavigateToDeepDive, onOutput
                 "group flex-shrink-0 flex flex-col items-center gap-1.5 px-4 py-3 rounded-2xl border transition-all duration-200 min-w-[90px] snap-start",
                 activeMode === mode.id
                   ? cn("bg-gradient-to-br shadow-lg", mode.bg, mode.border)
-                  : "border-white/8 bg-white/[0.03] hover:bg-white/[0.06]",
+                  : "border-foreground/10 dark:border-white/8 bg-foreground/5 dark:bg-white/[0.03] hover:bg-foreground/10 dark:hover:bg-white/[0.06]",
                 mode.comingSoon && "opacity-40 cursor-not-allowed"
               )}
             >
-              <mode.icon className={cn("w-5 h-5", activeMode === mode.id ? mode.color : "text-white/60 group-hover:text-white/80")} />
-              <span className={cn("text-[10px] font-bold uppercase tracking-wide", activeMode === mode.id ? "text-white" : "text-white/60")}>{mode.label}</span>
-              {mode.comingSoon && <span className="text-[8px] text-amber-400 font-bold uppercase tracking-wide">Soon</span>}
+              <mode.icon className={cn("w-5 h-5", activeMode === mode.id ? (activeMode === mode.id ? "text-white" : mode.color) : "text-foreground/40 dark:text-white/60 group-hover:text-foreground/70 dark:group-hover:text-white/80")} />
+              <span className={cn("text-[10px] font-bold uppercase tracking-wide", activeMode === mode.id ? "text-white" : "text-foreground/60 dark:text-white/60")}>{mode.label}</span>
+              {mode.comingSoon && <span className="text-[8px] text-amber-500 font-bold uppercase tracking-wide">Soon</span>}
             </motion.button>
           ))}
         </motion.div>
@@ -342,12 +357,12 @@ export function Studio({ sources, tone, language, onNavigateToDeepDive, onOutput
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2.5">
-            <div className={cn("p-2 rounded-xl bg-white/5")}>
+            <div className={cn("p-2 rounded-xl bg-foreground/5 dark:bg-white/5")}>
               <currentMode.icon className={cn("w-5 h-5", currentMode.color)} />
             </div>
             <div>
-              <p className="text-sm font-bold text-white">{currentMode.label}</p>
-              <p className="text-[10px] text-white/70">{currentMode.desc}</p>
+              <p className="text-sm font-bold text-foreground dark:text-white">{currentMode.label}</p>
+              <p className="text-[10px] text-foreground/50 dark:text-white/70">{currentMode.desc}</p>
             </div>
           </motion.div>
           <div className="flex items-center gap-2">
@@ -362,18 +377,28 @@ export function Studio({ sources, tone, language, onNavigateToDeepDive, onOutput
               </button>
             )}
             {hasOutput && !isGenerating && (
-              <button
-                onClick={() => generate()}
-                className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-colors"
-                title="Regenerate"
-              >
-                <RefreshCw className="w-4 h-4" />
-              </button>
+              <>
+                <button
+                  onClick={onManualSave}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-violet-500/20 hover:bg-violet-500/30 text-violet-400 text-xs font-bold border border-violet-500/30 transition-colors group"
+                  title="Save to WorkSpace"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  Save
+                </button>
+                <button
+                  onClick={() => generate()}
+                  className="p-2 rounded-xl bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 text-foreground/40 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-colors"
+                  title="Regenerate"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </button>
+              </>
             )}
             {streamText && !isGenerating && (
               <button
                 onClick={() => downloadText(streamText, `workspaceiq-${activeMode}.md`)}
-                className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-colors"
+                className="p-2 rounded-xl bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 text-foreground/40 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-colors"
                 title="Download"
               >
                 <Download className="w-4 h-4" />
@@ -394,12 +419,12 @@ export function Studio({ sources, tone, language, onNavigateToDeepDive, onOutput
                 exit={{ opacity: 0, y: -10 }}
                 className="h-full flex flex-col items-center justify-center gap-4 text-center py-8"
               >
-                <div className={cn("p-4 rounded-2xl bg-white/5")}>
+                <div className={cn("p-4 rounded-2xl bg-foreground/5 dark:bg-white/5")}>
                   <currentMode.icon className={cn("w-8 h-8", currentMode.color)} />
                 </div>
                 <div>
-                  <p className="text-base font-bold text-white mb-1">Generate {currentMode.label}</p>
-                  <p className="text-xs text-white/70 max-w-xs">{currentMode.desc} from your {sources.length} source{sources.length !== 1 ? "s" : ""}</p>
+                  <p className="text-base font-bold text-foreground dark:text-white mb-1">Generate {currentMode.label}</p>
+                  <p className="text-xs text-foreground/50 dark:text-white/70 max-w-xs">{currentMode.desc} from your {sources.length} source{sources.length !== 1 ? "s" : ""}</p>
                 </div>
                 <motion.button
                 layout
@@ -409,7 +434,7 @@ export function Studio({ sources, tone, language, onNavigateToDeepDive, onOutput
                 disabled={!sources.length || currentMode.comingSoon}
                 className={cn(
                   "flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-sm transition-all duration-200 shadow-xl shadow-black/10",
-                  "bg-white/10 hover:bg-white/15 text-white border border-white/15 hover:border-white/30 hover:shadow-[0_0_20px_rgba(255,255,255,0.05)]",
+                  "bg-foreground/5 dark:bg-white/10 hover:bg-foreground/10 dark:hover:bg-white/15 text-foreground dark:text-white border border-foreground/10 dark:border-white/15 hover:border-foreground/20 dark:hover:border-white/30 hover:shadow-[0_0_20px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_0_20px_rgba(255,255,255,0.05)]",
                   (!sources.length || currentMode.comingSoon) && "opacity-40 cursor-not-allowed"
                 )}
               >
@@ -417,7 +442,7 @@ export function Studio({ sources, tone, language, onNavigateToDeepDive, onOutput
                 Generate
               </motion.button>
                 {!sources.length && (
-                  <p className="text-[10px] text-white/60 font-medium bg-white/5 px-3 py-1 rounded-full">Add sources to the Research panel first</p>
+                  <p className="text-[10px] text-foreground/40 dark:text-white/60 font-medium bg-foreground/5 dark:bg-white/5 px-3 py-1 rounded-full">Add sources to the Research panel first</p>
                 )}
               </motion.div>
             )}
@@ -435,18 +460,18 @@ export function Studio({ sources, tone, language, onNavigateToDeepDive, onOutput
                   <Loader2 className={cn("w-8 h-8 animate-spin", currentMode.color)} />
                 </div>
                 <div className="text-center">
-                  <p className="text-sm font-semibold text-white/70">Generating {currentMode.label}...</p>
-                  <p className="text-xs text-white/40 mt-1">This may take a moment</p>
+                  <p className="text-sm font-semibold text-foreground/70 dark:text-white/70">Generating {currentMode.label}...</p>
+                  <p className="text-xs text-foreground/40 dark:text-white/40 mt-1">This may take a moment</p>
                 </div>
                 <button
                   onClick={cancelGeneration}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-400 text-xs font-bold border border-red-500/25 transition-all"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 dark:bg-red-500/15 hover:bg-red-500/20 dark:hover:bg-red-500/25 text-red-600 dark:text-red-400 text-xs font-bold border border-red-500/20 dark:border-red-500/25 transition-all"
                 >
                   <Square className="w-3 h-3 fill-current" />
                   Cancel Generation
                 </button>
                 {streamText && (
-                  <div className="w-full mt-2 text-sm text-white/70 whitespace-pre-wrap font-mono max-h-48 overflow-y-auto leading-relaxed">
+                  <div className="w-full mt-2 text-sm text-foreground/70 dark:text-white/70 whitespace-pre-wrap font-mono max-h-48 overflow-y-auto leading-relaxed">
                     {streamText}
                   </div>
                 )}
@@ -470,10 +495,10 @@ export function Studio({ sources, tone, language, onNavigateToDeepDive, onOutput
                   return (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between mb-3">
-                        <p className="text-xs text-white/40 font-semibold">{slides.length} slides generated</p>
+                        <p className="text-xs text-foreground/40 dark:text-white/40 font-semibold">{slides.length} slides generated</p>
                         <button
                           onClick={() => downloadText(streamText, "workspaceiq-slides.md")}
-                          className="flex items-center gap-1.5 text-[10px] text-white/30 hover:text-white/60 transition-colors"
+                          className="flex items-center gap-1.5 text-[10px] text-foreground/30 dark:text-white/30 hover:text-foreground/60 dark:hover:text-white/60 transition-colors"
                         >
                           <Download className="w-3 h-3" />
                           Download all slides
@@ -497,7 +522,7 @@ export function Studio({ sources, tone, language, onNavigateToDeepDive, onOutput
                 key="report"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="prose prose-invert prose-sm max-w-none text-white/80 whitespace-pre-wrap leading-relaxed text-sm"
+                className="prose prose-invert prose-sm dark:prose-invert max-w-none text-foreground/80 dark:text-white/80 whitespace-pre-wrap leading-relaxed text-sm"
               >
                 {streamText}
               </motion.div>
@@ -513,24 +538,29 @@ export function Studio({ sources, tone, language, onNavigateToDeepDive, onOutput
                 className="grid grid-cols-1 sm:grid-cols-2 gap-3"
               >
                 {flashcards.length === 0 ? (
-                  <p className="text-sm text-white/50 col-span-2 text-center py-8">No flashcards were generated. Try again.</p>
+                  <p className="text-sm text-foreground/40 dark:text-white/50 col-span-2 text-center py-8 font-medium">No flashcards were generated. Try again.</p>
                 ) : flashcards.map((card: Flashcard, i: number) => (
                   <motion.div
                     key={i}
                     variants={itemVariants}
                     onClick={() => setFlippedCard(flippedCard === i ? null : i)}
                     className={cn(
-                      "relative p-5 rounded-2xl border cursor-pointer transition-all duration-200 hover:scale-[1.01] min-h-[100px]",
-                      flippedCard === i ? "bg-white/15 border-white/20" : "bg-white/5 border-white/10 hover:bg-white/10"
+                      "relative p-5 rounded-2xl border cursor-pointer transition-all duration-300 hover:scale-[1.01] min-h-[140px] flex flex-col justify-center text-center shadow-sm dark:shadow-none",
+                      flippedCard === i 
+                        ? "bg-violet-500/10 border-violet-500/30" 
+                        : "bg-foreground/5 dark:bg-white/5 border-foreground/10 dark:border-white/10 hover:bg-foreground/10 dark:hover:bg-white/10"
                     )}
                   >
-                    <div className="text-[9px] uppercase tracking-widest font-bold text-white/30 mb-2">
+                    <div className="text-[9px] uppercase tracking-widest font-bold text-foreground/30 dark:text-white/30 mb-3">
                       {flippedCard === i ? "Answer" : `Card ${i + 1}`}
                     </div>
-                    <p className="text-sm text-white leading-relaxed">
+                    <p className={cn(
+                      "text-sm font-semibold leading-relaxed",
+                      flippedCard === i ? "text-violet-700 dark:text-violet-200" : "text-foreground dark:text-white"
+                    )}>
                       {flippedCard === i ? card.answer : card.question}
                     </p>
-                    <div className="absolute bottom-3 right-3 text-[9px] text-white/20">
+                    <div className="absolute bottom-3 right-3 text-[9px] text-foreground/20 dark:text-white/20">
                       {flippedCard === i ? "Tap to flip back" : "Tap to reveal"}
                     </div>
                   </motion.div>
@@ -550,7 +580,7 @@ export function Studio({ sources, tone, language, onNavigateToDeepDive, onOutput
                   <p className="text-sm text-white/50 text-center py-8">No quiz questions were generated. Try again.</p>
                 ) : quizQuestions.map((q: QuizQuestion, qi: number) => (
                   <motion.div variants={fadeUpVariants} initial="hidden" animate="visible" key={qi} className="space-y-2">
-                    <p className="text-sm font-bold text-white">{qi + 1}. {q.question}</p>
+                    <p className="text-sm font-bold text-foreground dark:text-white">{qi + 1}. {q.question}</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {q.options.map((opt, oi) => {
                         const isSelected = quizSelected[qi] === opt;
@@ -561,11 +591,11 @@ export function Studio({ sources, tone, language, onNavigateToDeepDive, onOutput
                             key={oi}
                             onClick={() => !quizRevealed && setQuizSelected(prev => ({ ...prev, [qi]: opt }))}
                             className={cn(
-                              "text-left px-4 py-2.5 rounded-xl border text-xs font-medium transition-all",
-                              isCorrect ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-300" :
-                              isWrong ? "bg-red-500/20 border-red-500/40 text-red-300" :
-                              isSelected ? "bg-white/15 border-white/25 text-white" :
-                              "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"
+                              "text-left px-4 py-2.5 rounded-xl border text-xs font-medium transition-all outline-none",
+                              isCorrect ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-700 dark:text-emerald-300" :
+                              isWrong ? "bg-red-500/20 border-red-500/40 text-red-700 dark:text-red-300" :
+                              isSelected ? "bg-foreground/10 dark:bg-white/15 border-foreground/20 dark:border-white/25 text-foreground dark:text-white" :
+                              "bg-foreground/5 dark:bg-white/5 border-foreground/5 dark:border-white/10 text-foreground/60 dark:text-white/60 hover:bg-foreground/10 dark:hover:bg-white/10"
                             )}
                           >
                             {opt}
@@ -578,7 +608,7 @@ export function Studio({ sources, tone, language, onNavigateToDeepDive, onOutput
                 {quizQuestions.length > 0 && !quizRevealed && Object.keys(quizSelected).length > 0 && (
                   <button
                     onClick={() => setQuizRevealed(true)}
-                    className="px-6 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-sm font-bold text-white border border-white/15 transition-all"
+                    className="px-6 py-2.5 rounded-xl bg-foreground/5 dark:bg-white/10 hover:bg-foreground/10 dark:hover:bg-white/15 text-sm font-bold text-foreground dark:text-white border border-foreground/10 dark:border-white/15 transition-all shadow-lg shadow-black/5 dark:shadow-none"
                   >
                     Check Answers
                   </button>
@@ -596,9 +626,9 @@ export function Studio({ sources, tone, language, onNavigateToDeepDive, onOutput
             {/* Infographic */}
             {!isGenerating && activeMode === "infographic" && jsonData && (
               <motion.div key="infographic" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5">
-                <div className="text-center space-y-1 pb-4 border-b border-white/10">
-                  <p className="text-lg font-black text-white">{jsonData.title}</p>
-                  <p className="text-xs text-white/50">{jsonData.subtitle}</p>
+                <div className="text-center space-y-1 pb-4 border-b border-foreground/10 dark:border-white/10">
+                  <p className="text-lg font-black text-foreground dark:text-white">{jsonData.title}</p>
+                  <p className="text-xs text-foreground/40 dark:text-white/50">{jsonData.subtitle}</p>
                 </div>
                 {jsonData.keyStats?.length > 0 && (
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -608,27 +638,27 @@ export function Studio({ sources, tone, language, onNavigateToDeepDive, onOutput
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: i * 0.1 }}
                         key={i} 
-                        className="text-center p-4 bg-white/5 rounded-2xl border border-white/8"
+                        className="text-center p-4 bg-foreground/5 dark:bg-white/5 rounded-2xl border border-foreground/10 dark:border-white/8 shadow-sm dark:shadow-none"
                       >
-                        <p className="text-2xl font-black text-orange-400">{stat.value}</p>
-                        <p className="text-[10px] font-bold text-white/70 mt-1">{stat.label}</p>
-                        {stat.context && <p className="text-[9px] text-white/35 mt-1">{stat.context}</p>}
+                        <p className="text-2xl font-black text-orange-600 dark:text-orange-400">{stat.value}</p>
+                        <p className="text-[10px] font-bold text-foreground/70 dark:text-white/70 mt-1">{stat.label}</p>
+                        {stat.context && <p className="text-[9px] text-foreground/30 dark:text-white/35 mt-1">{stat.context}</p>}
                       </motion.div>
                     ))}
                   </div>
                 )}
                 {jsonData.pullQuote && (
-                  <blockquote className="border-l-4 border-orange-400/50 pl-4 italic text-sm text-white/70">
+                  <blockquote className="border-l-4 border-orange-500/30 dark:border-orange-400/50 pl-4 italic text-sm text-foreground/70 dark:text-white/70">
                     "{jsonData.pullQuote}"
                   </blockquote>
                 )}
                 {jsonData.sections?.map((section: any, i: number) => (
                   <div key={i}>
-                    <p className="text-xs font-bold text-white/60 uppercase tracking-wider mb-2">{section.heading}</p>
+                    <p className="text-xs font-bold text-foreground/50 dark:text-white/60 uppercase tracking-wider mb-2">{section.heading}</p>
                     <ul className="space-y-1">
                       {section.bullets?.map((b: string, j: number) => (
-                        <li key={j} className="text-xs text-white/60 flex items-start gap-2">
-                          <span className="text-orange-400 mt-0.5">•</span>{b}
+                        <li key={j} className="text-xs text-foreground/60 dark:text-white/60 flex items-start gap-2">
+                          <span className="text-orange-600 dark:text-orange-400 mt-0.5">•</span>{b}
                         </li>
                       ))}
                     </ul>
@@ -640,21 +670,21 @@ export function Studio({ sources, tone, language, onNavigateToDeepDive, onOutput
             {/* Data Table */}
             {!isGenerating && activeMode === "datatable" && jsonData && (
               <motion.div key="datatable" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-                <p className="text-sm font-bold text-white">{jsonData.title}</p>
-                <div className="overflow-x-auto rounded-xl border border-white/10">
+                <p className="text-sm font-bold text-foreground dark:text-white">{jsonData.title}</p>
+                <div className="overflow-x-auto rounded-xl border border-foreground/10 dark:border-white/10">
                   <table className="w-full text-xs">
                     <thead>
-                      <tr className="border-b border-white/10 bg-white/5">
+                      <tr className="border-b border-foreground/10 dark:border-white/10 bg-foreground/5 dark:bg-white/5">
                         {jsonData.headers?.map((h: string, i: number) => (
-                          <th key={i} className="px-4 py-2.5 text-left font-bold text-white/60 whitespace-nowrap">{h}</th>
+                          <th key={i} className="px-4 py-2.5 text-left font-bold text-foreground/40 dark:text-white/60 whitespace-nowrap">{h}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {jsonData.rows?.map((row: string[], i: number) => (
-                        <tr key={i} className="border-b border-white/5 hover:bg-white/5">
+                        <tr key={i} className="border-b border-foreground/5 dark:border-white/5 hover:bg-foreground/5 dark:hover:bg-white/5 transition-colors">
                           {row.map((cell, j) => (
-                            <td key={j} className="px-4 py-2 text-white/70 whitespace-nowrap">{cell}</td>
+                            <td key={j} className="px-4 py-2 text-foreground/80 dark:text-white/70 whitespace-nowrap">{cell}</td>
                           ))}
                         </tr>
                       ))}
@@ -662,7 +692,7 @@ export function Studio({ sources, tone, language, onNavigateToDeepDive, onOutput
                   </table>
                 </div>
                 {jsonData.summary && (
-                  <p className="text-xs text-white/50 italic p-3 bg-white/5 rounded-xl">{jsonData.summary}</p>
+                  <p className="text-xs text-foreground/40 dark:text-white/50 italic p-3 bg-foreground/5 dark:bg-white/5 rounded-xl">{jsonData.summary}</p>
                 )}
               </motion.div>
             )}
@@ -690,7 +720,7 @@ export function Studio({ sources, tone, language, onNavigateToDeepDive, onOutput
         <div className="flex justify-center">
           <button
             onClick={() => generate()}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-semibold text-white/60 hover:text-white transition-all"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 border border-foreground/10 dark:border-white/10 text-sm font-semibold text-foreground/50 hover:text-foreground dark:text-white/60 dark:hover:text-white transition-all shadow-sm dark:shadow-none"
           >
             <RefreshCw className="w-4 h-4" />
             Regenerate

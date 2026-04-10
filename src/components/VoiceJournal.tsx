@@ -160,7 +160,7 @@ export function VoiceJournal({ entryType }: VoiceJournalProps) {
       {/* Type Toggle Removed - Handled by Tabs */}
 
       {/* Card */}
-      <div className="bg-white/[0.03] border border-white/8 rounded-3xl p-6 space-y-5 backdrop-blur-sm">
+      <div className="bg-foreground/[0.02] dark:bg-white/[0.03] border border-foreground/10 dark:border-white/8 rounded-3xl p-6 space-y-5 backdrop-blur-sm shadow-sm dark:shadow-none">
 
         {/* Title */}
         <input
@@ -168,7 +168,7 @@ export function VoiceJournal({ entryType }: VoiceJournalProps) {
           value={title}
           onChange={e => setTitle(e.target.value)}
           placeholder={entryType === "journal" ? "Give this entry a title…" : "Memo title…"}
-          className="w-full bg-transparent text-white text-lg font-semibold placeholder:text-white/40 focus:outline-none border-b border-white/8 pb-3"
+          className="w-full bg-transparent text-foreground dark:text-white text-lg font-semibold placeholder:text-foreground/30 dark:placeholder:text-white/40 focus:outline-none border-b border-foreground/5 dark:border-white/8 pb-3"
         />
 
         {/* Content Area */}
@@ -181,7 +181,7 @@ export function VoiceJournal({ entryType }: VoiceJournalProps) {
               : "Record a quick voice memo, or type your note…"
           }
           rows={10}
-          className="w-full bg-transparent text-white text-base leading-relaxed placeholder:text-white/40 focus:outline-none resize-none"
+          className="w-full bg-transparent text-foreground dark:text-white text-base leading-relaxed placeholder:text-foreground/30 dark:placeholder:text-white/40 focus:outline-none resize-none"
         />
 
         {/* Error */}
@@ -193,7 +193,7 @@ export function VoiceJournal({ entryType }: VoiceJournalProps) {
         )}
 
         {/* Toolbar */}
-        <div className="flex items-center justify-between pt-3 border-t border-white/6">
+        <div className="flex items-center justify-between pt-3 border-t border-foreground/5 dark:border-white/6">
 
           {/* Voice Controls */}
           <div className="flex items-center gap-3">
@@ -249,15 +249,15 @@ export function VoiceJournal({ entryType }: VoiceJournalProps) {
               </button>
 
               {showEnhanceMenu && (
-                <div className="absolute bottom-full mb-2 right-0 w-56 bg-[#0c0c14]/95 border border-white/10 rounded-2xl shadow-2xl backdrop-blur-xl overflow-hidden z-50">
+                <div className="absolute bottom-full mb-2 right-0 w-56 bg-background/95 dark:bg-[#0c0c14]/95 border border-foreground/10 dark:border-white/10 rounded-2xl shadow-2xl backdrop-blur-xl overflow-hidden z-50">
                   {ENHANCE_OPTIONS.map(({ mode, label, desc }) => (
                     <button
                       key={mode}
                       onClick={() => enhance(mode)}
-                      className="w-full flex flex-col items-start px-4 py-3 hover:bg-white/[0.06] transition-colors text-left"
+                      className="w-full flex flex-col items-start px-4 py-3 hover:bg-foreground/5 dark:hover:bg-white/[0.06] transition-colors text-left"
                     >
-                      <span className="text-sm font-semibold text-white">{label}</span>
-                      <span className="text-[11px] text-white/35">{desc}</span>
+                      <span className="text-sm font-semibold text-foreground dark:text-white">{label}</span>
+                      <span className="text-[11px] text-foreground/40 dark:text-white/35">{desc}</span>
                     </button>
                   ))}
                 </div>
@@ -268,7 +268,7 @@ export function VoiceJournal({ entryType }: VoiceJournalProps) {
             {rawContent && content !== rawContent && (
               <button
                 onClick={() => setContent(rawContent)}
-                className="p-2.5 rounded-full text-white/30 hover:text-white/60 hover:bg-white/5 transition-colors"
+                className="p-2.5 rounded-full text-foreground/30 dark:text-white/30 hover:text-foreground/60 dark:hover:text-white/60 hover:bg-foreground/5 dark:hover:bg-white/5 transition-colors"
                 title="Revert to original"
               >
                 <Type className="w-4 h-4" />
@@ -295,7 +295,7 @@ export function VoiceJournal({ entryType }: VoiceJournalProps) {
       </div>
 
       {/* Entry type hint */}
-      <p className="text-center text-xs text-white/40">
+      <p className="text-center text-xs text-foreground/40 dark:text-white/40 font-medium">
         {entryType === "journal"
           ? "Journal entries are private, date-stamped, and saved to your Library."
           : "Voice memos are quick notes — record, enhance, and save in seconds."}

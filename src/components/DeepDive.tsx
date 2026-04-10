@@ -127,23 +127,23 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1.2 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-purple-500/5 rounded-3xl blur-3xl pointer-events-none"
+              className="absolute inset-0 bg-purple-500/10 dark:bg-purple-500/5 rounded-3xl blur-3xl pointer-events-none"
             />
           )}
         </AnimatePresence>
 
-        <div className="relative z-10 w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-purple-500/10 to-accent/10 flex items-center justify-center">
+        <div className="relative z-10 w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-purple-500/10 to-accent/10 dark:from-purple-500/5 dark:to-accent/5 flex items-center justify-center shadow-lg dark:shadow-none">
           <motion.div
             animate={isPlaying ? { scale: [1, 1.1, 1] } : {}}
             transition={{ repeat: Infinity, duration: 2 }}
           >
-            <Headphones className={cn("w-10 h-10 transition-colors", isPlaying ? "text-purple-500" : "text-purple-500/60")} />
+            <Headphones className={cn("w-10 h-10 transition-colors", isPlaying ? "text-purple-600 dark:text-purple-500" : "text-purple-500/60")} />
           </motion.div>
         </div>
 
         <div className="space-y-2">
-          <h3 className="text-3xl font-serif italic text-primary">Deep Dive</h3>
-          <p className="text-sm text-foreground/40 max-w-md mx-auto">
+          <h3 className="text-3xl font-serif italic text-foreground dark:text-white">Deep Dive</h3>
+          <p className="text-sm text-foreground/40 dark:text-white/40 max-w-md mx-auto">
             Transform your uploaded sources into an engaging AI-generated podcast discussion between two hosts.
           </p>
         </div>
@@ -199,7 +199,7 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={togglePlayback}
-                className="w-20 h-20 rounded-full bg-primary text-white flex items-center justify-center shadow-2xl shadow-purple-500/20"
+                className="w-20 h-20 rounded-full bg-foreground dark:bg-white text-background dark:text-black flex items-center justify-center shadow-2xl shadow-foreground/20 dark:shadow-purple-500/20"
               >
                 {isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8 ml-1" />}
               </motion.button>
@@ -208,14 +208,14 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
             <div className="flex items-center justify-center gap-3">
               <button
                 onClick={togglePlayback}
-                className="px-6 py-2.5 text-sm font-medium border border-black/10 rounded-full hover:bg-secondary/50 transition-colors flex items-center gap-2"
+                className="px-6 py-2.5 text-sm font-semibold border border-foreground/10 dark:border-white/10 rounded-full hover:bg-foreground/5 dark:hover:bg-white/5 transition-colors flex items-center gap-2"
               >
                 {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                 {isPlaying ? "Pause" : "Play"}
               </button>
               <button
                 onClick={downloadAudio}
-                className="px-6 py-2.5 text-sm font-medium border border-black/10 rounded-full hover:bg-secondary/50 transition-colors flex items-center gap-2"
+                className="px-6 py-2.5 text-sm font-semibold border border-foreground/10 dark:border-white/10 rounded-full hover:bg-foreground/5 dark:hover:bg-white/5 transition-colors flex items-center gap-2"
               >
                 <Download className="w-4 h-4" />
                 Download MP3
@@ -229,7 +229,7 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
               </button>
             </div>
 
-            <p className="text-[10px] uppercase tracking-widest text-foreground/30 font-bold">
+            <p className="text-[10px] uppercase tracking-widest text-foreground/30 dark:text-white/25 font-bold">
               Powered by GPT-5.4 · Nova & Echo Voices
             </p>
           </div>
@@ -248,11 +248,11 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="p-5 bg-white/50 border border-black/5 rounded-2xl space-y-2 backdrop-blur-sm shadow-sm"
+            className="p-5 bg-foreground/5 dark:bg-white/5 border border-foreground/10 dark:border-white/8 rounded-2xl space-y-2 backdrop-blur-sm shadow-sm dark:shadow-none"
           >
             <span className="text-2xl">{item.icon}</span>
-            <h4 className="text-xs font-bold text-primary/80">{item.title}</h4>
-            <p className="text-[11px] text-foreground/40 leading-relaxed font-medium">{item.desc}</p>
+            <h4 className="text-xs font-bold text-foreground/80 dark:text-white/80">{item.title}</h4>
+            <p className="text-[11px] text-foreground/40 dark:text-white/40 leading-relaxed font-medium">{item.desc}</p>
           </motion.div>
         ))}
       </div>

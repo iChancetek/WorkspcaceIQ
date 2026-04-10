@@ -4,18 +4,45 @@
 @import "@fontsource-variable/inter";
 
 @theme {
-  --color-background: #050508;
-  --color-foreground: #ffffff;
-  --color-primary: #f0f0f0;
-  --color-primary-foreground: #050508;
-  --color-secondary: #1a1a1a;
-  --color-secondary-foreground: #ffffff;
-  --color-accent: #3b82f6; 
-  --color-accent-foreground: #ffffff;
-  --color-border: #ffffff15;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-card: var(--card);
 
   --font-serif: "EB Garamond", serif;
   --font-sans: "Inter Variable", sans-serif;
+}
+
+:root {
+  --background: #fdfdfb;
+  --foreground: #0f172a;
+  --primary: #1e293b;
+  --primary-foreground: #fdfdfb;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+  --accent: #3b82f6; 
+  --accent-foreground: #ffffff;
+  --border: #e2e8f0;
+  --card: rgba(0, 0, 0, 0.03);
+}
+
+.dark {
+  --background: #050508;
+  --foreground: #ffffff;
+  --primary: #f0f0f0;
+  --primary-foreground: #050508;
+  --secondary: #1a1a1a;
+  --secondary-foreground: #ffffff;
+  --accent: #3b82f6; 
+  --accent-foreground: #ffffff;
+  --border: #ffffff15;
+  --card: rgba(255, 255, 255, 0.04);
 }
 
 @layer base {
@@ -39,15 +66,14 @@
 
 @layer utilities {
   .flow-glass {
-    @apply bg-white/[0.04] backdrop-blur-xl border border-white/8 shadow-sm;
+    @apply bg-card backdrop-blur-xl border border-border shadow-sm;
   }
   
   .writing-pad {
-    @apply max-w-4xl mx-auto w-full bg-white/[0.03] shadow-none rounded-2xl border border-white/8 p-10 backdrop-blur-sm;
+    @apply max-w-4xl mx-auto w-full bg-card shadow-none rounded-2xl border border-border p-10 backdrop-blur-sm;
   }
 
   .dark-card {
-    @apply bg-white/[0.04] border border-white/8 rounded-2xl backdrop-blur-sm hover:bg-white/[0.07] transition-all duration-200;
+    @apply bg-card border border-border rounded-2xl backdrop-blur-sm transition-all duration-200;
   }
 }
-

@@ -28,6 +28,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FileText, StickyNote } from "lucide-react";
 import { BrandIdentifier } from "@/components/BrandIdentifier";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   subscribeToProjects,
@@ -104,7 +105,7 @@ export default function Dashboard() {
   const [sources, setSources] = useState<Source[]>([]);
   const [activeTone, setActiveTone] = useState("professional");
   const [activeLanguage, setActiveLanguage] = useState("English");
-  const [currentStudioOutput, setCurrentStudioOutput] = useState<{ text?: string; json?: any; mode: string } | null>(null);
+  const [allStudioOutputs, setAllStudioOutputs] = useState<Record<string, any>>({});
   const [deepDiveTranscript, setDeepDiveTranscript] = useState<string | null>(null);
 
   // Project / workspace state
@@ -130,6 +131,7 @@ export default function Dashboard() {
         setSources(recent.sources ?? []);
         setActiveTone(recent.tone ?? "professional");
         setActiveLanguage(recent.language ?? "English");
+        setAllStudioOutputs(recent.studioOutputs ?? {});
         setDeepDiveTranscript(recent.deepDiveTranscript ?? null);
       }
     });
@@ -146,15 +148,11 @@ export default function Dashboard() {
     saveTimerRef.current = setTimeout(async () => {
       setSaveStatus("saving");
       try {
-        const outputs: Record<string, any> = {};
-        if (currentStudioOutput) {
-          outputs[currentStudioOutput.mode] = currentStudioOutput.json ?? currentStudioOutput.text;
-        }
         await updateProject(user.uid, activeProjectId, {
           sources,
           tone: activeTone,
           language: activeLanguage,
-          studioOutputs: outputs,
+          studioOutputs: allStudioOutputs,
           deepDiveTranscript: deepDiveTranscript ?? null,
         });
         setSaveStatus("saved");
@@ -166,7 +164,7 @@ export default function Dashboard() {
     return () => {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
-  }, [sources, activeTone, activeLanguage, currentStudioOutput, deepDiveTranscript, activeProjectId, user]);
+  }, [sources, activeTone, activeLanguage, allStudioOutputs, deepDiveTranscript, activeProjectId, user]);
 
   // ── Handlers ───────────────────────────────────────────────────────────────
 
@@ -206,7 +204,7 @@ export default function Dashboard() {
     setActiveTone(project.tone ?? "professional");
     setActiveLanguage(project.language ?? "English");
     setDeepDiveTranscript(project.deepDiveTranscript ?? null);
-    setCurrentStudioOutput(null);
+    setAllStudioOutputs(project.studioOutputs ?? {});
     setSaveStatus("saved");
     setActiveTab("research");
   };
@@ -215,7 +213,7 @@ export default function Dashboard() {
   const handleProjectCreated = (projectId: string) => {
     setActiveProjectId(projectId);
     setSources([]);
-    setCurrentStudioOutput(null);
+    setAllStudioOutputs({});
     setDeepDiveTranscript(null);
     setSaveStatus("saved");
     setActiveTab("research");
@@ -238,13 +236,28 @@ export default function Dashboard() {
     const md = generateProjectMarkdown({
       title,
       sources,
-      studioOutputs: currentStudioOutput
-        ? { [currentStudioOutput.mode]: currentStudioOutput.json ?? currentStudioOutput.text }
-        : {},
+      studioOutputs: allStudioOutputs,
       deepDiveTranscript: deepDiveTranscript ?? undefined,
       createdAt: new Date().toISOString(),
     });
     downloadFile(md, `${title.toLowerCase().replace(/\s+/g, "-")}.md`, "text/markdown");
+  };
+
+  const handleManualSave = async () => {
+    if (!activeProjectId || !user) return;
+    setSaveStatus("saving");
+    try {
+      await updateProject(user.uid, activeProjectId, {
+        sources,
+        tone: activeTone,
+        language: activeLanguage,
+        studioOutputs: allStudioOutputs,
+        deepDiveTranscript: deepDiveTranscript ?? null,
+      });
+      setSaveStatus("saved");
+    } catch {
+      setSaveStatus("unsaved");
+    }
   };
 
   // ── Project delete state ──────────────────────────────────────────────────
@@ -257,7 +270,7 @@ export default function Dashboard() {
     await softDeleteProject(user.uid, activeProjectId);
     setActiveProjectId(null);
     setSources([]);
-    setCurrentStudioOutput(null);
+    setAllStudioOutputs({});
     setDeepDiveTranscript(null);
     setSaveStatus("saved");
     setConfirmDeleteProject(false);
@@ -277,14 +290,14 @@ export default function Dashboard() {
 
   return (
     <AuthGuard>
-      <main className="min-h-screen bg-[#050508] text-white relative overflow-x-hidden">
+      <main className="min-h-screen bg-background text-foreground relative overflow-x-hidden">
 
         {/* Aurora backgrounds */}
         <div className="pointer-events-none fixed inset-0 z-0">
-          <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-blue-600/20 blur-[120px]" />
-          <div className="absolute top-[-10%] right-[-15%] w-[500px] h-[500px] rounded-full bg-violet-600/15 blur-[130px]" />
-          <div className="absolute bottom-[10%] left-[30%] w-[400px] h-[400px] rounded-full bg-teal-500/10 blur-[100px]" />
-          <div className="absolute bottom-[-5%] right-[5%] w-[350px] h-[350px] rounded-full bg-amber-500/8 blur-[100px]" />
+          <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-blue-600/10 dark:bg-blue-600/20 blur-[120px]" />
+          <div className="absolute top-[-10%] right-[-15%] w-[500px] h-[500px] rounded-full bg-violet-600/10 dark:bg-violet-600/15 blur-[130px]" />
+          <div className="absolute bottom-[10%] left-[30%] w-[400px] h-[400px] rounded-full bg-teal-500/5 dark:bg-teal-500/10 blur-[100px]" />
+          <div className="absolute bottom-[-5%] right-[5%] w-[350px] h-[350px] rounded-full bg-amber-500/5 dark:bg-amber-500/8 blur-[100px]" />
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto px-6 py-8 md:py-12 space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
@@ -304,22 +317,23 @@ export default function Dashboard() {
                 />
               ) : (
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-white/[0.04] border border-white/8">
-                    <FolderOpen className="w-3.5 h-3.5 text-white/30" />
+                  <div className="p-1.5 rounded-lg bg-foreground/5 dark:bg-white/[0.04] border border-foreground/10 dark:border-white/8">
+                    <FolderOpen className="w-3.5 h-3.5 text-foreground/30 dark:text-white/30" />
                   </div>
-                  <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/30 hidden sm:inline-block">
+                  <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/30 dark:text-white/30 hidden sm:inline-block">
                     {activeTab === "workspaces" ? "Home" : "Dashboard"}
                   </span>
                 </div>
               )}
             </div>
             <div className="flex items-center gap-3">
-              <span className="hidden sm:flex items-center gap-1.5 text-xs font-medium text-blue-400/80 bg-blue-400/10 border border-blue-400/20 px-3 py-1.5 rounded-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+              <span className="hidden sm:flex items-center gap-1.5 text-xs font-medium text-blue-500 dark:text-blue-400/80 bg-blue-500/10 border border-blue-500/20 dark:border-blue-400/20 px-3 py-1.5 rounded-full">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 dark:bg-blue-400 animate-pulse" />
                 GPT-5.4
               </span>
+              <ThemeToggle />
               {user?.photoURL ? (
-                <img src={user.photoURL} alt={initials} className="w-8 h-8 rounded-full object-cover shadow-lg ring-2 ring-white/10" />
+                <img src={user.photoURL} alt={initials} className="w-8 h-8 rounded-full object-cover shadow-lg ring-2 ring-foreground/10" />
               ) : (
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 via-violet-400 to-emerald-400 flex items-center justify-center text-xs font-bold shadow-lg">
                   {initials}
@@ -327,7 +341,7 @@ export default function Dashboard() {
               )}
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/70 transition-colors px-2 py-1 rounded-lg hover:bg-white/5"
+                className="flex items-center gap-1.5 text-xs text-foreground/30 hover:text-foreground/70 transition-colors px-2 py-1 rounded-lg hover:bg-foreground/5"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Sign out</span>
@@ -336,7 +350,7 @@ export default function Dashboard() {
           </header>
 
           {/* ── Tab Navigation ──────────────────────────────────────────────── */}
-          <nav className="flex items-center gap-1 p-1.5 bg-white/[0.04] rounded-2xl border border-white/8 w-full overflow-x-auto scrollbar-none backdrop-blur-sm"
+          <nav className="flex items-center gap-1 p-1.5 bg-foreground/5 dark:bg-white/[0.04] rounded-2xl border border-foreground/10 dark:border-white/8 w-full overflow-x-auto scrollbar-none backdrop-blur-sm shadow-sm dark:shadow-none"
             style={{ scrollbarWidth: "none" }}
             aria-label="Main navigation"
           >
@@ -349,14 +363,14 @@ export default function Dashboard() {
                 className={cn(
                   "relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200",
                   activeTab === tab.id
-                    ? "text-white shadow-lg"
-                    : "text-white/60 hover:text-white hover:bg-white/5"
+                    ? "text-foreground dark:text-white shadow-lg"
+                    : "text-foreground/40 dark:text-white/60 hover:text-foreground dark:hover:text-white hover:bg-foreground/5 dark:hover:bg-white/5"
                 )}
               >
                 {activeTab === tab.id && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute inset-0 bg-white/10 border border-white/15 rounded-xl -z-10 shadow-[0_0_20px_rgba(255,255,255,0.03)]"
+                    className="absolute inset-0 bg-background dark:bg-white/10 border border-foreground/5 dark:border-white/15 rounded-xl -z-10 shadow-sm dark:shadow-[0_0_20px_rgba(255,255,255,0.03)]"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -401,8 +415,8 @@ export default function Dashboard() {
                   <Mic className="w-8 h-8 text-blue-400" />
                 </div>
                 <div className="space-y-2">
-                  <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-white">Your Workspace</h2>
-                  <p className="text-white/50 font-medium leading-relaxed italic">Dictate, type, or paste — GPT-5.4 handles the friction of thinking.</p>
+                  <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-foreground dark:text-white">Your Workspace</h2>
+                  <p className="text-foreground/50 dark:text-white/50 font-medium leading-relaxed italic">Dictate, type, or paste — GPT-5.4 handles the friction of thinking.</p>
                 </div>
               </motion.div>
               <StreamingAudioRecorder />
@@ -423,12 +437,12 @@ export default function Dashboard() {
                       )}
                     >
                       <div className="flex items-start gap-3">
-                        <div className={cn("p-2 rounded-xl bg-white/5", card.color)}>
+                        <div className={cn("p-2 rounded-xl bg-foreground/5 dark:bg-white/5", card.color)}>
                           <card.icon className="w-4 h-4" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-bold text-white mb-1">{card.title}</p>
-                          <p className="text-[11px] text-white/45 leading-relaxed">{card.desc}</p>
+                          <p className="text-sm font-bold text-foreground dark:text-white mb-1">{card.title}</p>
+                          <p className="text-[11px] text-foreground/45 dark:text-white/45 leading-relaxed font-medium">{card.desc}</p>
                         </div>
                       </div>
                       <div className={cn("mt-3 text-[11px] font-semibold flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity", card.color)}>
@@ -452,8 +466,8 @@ export default function Dashboard() {
                   <BookOpen className="w-8 h-8 text-amber-400" />
                 </div>
                 <div className="space-y-2">
-                  <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-white">Voice Journal</h2>
-                  <p className="text-white/50 font-medium leading-relaxed italic">Record your sequence of thoughts, enhanced by AI precision.</p>
+                  <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-foreground dark:text-white">Voice Journal</h2>
+                  <p className="text-foreground/50 dark:text-white/50 font-medium leading-relaxed italic">Record your sequence of thoughts, enhanced by AI precision.</p>
                 </div>
               </motion.div>
               <VoiceJournal entryType="journal" />
@@ -470,8 +484,8 @@ export default function Dashboard() {
                   <StickyNote className="w-8 h-8 text-sky-400" />
                 </div>
                 <div className="space-y-2">
-                  <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-white">Voice Memo</h2>
-                  <p className="text-white/50 font-medium leading-relaxed italic">The fastest way to capture a spark. Private and persistent.</p>
+                  <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-foreground dark:text-white">Voice Memo</h2>
+                  <p className="text-foreground/50 dark:text-white/50 font-medium leading-relaxed italic">The fastest way to capture a spark. Private and persistent.</p>
                 </div>
               </motion.div>
               <VoiceJournal entryType="memo" />
@@ -482,13 +496,13 @@ export default function Dashboard() {
             {/* Research header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="space-y-1">
-                  <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white">Research</h2>
-                  <p className="text-white/70 font-light">Upload sources and let AI become your research partner.</p>
+                  <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground dark:text-white">Research</h2>
+                  <p className="text-foreground/60 dark:text-white/70 font-light font-medium">Upload sources and let AI become your research partner.</p>
                 </div>
                 <button
                   onClick={handleExportProject}
                   disabled={sources.length === 0}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-white/70 hover:text-white transition-all disabled:opacity-30 self-start md:self-auto"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 border border-foreground/10 dark:border-white/10 text-xs font-bold text-foreground/40 dark:text-white/70 hover:text-foreground dark:hover:text-white transition-all disabled:opacity-30 self-start md:self-auto shadow-sm dark:shadow-none"
                 >
                   <Download className="w-3.5 h-3.5" />
                   Export
@@ -519,10 +533,10 @@ export default function Dashboard() {
 
                     {/* Name */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-white/70 truncate">
+                      <p className="text-sm font-semibold text-foreground/70 dark:text-white/70 truncate">
                         {activeProject?.name ?? "No project active"}
                       </p>
-                      <p className="text-[10px] text-white/25">
+                      <p className="text-[10px] text-foreground/30 dark:text-white/25 font-bold uppercase tracking-wider">
                         {activeProject
                           ? `${sources.length} resource${sources.length !== 1 ? "s" : ""} · auto-saved`
                           : "Add a resource below to automatically create a workspace"}
@@ -556,7 +570,7 @@ export default function Dashboard() {
                             </button>
                             <button
                               onClick={() => setConfirmDeleteProject(false)}
-                              className="px-2.5 py-1 rounded-lg hover:bg-white/8 text-white/40 text-[10px] font-bold transition-colors"
+                              className="px-2.5 py-1 rounded-lg hover:bg-foreground/5 dark:hover:bg-white/8 text-foreground/40 dark:text-white/40 text-[10px] font-bold transition-colors"
                             >
                               No
                             </button>
@@ -589,8 +603,10 @@ export default function Dashboard() {
                     sources={sources}
                     tone={activeTone}
                     language={activeLanguage}
+                    studioOutputs={allStudioOutputs}
                     onNavigateToDeepDive={() => setActiveTab("deepdive")}
-                    onOutputChange={setCurrentStudioOutput}
+                    onOutputChange={(out) => setAllStudioOutputs(prev => ({ ...prev, [out.mode]: out.json ?? out.text }))}
+                    onManualSave={handleManualSave}
                   />
 
                   {/* ── Ask Your Sources ─────────────────────────────── */}
@@ -603,8 +619,8 @@ export default function Dashboard() {
                           </svg>
                         </div>
                         <div>
-                          <p className="text-sm font-bold text-white">Ask Your Sources</p>
-                          <p className="text-[10px] text-white/40">Chat directly with your uploaded documents and links</p>
+                          <p className="text-sm font-bold text-foreground dark:text-white">Ask Your Sources</p>
+                          <p className="text-[10px] text-foreground/40 dark:text-white/40">Chat directly with your uploaded documents and links</p>
                         </div>
                       </div>
                       <div className="p-5">
@@ -618,16 +634,16 @@ export default function Dashboard() {
                   )}
 
                   {sources.length > 0 && (
-                    <div className="flex flex-col items-center gap-3 pt-4 border-t border-white/8">
-                      <p className="text-[11px] text-white/30 uppercase tracking-widest font-bold">Ready for the next level?</p>
+                    <div className="flex flex-col items-center gap-3 pt-4 border-t border-foreground/5 dark:border-white/8">
+                      <p className="text-[11px] text-foreground/30 dark:text-white/30 uppercase tracking-widest font-bold">Ready for the next level?</p>
                       <button
                         onClick={() => setActiveTab("deepdive")}
                         className="group flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500/20 to-teal-500/10 border border-emerald-500/25 hover:border-emerald-400/50 hover:from-emerald-500/30 transition-all duration-200 hover:scale-[1.02] hover:shadow-xl hover:shadow-emerald-500/10"
                       >
                         <Headphones className="w-5 h-5 text-emerald-400" />
                         <div className="text-left">
-                          <p className="text-sm font-bold text-white">Generate Deep Dive Podcast</p>
-                          <p className="text-[10px] text-white/40">
+                          <p className="text-sm font-bold text-foreground dark:text-white">Generate Deep Dive Podcast</p>
+                          <p className="text-[10px] text-foreground/40 dark:text-white/40">
                             Turn your {sources.length} source{sources.length > 1 ? "s" : ""} into an AI audio discussion
                           </p>
                         </div>
@@ -642,8 +658,8 @@ export default function Dashboard() {
           {/* ── DEEP DIVE TAB ────────────────────────────────────────────────── */}
           <section className={cn("space-y-8", activeTab !== "deepdive" && "hidden")}>
             <div className="text-center space-y-2">
-                <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white">Deep Dive</h2>
-                <p className="text-white/70 font-light">Generate an AI podcast discussion from your research sources.</p>
+                <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground dark:text-white">Deep Dive</h2>
+                <p className="text-foreground/60 dark:text-white/70 font-light font-medium">Generate an AI podcast discussion from your research sources.</p>
               </div>
               <DeepDive
                 sources={sources}
@@ -663,12 +679,12 @@ export default function Dashboard() {
           )}
 
           {/* Footer */}
-          <footer className="pt-12 pb-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-white/20">© {new Date().getFullYear()} WorkSpaceIQ | Chancellor Minus</p>
+          <footer className="pt-12 pb-8 border-t border-foreground/5 dark:border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-foreground/20 dark:text-white/20 font-medium">© {new Date().getFullYear()} WorkSpaceIQ | Chancellor Minus</p>
             <div className="flex items-center gap-6">
-              <Link href="/privacy" className="text-[10px] uppercase tracking-widest font-bold text-white/20 hover:text-white/60 transition-colors">Privacy</Link>
-              <Link href="/terms" className="text-[10px] uppercase tracking-widest font-bold text-white/20 hover:text-white/60 transition-colors">Terms</Link>
-              <Link href="/support" className="text-[10px] uppercase tracking-widest font-bold text-white/20 hover:text-white/60 transition-colors">Support</Link>
+              <Link href="/privacy" className="text-[10px] uppercase tracking-widest font-bold text-foreground/20 dark:text-white/20 hover:text-foreground/60 dark:hover:text-white/60 transition-colors">Privacy</Link>
+              <Link href="/terms" className="text-[10px] uppercase tracking-widest font-bold text-foreground/20 dark:text-white/20 hover:text-foreground/60 dark:hover:text-white/60 transition-colors">Terms</Link>
+              <Link href="/support" className="text-[10px] uppercase tracking-widest font-bold text-foreground/20 dark:text-white/20 hover:text-foreground/60 dark:hover:text-white/60 transition-colors">Support</Link>
             </div>
           </footer>
 

@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { BackButton } from "@/components/BackButton";
 import { GlobalErrorBoundary } from "@/components/GlobalErrorBoundary";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -54,14 +55,16 @@ export const viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-[#050508]">
-        <AuthProvider>
-          <GlobalErrorBoundary>
-            <BackButton />
-            {children}
-          </GlobalErrorBoundary>
-        </AuthProvider>
+    <html lang="en" className={`${inter.variable} h-full antialiased`} suppressHydrationWarning>
+      <body className="min-h-full flex flex-col transition-colors duration-300">
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+          <AuthProvider>
+            <GlobalErrorBoundary>
+              <BackButton />
+              {children}
+            </GlobalErrorBoundary>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

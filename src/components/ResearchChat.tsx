@@ -57,11 +57,11 @@ const MarkdownContent = ({ content }: { content: string }) => {
 // ─── Mode Presets ─────────────────────────────────────────────────────────────
 
 const MODES = [
-  { id: "summarize", label: "Summarize", icon: BookOpen,       color: "text-blue-400",    active: "bg-blue-500/15 border-blue-500/30 text-blue-300" },
-  { id: "study",     label: "Study",     icon: GraduationCap,  color: "text-emerald-400", active: "bg-emerald-500/15 border-emerald-500/30 text-emerald-300" },
-  { id: "organize",  label: "Organize",  icon: LayoutGrid,     color: "text-violet-400",  active: "bg-violet-500/15 border-violet-500/30 text-violet-300" },
-  { id: "create",    label: "Create",    icon: Lightbulb,      color: "text-amber-400",   active: "bg-amber-500/15 border-amber-500/30 text-amber-300" },
-  { id: "rewrite",   label: "Rewrite",   icon: PenTool,        color: "text-orange-400",  active: "bg-orange-500/15 border-orange-500/30 text-orange-300" },
+  { id: "summarize", label: "Summarize", icon: BookOpen,       color: "text-blue-600 dark:text-blue-400",    active: "bg-blue-500/10 dark:bg-blue-500/15 border-blue-500/20 dark:border-blue-500/30 text-blue-700 dark:text-blue-300" },
+  { id: "study",     label: "Study",     icon: GraduationCap,  color: "text-emerald-600 dark:text-emerald-400", active: "bg-emerald-500/10 dark:bg-emerald-500/15 border-emerald-500/20 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-300" },
+  { id: "organize",  label: "Organize",  icon: LayoutGrid,     color: "text-violet-600 dark:text-violet-400",  active: "bg-violet-500/10 dark:bg-violet-500/15 border-violet-500/20 dark:border-violet-500/30 text-violet-700 dark:text-violet-300" },
+  { id: "create",    label: "Create",    icon: Lightbulb,      color: "text-amber-600 dark:text-amber-400",   active: "bg-amber-500/10 dark:bg-amber-500/15 border-amber-500/20 dark:border-amber-500/30 text-amber-700 dark:text-amber-300" },
+  { id: "rewrite",   label: "Rewrite",   icon: PenTool,        color: "text-orange-600 dark:text-orange-400",  active: "bg-orange-500/10 dark:bg-orange-500/15 border-orange-500/20 dark:border-orange-500/30 text-orange-700 dark:text-orange-300" },
 ];
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -308,16 +308,16 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
       {/* Source scope selector — individual or all */}
       {sources.length > 0 && (
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-white/30 mr-1">Process:</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-foreground/30 mr-1">Process:</span>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => { setSelectedSourceId(null); setMessages([]); }}
             className={cn(
-              "px-3 py-1.5 rounded-full text-xs font-bold border transition-all",
+              "px-3 py-1.5 rounded-full text-xs font-bold border transition-all shadow-sm dark:shadow-none",
               selectedSourceId === null
-                ? "bg-violet-500/20 border-violet-500/40 text-violet-300"
-                : "border-white/10 text-white/35 hover:text-white/55 hover:border-white/20"
+                ? "bg-violet-500/10 dark:bg-violet-500/20 border-violet-500/20 dark:border-violet-500/40 text-violet-700 dark:text-violet-300"
+                : "bg-foreground/5 dark:bg-transparent border-foreground/10 dark:border-white/10 text-foreground/40 dark:text-white/35 hover:text-foreground dark:hover:text-white/55 hover:border-foreground/20 dark:hover:border-white/20"
             )}
           >
             All Resources ({sources.length})
@@ -329,10 +329,10 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
               whileTap={{ scale: 0.95 }}
               onClick={() => { setSelectedSourceId(s.id); setMessages([]); }}
               className={cn(
-                "px-3 py-1.5 rounded-full text-xs font-bold border transition-all max-w-[180px] truncate",
+                "px-3 py-1.5 rounded-full text-xs font-bold border transition-all max-w-[180px] truncate shadow-sm dark:shadow-none",
                 selectedSourceId === s.id
-                  ? "bg-blue-500/20 border-blue-500/40 text-blue-300"
-                  : "border-white/10 text-white/35 hover:text-white/55 hover:border-white/20"
+                  ? "bg-blue-500/10 dark:bg-blue-500/20 border-blue-500/20 dark:border-blue-500/40 text-blue-700 dark:text-blue-300"
+                  : "bg-foreground/5 dark:bg-transparent border-foreground/10 dark:border-white/10 text-foreground/40 dark:text-white/35 hover:text-foreground dark:hover:text-white/55 hover:border-foreground/20 dark:hover:border-white/20"
               )}
               title={s.title}
             >
@@ -352,10 +352,10 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
             onClick={() => runMode(mode.id)}
             disabled={isStreaming || sources.length === 0}
             className={cn(
-              "flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all border",
+              "flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all border shadow-sm dark:shadow-none",
               activeMode === mode.id
                 ? mode.active
-                : "border-transparent hover:bg-white/5 text-white/50",
+                : "border-transparent text-foreground/40 dark:text-white/50 hover:bg-foreground/5 dark:hover:bg-white/5",
               (isStreaming || sources.length === 0) && "opacity-40 cursor-not-allowed"
             )}
           >
@@ -371,10 +371,10 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
             whileTap={{ scale: 0.95 }}
             onClick={() => { if (isSpeaking) stopAudio(); setAutoSpeak(v => !v); }}
             className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-all",
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-all shadow-sm dark:shadow-none",
               autoSpeak
-                ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-300"
-                : "border-white/10 text-white/30 hover:text-white/50"
+                ? "bg-emerald-500/10 dark:bg-emerald-500/15 border-emerald-500/20 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-300"
+                : "bg-foreground/5 dark:bg-transparent border-foreground/10 dark:border-white/10 text-foreground/40 dark:text-white/30 hover:text-foreground/60 dark:hover:text-white/50"
             )}
             title={autoSpeak ? "Auto-speak ON — click to mute" : "Auto-speak OFF"}
           >
@@ -392,7 +392,7 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
               whileHover={{ scale: 1.1, rotate: -10 }}
               whileTap={{ scale: 0.9 }}
               onClick={clearChat}
-              className="p-1.5 rounded-lg hover:bg-white/8 text-white/30 hover:text-white/60 transition-colors"
+              className="p-1.5 rounded-lg hover:bg-foreground/5 dark:hover:bg-white/8 text-foreground/30 dark:text-white/30 hover:text-foreground/60 dark:hover:text-white/60 transition-colors"
               title="Clear conversation"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -440,18 +440,18 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
                 className="h-[240px] flex flex-col items-center justify-center text-center space-y-4"
               >
                 <div className="w-14 h-14 rounded-2xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
-                  <Sparkles className="w-6 h-6 text-violet-400" />
+                  <Sparkles className="w-6 h-6 text-violet-600 dark:text-violet-400" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-white/60">Conversational AI — Ask Anything</h4>
-                  <p className="text-xs text-white/30 mt-1.5 max-w-[280px]">
+                  <h4 className="text-sm font-bold text-foreground/60 dark:text-white/60">Conversational AI — Ask Anything</h4>
+                  <p className="text-xs text-foreground/30 dark:text-white/30 mt-1.5 max-w-[280px]">
                     {selectedSourceId
                       ? `Focused on: ${sources.find(s => s.id === selectedSourceId)?.title ?? "1 resource"}`
                       : "Type or speak a question about your sources. Upload an image to analyze charts & diagrams."
                     }
                   </p>
                 </div>
-                <div className="flex items-center gap-2 text-[11px] text-white/25">
+                <div className="flex items-center gap-2 text-[11px] text-foreground/25 dark:text-white/25">
                   <Mic className="w-3.5 h-3.5" />
                   <span>Whisper STT</span>
                   <span>·</span>
@@ -480,8 +480,8 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
                 <div className={cn(
                   "group relative max-w-[85%] rounded-2xl px-5 py-3.5 text-sm leading-relaxed",
                   msg.role === "user"
-                    ? "bg-violet-500/20 text-violet-100 border border-violet-500/25 rounded-br-sm shadow-xl shadow-violet-500/5"
-                    : "bg-white/[0.07] text-white/90 border border-white/10 rounded-bl-sm shadow-xl shadow-black/5"
+                    ? "bg-violet-500/10 dark:bg-violet-500/20 text-violet-900 dark:text-violet-100 border border-violet-500/20 dark:border-violet-500/25 rounded-br-sm shadow-sm dark:shadow-xl dark:shadow-violet-500/5"
+                    : "bg-foreground/[0.04] dark:bg-white/[0.07] text-foreground dark:text-white/90 border border-foreground/10 dark:border-white/10 rounded-bl-sm shadow-sm dark:shadow-xl dark:shadow-black/5"
                 )}>
                   {/* Vision image preview */}
                   {msg.imagePreview && (
@@ -496,13 +496,13 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
                   {/* Streaming cursor */}
                   {msg.role === "assistant" && isStreaming && msg.content === "" && (
                     <span className="flex gap-1 mt-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: "0ms" }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: "120ms" }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: "240ms" }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-foreground/30 dark:bg-white/40 animate-bounce" style={{ animationDelay: "0ms" }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-foreground/30 dark:bg-white/40 animate-bounce" style={{ animationDelay: "120ms" }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-foreground/30 dark:bg-white/40 animate-bounce" style={{ animationDelay: "240ms" }} />
                     </span>
                   )}
                   {msg.role === "assistant" && isStreaming && msg.content !== "" && (
-                    <span className="inline-block w-1.5 h-3.5 ml-0.5 bg-violet-400/60 animate-pulse rounded-full align-middle" />
+                    <span className="inline-block w-1.5 h-3.5 ml-0.5 bg-violet-500/60 dark:bg-violet-400/60 animate-pulse rounded-full align-middle" />
                   )}
 
                   {/* Actions (Play / Copy) */}
@@ -510,19 +510,19 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
                     <motion.div 
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="mt-3 pt-3 border-t border-white/5 flex items-center gap-4"
+                      className="mt-3 pt-3 border-t border-foreground/5 dark:border-white/5 flex items-center gap-4"
                     >
                       <button
                         onClick={() => speakText(msg.content)}
-                        className="flex items-center gap-1 text-[10px] uppercase font-bold tracking-widest text-white/20 hover:text-violet-400 transition-colors"
+                        className="flex items-center gap-1 text-[10px] uppercase font-bold tracking-widest text-foreground/30 dark:text-white/20 hover:text-violet-600 dark:hover:text-violet-400 transition-colors"
                       >
                         {isSpeaking ? <Volume2 className="w-3 h-3 animate-pulse" /> : <Volume2 className="w-3 h-3" />} Play
                       </button>
                       <button
                         onClick={() => handleCopy(msg.content, msg.id)}
-                        className="flex items-center gap-1 text-[10px] uppercase font-bold tracking-widest text-white/20 hover:text-emerald-400 transition-colors"
+                        className="flex items-center gap-1 text-[10px] uppercase font-bold tracking-widest text-foreground/30 dark:text-white/20 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                       >
-                        {copiedId === msg.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                        {copiedId === msg.id ? <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-3 h-3" />}
                         {copiedId === msg.id ? "Copied" : "Copy"}
                       </button>
                     </motion.div>
@@ -569,10 +569,10 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
               onClick={() => fileInputRef.current?.click()}
               disabled={isStreaming}
               className={cn(
-                "p-2.5 rounded-xl border transition-all",
+                "p-2.5 rounded-xl border transition-all shadow-sm dark:shadow-none",
                 pendingImage
-                  ? "bg-violet-500/20 border-violet-500/30 text-violet-400"
-                  : "bg-white/5 border-white/10 text-white/30 hover:text-white/60 hover:border-white/20"
+                  ? "bg-violet-500/10 dark:bg-violet-500/20 border-violet-500/20 dark:border-violet-500/30 text-violet-600 dark:text-violet-400"
+                  : "bg-foreground/5 dark:bg-white/5 border-foreground/10 dark:border-white/10 text-foreground/30 dark:text-white/30 hover:text-foreground/60 dark:hover:text-white/60 hover:border-foreground/20 dark:hover:border-white/20"
               )}
               title="Attach image for vision analysis"
             >
@@ -586,7 +586,7 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === "Enter" && !e.shiftKey && sendMessage()}
-              placeholder={
+               placeholder={
                 sources.length === 0 ? "Add sources first..." :
                 isListening ? "Listening..." :
                 selectedSourceId
@@ -594,7 +594,7 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
                   : "Ask a question about all your sources..."
               }
               disabled={isStreaming || sources.length === 0}
-              className="flex-1 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm font-medium text-white focus:outline-none focus:border-violet-400/50 focus:bg-white/10 placeholder:text-white/30 disabled:opacity-50 transition-all shadow-inner"
+              className="flex-1 px-4 py-2.5 bg-foreground/5 dark:bg-white/5 border border-foreground/10 dark:border-white/10 rounded-xl text-sm font-medium text-foreground dark:text-white focus:outline-none focus:border-violet-500/50 dark:focus:border-violet-400/50 focus:bg-foreground/10 dark:focus:bg-white/10 placeholder:text-foreground/20 dark:placeholder:text-white/30 disabled:opacity-50 transition-all shadow-inner"
             />
 
             {/* Mic button */}
@@ -604,10 +604,10 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
               onClick={toggleVoice}
               disabled={isStreaming || sources.length === 0}
               className={cn(
-                "p-2.5 rounded-xl border transition-all",
+                "p-2.5 rounded-xl border transition-all shadow-sm dark:shadow-none",
                 isListening
-                  ? "bg-red-500/20 border-red-500/30 text-red-400 animate-pulse"
-                  : "bg-white/5 border-white/10 text-white/30 hover:text-white/60 hover:border-white/20"
+                  ? "bg-red-500/10 dark:bg-red-500/20 border-red-500/20 dark:border-red-500/30 text-red-600 dark:text-red-400 animate-pulse"
+                  : "bg-foreground/5 dark:bg-white/5 border-foreground/10 dark:border-white/10 text-foreground/30 dark:text-white/30 hover:text-foreground/60 dark:hover:text-white/60 hover:border-foreground/20 dark:hover:border-white/20"
               )}
               title={isListening ? "Stop recording" : "Hold to speak (Whisper)"}
             >
@@ -636,7 +636,7 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
               </motion.button>
             )}
           </div>
-          <p className="text-[10px] text-white/25 text-center mt-2 font-medium">
+          <p className="text-[10px] text-foreground/20 dark:text-white/25 text-center mt-2 font-medium">
             Powered by GPT-5.4 Vision · Whisper STT · OpenAI Nova TTS
           </p>
         </div>
