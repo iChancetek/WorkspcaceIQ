@@ -208,7 +208,7 @@ export function VoiceJournal({ entryType }: VoiceJournalProps) {
                 )}
               >
                 {isTranscribing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mic className="w-4 h-4" />}
-                {isTranscribing ? "Transcribing with ChanceScribe…" : "Record"}
+                {isTranscribing ? "Transcribing with WorkspaceIQ…" : "Record"}
               </button>
             ) : (
               <button

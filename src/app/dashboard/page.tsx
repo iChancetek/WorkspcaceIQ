@@ -162,7 +162,7 @@ export default function Dashboard() {
         <header className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
             <BrandLogo size={28} />
-            <span className="text-base font-semibold tracking-tight text-white">ChanceScribe AI</span>
+            <span className="text-base font-semibold tracking-tight text-white">WorkspaceIQ</span>
           </Link>
           <div className="flex items-center gap-3">
             <span className="hidden sm:flex items-center gap-1.5 text-xs font-medium text-blue-400/80 bg-blue-400/10 border border-blue-400/20 px-3 py-1.5 rounded-full">
@@ -226,7 +226,7 @@ export default function Dashboard() {
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <div className="h-px flex-1 bg-white/8" />
-                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/25">Also available in ChanceScribe AI</p>
+                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/25">Also available in WorkspaceIQ</p>
                 <div className="h-px flex-1 bg-white/8" />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

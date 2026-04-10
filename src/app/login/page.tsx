@@ -70,7 +70,7 @@ export default function LoginPage() {
   };
 
   const subtitles: Record<Mode, string> = {
-    signin: "Sign in to ChanceScribe AI",
+    signin: "Sign in to WorkspaceIQ",
     signup: "Start researching and dictating with AI",
     reset: "We'll send a reset link to your email",
   };
@@ -96,7 +96,7 @@ export default function LoginPage() {
         <div className="flex flex-col items-center mb-8">
           <Link href="/" className="group flex items-center gap-2.5 mb-6 hover:opacity-80 transition-opacity">
             <BrandLogo size={40} className="shadow-2xl shadow-blue-500/20" />
-            <span className="text-xl font-semibold tracking-tight">ChanceScribe AI</span>
+            <span className="text-xl font-semibold tracking-tight">WorkspaceIQ</span>
           </Link>
           <h1 className="text-3xl font-bold tracking-tight text-white text-center">{titles[mode]}</h1>
           <p className="text-white/40 text-sm mt-2 text-center">{subtitles[mode]}</p>
@@ -235,7 +235,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-xs text-white/15 mt-6">
-          By continuing, you agree to ChanceScribe AI&apos;s{" "}
+          By continuing, you agree to WorkspaceIQ&apos;s{" "}
           <a href="#" className="underline hover:text-white/40 transition-colors">Terms</a>
           {" "}and{" "}
           <a href="#" className="underline hover:text-white/40 transition-colors">Privacy Policy</a>.

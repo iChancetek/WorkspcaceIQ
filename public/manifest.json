@@ -1,7 +1,7 @@
 {
-  "name": "ChanceScribe AI",
-  "short_name": "ChanceScribe AI",
-  "description": "Power your thinking with ChanceScribe AI",
+  "name": "WorkspaceIQ",
+  "short_name": "WorkspaceIQ",
+  "description": "Power your thinking with WorkspaceIQ",
   "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#050508",

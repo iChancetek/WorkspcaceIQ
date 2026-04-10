@@ -38,7 +38,7 @@ export function generateProjectMarkdown(project: ProjectData): string {
     });
   }
 
-  md += `\n*Produced with ChanceScribe AI*`;
+  md += `\n*Produced with WorkspaceIQ*`;
   return md;
 }
 

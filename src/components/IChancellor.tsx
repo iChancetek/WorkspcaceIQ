@@ -11,7 +11,7 @@ interface Message {
 }
 
 const GREETINGS = [
-  "Hi! I'm iChancellor, your ChanceScribe AI guide. What can I help you discover today?",
+  "Hi! I'm iChancellor, your WorkspaceIQ guide. What can I help you discover today?",
 ];
 
 export function IChancellor() {
@@ -33,7 +33,7 @@ export function IChancellor() {
 
   // Auto-seed knowledge base on first open (version-gated so re-seeds on content updates)
   useEffect(() => {
-    const SEED_VERSION = "cs-kb-v4"; // Bump this string whenever knowledge content changes
+    const SEED_VERSION = "wiq-kb-v5"; // Bump this string whenever knowledge content changes
     const alreadySeeded = typeof window !== "undefined" && localStorage.getItem("ichancellor_seed") === SEED_VERSION;
 
     if (isOpen && !alreadySeeded) {
@@ -171,7 +171,7 @@ export function IChancellor() {
   };
 
   const suggestions = [
-    "What is ChanceScribe?",
+    "What is WorkspaceIQ?",
     "How does Flow mode work?",
     "Tell me about Deep Dive",
     "How do I upload research sources?",

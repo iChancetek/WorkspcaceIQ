@@ -4,23 +4,23 @@ import { ingestDocument } from "@/lib/rag/pinecone";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// Seed ChanceScribe's knowledge base — v3: comprehensive full-app encyclopedi// Seed ChanceScribe's knowledge base — v4: Studio, Data, and Projects update
-const CHANCESCRIBE_KNOWLEDGE = `
-=== CHANCESCRIBE: COMPLETE KNOWLEDGE BASE v4 ===
+// Seed WorkspaceIQ's knowledge base — v5: WorkspaceIQ Rebrand
+const WORKSPACEIQ_KNOWLEDGE = `
+=== WORKSPACEIQ: COMPLETE KNOWLEDGE BASE v5 ===
 
-WHAT IS CHANCESCRIBE?
-ChanceScribe is an AI-powered research, dictation, and understanding platform. It is built for professionals, students, researchers, writers, and anyone who needs to think smarter, write faster, and understand deeper. It is powered by OpenAI GPT-5.4 and hosted on Firebase App Hosting (Google Cloud Run, us-east4 region).
+WHAT IS WORKSPACEIQ?
+WorkspaceIQ is an AI-powered research, dictation, and understanding platform. It is built for professionals, students, researchers, writers, and anyone who needs to think smarter, write faster, and understand deeper. It is powered by OpenAI GPT-5.4 and hosted on Firebase App Hosting (Google Cloud Run, us-east4 region).
 
 COMPANY AND BRAND:
-Product name: ChanceScribe
-Brand tagline: Power your thinking with ChanceScribe AI
+Product name: WorkspaceIQ
+Brand tagline: Power your thinking with WorkspaceIQ AI
 Secondary tagline: Frictionless Intelligence, Privacy-Native
 Creator / Owner: iChancetek
 Website: chancescribe--chancescribe.us-east4.hosted.app
 Contact: DevOps@ichancetek.com
 
 HOW TO GET STARTED:
-1. Visit the ChanceScribe landing page.
+1. Visit the WorkspaceIQ landing page.
 2. Click Start for free or Sign in to go to the login page.
 3. Sign in with Google or create an email/password account.
 4. After login, you are taken to the dashboard.
@@ -37,12 +37,12 @@ iChancellor widget - Floating chat button in the bottom-right corner of landing 
 === FLOW MODE ===
 
 WHAT IS FLOW?
-Flow is ChanceScribe's core dictation product. It turns spoken words into polished professional writing using GPT-5.4. Flow is the default tab when you open the dashboard.
+Flow is WorkspaceIQ's core dictation product. It turns spoken words into polished professional writing using GPT-5.4. Flow is the default tab when you open the dashboard.
 
 HOW TO USE FLOW:
 1. Open the dashboard - you land on the Flow tab.
 2. Click the microphone button to begin recording, or type/paste text into the writing pad.
-3. Speak naturally. ChanceScribe records your voice in real time.
+3. Speak naturally. WorkspaceIQ records your voice in real time.
 4. Click Stop. Whisper AI transcribes your speech.
 5. GPT-5.4 polishes the raw transcript - removing filler words, correcting structure, applying your chosen tone.
 6. The polished text appears in the writing pad.
@@ -60,7 +60,7 @@ Six AI voices: Nova (default), Alloy, Echo, Fable, Onyx, Shimmer.
 === RESEARCH & DATA MODE ===
 
 WHAT IS RESEARCH MODE?
-Research mode is ChanceScribe's document intelligence workspace. Users upload multiple sources (files, URLs, YouTube videos, spreadsheets), then ask questions or use Studio tools.
+Research mode is WorkspaceIQ's document intelligence workspace. Users upload multiple sources (files, URLs, YouTube videos, spreadsheets), then ask questions or use Studio tools.
 
 RESEARCH: SUPPORTED SOURCE TYPES
 - PDF, DOCX, TXT
@@ -70,7 +70,7 @@ RESEARCH: SUPPORTED SOURCE TYPES
 - GOOGLE SHEETS: Paste a "Published to Web" CSV URL to instantly ingest your live spreadsheet data.
 
 DATA DASHBOARD & VISUALIZATION:
-When a spreadsheet is uploaded, ChanceScribe automatically generates a Data Dashboard.
+When a spreadsheet is uploaded, WorkspaceIQ automatically generates a Data Dashboard.
 - Automated Charts: Uses Recharts to plot numeric data into Bar, Line, and Pie charts.
 - Executive Briefings: AI analyzes the data to provide three persona-based views:
   - CEO: High-level strategic summary, bottom-line impact.
@@ -111,7 +111,7 @@ LIBRARY CONTROLS:
 Generates a 2-3 minute AI podcast discussion between Alex (Nova) and Sam (Echo). Fully downloadable as an MP3. Supports English, Spanish, French, and Chinese.
 
 === ICHANCELLOR AI ASSISTANT ===
-RAG-powered agent using Pinecone and GPT-5.4. Uses text-embedding-3-small (1536 dims). Maintains conversation memory and features voice input/output. Knowledge base version: v4.
+RAG-powered agent using Pinecone and GPT-5.4. Uses text-embedding-3-small (1536 dims). Maintains conversation memory and features voice input/output. Knowledge base version: v5.
 `;
 ;
 
@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
   try {
     const { text, source, trigger } = await req.json();
 
-    const contentToIngest = text ?? (trigger === "seed" ? CHANCESCRIBE_KNOWLEDGE : null);
+    const contentToIngest = text ?? (trigger === "seed" ? WORKSPACEIQ_KNOWLEDGE : null);
 
     if (!contentToIngest) {
       return NextResponse.json({ error: "No content provided" }, { status: 400 });

@@ -108,7 +108,7 @@ export function StreamingAudioRecorder() {
           const formData = new FormData();
           formData.append("audio", new File([audioBlob], "recording.webm"));
           
-          setTranscript("Transcribing with ChanceScribe...");
+          setTranscript("Transcribing with WorkspaceIQ...");
           
           // 1. Whisper STT transcription
           const rawText = await transcribeAudio(formData);

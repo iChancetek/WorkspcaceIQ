@@ -8,19 +8,19 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://chancescribe--chancescribe.us-east4.hosted.app"),
-  title: "ChanceScribe — Power your thinking with ChanceScribe AI",
+  title: "WorkspaceIQ — Power your thinking with WorkspaceIQ",
   description: "Dictate, research, and create with GPT-5.4. Upload any source, ask anything, and generate AI podcasts from your content.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    title: "ChanceScribe",
+    title: "WorkspaceIQ",
     statusBarStyle: "black-translucent",
   },
   openGraph: {
-    title: "ChanceScribe — Power your thinking with ChanceScribe AI",
+    title: "WorkspaceIQ — Power your thinking with WorkspaceIQ",
     description: "Frictionless Intelligence. Privacy-Native. Dictate, research, and understand deeper with GPT-5.4.",
     url: "https://chancescribe--chancescribe.us-east4.hosted.app",
-    siteName: "ChanceScribe",
+    siteName: "WorkspaceIQ",
     images: [
       {
         url: "/og-image.png",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "ChanceScribe — Power your thinking with ChanceScribe AI",
+    title: "WorkspaceIQ — Power your thinking with WorkspaceIQ",
     description: "Frictionless Intelligence. Privacy-Native. Dictate, research, and understand deeper with GPT-5.4.",
     images: ["/og-image.png"],
   },

@@ -69,7 +69,7 @@ export default function Home() {
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 via-violet-400 to-emerald-400 flex items-center justify-center shadow-lg shadow-blue-500/30">
             <Mic className="w-4 h-4 text-white" />
           </div>
-          <span className="text-lg font-semibold tracking-tight text-white">ChanceScribe AI</span>
+          <span className="text-lg font-semibold tracking-tight text-white">WorkspaceIQ</span>
         </div>
         <div className="flex items-center gap-4">
           <Link
@@ -98,7 +98,7 @@ export default function Home() {
         <h1 className="text-5xl md:text-7xl font-bold leading-[1.08] tracking-tight text-white mb-6">
           Power your thinking with{' '}
           <span className="bg-gradient-to-r from-blue-400 via-violet-400 to-emerald-400 bg-clip-text text-transparent">
-            ChanceScribe AI
+            WorkspaceIQ
           </span>
         </h1>
 
@@ -180,13 +180,13 @@ export default function Home() {
               Everything you need to think smarter
             </h2>
             <p className="text-lg text-white/50 max-w-xl mx-auto mb-10 font-light">
-              From a single dictation to a full research workspace — ChanceScribe scales with every idea.
+              From a single dictation to a full research workspace — WorkspaceIQ scales with every idea.
             </p>
             <Link
               href="/dashboard"
               className="inline-flex items-center gap-2.5 px-10 py-4 bg-[#1a73e8] hover:bg-[#1a73e8]/90 text-white font-semibold rounded-full shadow-xl shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-[1.02] transition-all duration-200"
             >
-              Open ChanceScribe <ArrowRight className="w-4 h-4" />
+              Open WorkspaceIQ <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
@@ -196,7 +196,7 @@ export default function Home() {
       <footer className="relative z-10 border-t border-white/6 max-w-6xl mx-auto px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 via-violet-400 to-emerald-400" />
-          <span className="text-sm text-white/30 font-medium">ChanceScribe AI © 2026</span>
+          <span className="text-sm text-white/30 font-medium">WorkspaceIQ © 2026</span>
         </div>
         <div className="flex items-center gap-6">
           {['Privacy', 'Terms', 'Support'].map((item) => (

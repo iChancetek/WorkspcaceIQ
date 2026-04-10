@@ -19,8 +19,8 @@ const flowFeatures = [
 ];
 
 const researchFeatures = [
-  { icon: FileText, title: "PDF & DOCX Ingestion", desc: "Upload research papers, contracts, articles, or notes. ChanceScribe reads and indexes everything instantly." },
-  { icon: Video, title: "YouTube & Web URLs", desc: "Paste any YouTube link or website URL. ChanceScribe extracts the content and adds it to your research workspace." },
+  { icon: FileText, title: "PDF & DOCX Ingestion", desc: "Upload research papers, contracts, articles, or notes. WorkspaceIQ reads and indexes everything instantly." },
+  { icon: Video, title: "YouTube & Web URLs", desc: "Paste any YouTube link or website URL. WorkspaceIQ extracts the content and adds it to your research workspace." },
   { icon: Music, title: "Audio File Analysis", desc: "Upload MP3, WAV, and M4A files. Whisper AI transcribes them and they become fully searchable research sources." },
   { icon: Sparkles, title: "Citation Grounding", desc: "Every AI response explicitly cites its source using [Source N] notation. Always know where your answers come from." },
   { icon: BookOpen, title: "5 Analysis Modes", desc: "Summarize, Study, Organize, Create, and Rewrite. Every mode unlocks a different way of understanding your content." },
@@ -110,7 +110,7 @@ export default function LearnMorePage() {
       <nav className="relative z-10 flex items-center justify-between max-w-6xl mx-auto px-8 py-6 border-b border-white/5">
         <Link href="/" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
           <BrandLogo size={28} />
-          <span className="text-base font-semibold tracking-tight">ChanceScribe AI</span>
+          <span className="text-base font-semibold tracking-tight">WorkspaceIQ</span>
         </Link>
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-1.5 text-sm text-white/40 hover:text-white transition-colors">
@@ -124,7 +124,7 @@ export default function LearnMorePage() {
 
       {/* Hero */}
       <section className="relative z-10 max-w-6xl mx-auto px-8 pt-20 pb-16 text-center">
-        <p className="text-xs font-bold tracking-[0.25em] uppercase text-blue-400 mb-5">Everything ChanceScribe Can Do</p>
+        <p className="text-xs font-bold tracking-[0.25em] uppercase text-blue-400 mb-5">Everything WorkspaceIQ Can Do</p>
         <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-6 leading-[1.05]">
           One platform.<br />
           <span className="bg-gradient-to-r from-blue-400 via-violet-400 to-emerald-400 bg-clip-text text-transparent">
@@ -132,7 +132,7 @@ export default function LearnMorePage() {
           </span>
         </h1>
         <p className="text-xl text-white/40 max-w-2xl mx-auto font-light mb-14">
-          From dictation to research to AI podcasts — every feature of ChanceScribe, explained.
+          From dictation to research to AI podcasts — every feature of WorkspaceIQ, explained.
         </p>
 
         {/* Feature nav pills */}
@@ -176,7 +176,7 @@ export default function LearnMorePage() {
         id="research"
         badge="Research Mode"
         title="Upload anything. Understand everything."
-        subtitle="ChanceScribe becomes a personalized AI expert in any content you provide."
+        subtitle="WorkspaceIQ becomes a personalized AI expert in any content you provide."
         features={researchFeatures}
         accent="text-violet-400"
       />
@@ -244,7 +244,7 @@ export default function LearnMorePage() {
 
       {/* Footer */}
       <footer className="relative z-10 border-t border-white/5 max-w-6xl mx-auto px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <span className="text-sm text-white/25">ChanceScribe © 2026</span>
+        <span className="text-sm text-white/25">WorkspaceIQ © 2026</span>
         <div className="flex gap-6">
           {["Privacy", "Terms", "Support"].map(item => (
             <a key={item} href="#" className="text-xs text-white/20 hover:text-white/50 transition-colors">{item}</a>
