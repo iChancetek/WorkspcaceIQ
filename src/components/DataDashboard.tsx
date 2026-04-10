@@ -235,13 +235,14 @@ export function DataDashboard({ sources, tone }: DataDashboardProps) {
                 <YAxis tick={{ fill: "currentColor", fontSize: 10 }} className="text-foreground/30 dark:text-white/30" />
                 <Tooltip 
                   contentStyle={{ 
-                    background: "canvas", 
-                    border: "1px solid currentColor", 
+                    background: "var(--background)", 
+                    border: "1px solid var(--border)", 
                     borderRadius: "12px", 
                     fontSize: "12px",
-                    boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)"
-                  }} 
-                  className="text-foreground/10"
+                    boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
+                    color: "inherit"
+                  }}
+                  itemStyle={{ color: "var(--foreground)" }}
                 />
                 {numericHeaders.slice(0, 3).map((h, i) => (
                   <Bar key={h} dataKey={h} fill={CHART_COLORS[i]} radius={[4, 4, 0, 0]} />
@@ -256,11 +257,20 @@ export function DataDashboard({ sources, tone }: DataDashboardProps) {
               <p className="text-xs font-bold text-white/50 mb-4">Trend — {numericHeaders.slice(0, 2).join(" vs ")}</p>
               <ResponsiveContainer width="100%" height={180}>
                 <LineChart data={chartData.slice(0, 12)}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                  <XAxis dataKey={labelHeader} tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 10 }} />
-                  <YAxis tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 10 }} />
-                  <Tooltip contentStyle={{ background: "#0d0d12", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", color: "white", fontSize: "12px" }} />
-                  <Legend wrapperStyle={{ fontSize: "10px", color: "rgba(255,255,255,0.4)" }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-foreground/10 dark:text-white/5" />
+                  <XAxis dataKey={labelHeader} tick={{ fill: "currentColor", fontSize: 10 }} className="text-foreground/30 dark:text-white/30" />
+                  <YAxis tick={{ fill: "currentColor", fontSize: 10 }} className="text-foreground/30 dark:text-white/30" />
+                  <Tooltip 
+                    contentStyle={{ 
+                      background: "var(--background)", 
+                      border: "1px solid var(--border)", 
+                      borderRadius: "12px", 
+                      fontSize: "12px",
+                      color: "inherit"
+                    }}
+                    itemStyle={{ color: "var(--foreground)" }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: "10px", color: "var(--foreground)", opacity: 0.4 }} />
                   {numericHeaders.slice(0, 2).map((h, i) => (
                     <Line key={h} type="monotone" dataKey={h} stroke={CHART_COLORS[i]} strokeWidth={2} dot={{ fill: CHART_COLORS[i], r: 3 }} />
                   ))}
@@ -282,12 +292,20 @@ export function DataDashboard({ sources, tone }: DataDashboardProps) {
                     cx="50%" cy="50%"
                     outerRadius={80}
                     label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
+                    className="text-[10px] font-bold fill-foreground"
                   >
                     {chartData.map((_, index) => (
-                      <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                      <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} stroke="var(--background)" strokeWidth={2} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ background: "#0d0d12", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", color: "white", fontSize: "12px" }} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      background: "var(--background)", 
+                      border: "1px solid var(--border)", 
+                      borderRadius: "12px", 
+                      fontSize: "12px"
+                    }} 
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>
