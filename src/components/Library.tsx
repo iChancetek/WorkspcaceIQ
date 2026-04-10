@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import {
   Trash2, RotateCcw, Pencil, Check, X, ChevronDown, ChevronUp,
-  Mic, BookOpen, StickyNote, Headphones, Search, Clock, AlertTriangle, Loader2, FileText, Download
+  Mic, BookOpen, StickyNote, Headphones, Search, Clock,
+  AlertTriangle, Loader2, FileText, Download, FolderOpen, Plus
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
@@ -12,6 +13,15 @@ import {
   subscribeToItems, subscribeToTrash,
   softDeleteItem, recoverItem, hardDeleteItem, updateItem, purgeExpiredItems
 } from "@/lib/firebase/items";
+import {
+  ResearchProject,
+  subscribeToProjects,
+  subscribeToDeletedProjects,
+  softDeleteProject,
+  recoverProject,
+  hardDeleteProject,
+  updateProject,
+} from "@/lib/firebase/projects";
 import { Timestamp } from "firebase/firestore";
 import { generateProjectMarkdown, downloadFile } from "@/lib/export";
 
@@ -25,7 +35,10 @@ function daysUntilPurge(deletedAt: Timestamp | null): number {
 
 function formatDate(ts: Timestamp | null | undefined): string {
   if (!ts) return "—";
-  return ts.toDate().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  return ts.toDate().toLocaleDateString("en-US", {
+    month: "short", day: "numeric", year: "numeric",
+    hour: "2-digit", minute: "2-digit",
+  });
 }
 
 const TYPE_ICONS: Record<ItemType, any> = {
@@ -85,7 +98,9 @@ function ItemCard({
     const md = generateProjectMarkdown({
       title: item.title,
       sources: item.metadata?.sources || [],
-      studioOutputs: item.metadata?.studioOutput ? { [item.metadata.studioOutput.mode]: item.metadata.studioOutput.json || item.metadata.studioOutput.text } : {},
+      studioOutputs: item.metadata?.studioOutput
+        ? { [item.metadata.studioOutput.mode]: item.metadata.studioOutput.json || item.metadata.studioOutput.text }
+        : {},
       createdAt: (item.createdAt as any)?.toDate?.()?.toISOString() || new Date().toISOString(),
     });
     downloadFile(md, `${item.title.toLowerCase().replace(/\s+/g, "-")}.md`, "text/markdown");
@@ -100,17 +115,15 @@ function ItemCard({
         ? "bg-red-500/[0.03] border-red-500/10 hover:border-red-500/20"
         : "bg-white/[0.03] border-white/8 hover:border-white/15 hover:bg-white/[0.05]"
     )}>
-      {/* Card Header */}
       <div className="flex items-start gap-3 p-5">
         <div className={cn("w-8 h-8 rounded-xl bg-white/5 border border-white/8 flex items-center justify-center shrink-0 mt-0.5", color)}>
           <Icon className="w-4 h-4" />
         </div>
-
         <div className="flex-1 min-w-0">
           {isEditing ? (
             <input
               value={editTitle}
-              onChange={e => setEditTitle(e.target.value)}
+              onChange={(e) => setEditTitle(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm font-semibold text-white focus:outline-none focus:border-blue-400/50 mb-2"
             />
           ) : (
@@ -132,24 +145,17 @@ function ItemCard({
             )}
           </div>
         </div>
-
-        {/* Actions */}
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
           {item.type === "research" && !isTrash && onRestore && (
             <button
               onClick={() => onRestore(item)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 transition-all text-[10px] font-bold mr-1"
             >
-              <RotateCcw className="w-3 h-3" />
-              Restore
+              <RotateCcw className="w-3 h-3" /> Restore
             </button>
           )}
           {item.type === "research" && !isTrash && (
-            <button
-              onClick={handleExport}
-              className="p-1.5 rounded-lg hover:bg-white/8 text-white/30 hover:text-white/70 transition-colors"
-              title="Export Markdown"
-            >
+            <button onClick={handleExport} className="p-1.5 rounded-lg hover:bg-white/8 text-white/30 hover:text-white/70 transition-colors" title="Export Markdown">
               <Download className="w-3.5 h-3.5" />
             </button>
           )}
@@ -185,19 +191,17 @@ function ItemCard({
               <button onClick={() => setConfirmDelete(false)} className="px-2 py-1 rounded-lg hover:bg-white/8 text-white/30 text-[10px] font-bold transition-colors">No</button>
             </div>
           )}
-          <button onClick={() => setIsExpanded(o => !o)} className="p-1.5 rounded-lg hover:bg-white/8 text-white/30 hover:text-white/70 transition-colors">
+          <button onClick={() => setIsExpanded((o) => !o)} className="p-1.5 rounded-lg hover:bg-white/8 text-white/30 hover:text-white/70 transition-colors">
             {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
           </button>
         </div>
       </div>
-
-      {/* Expanded Content */}
       {isExpanded && (
         <div className="px-5 pb-5 border-t border-white/5 pt-4">
           {isEditing ? (
             <textarea
               value={editContent}
-              onChange={e => setEditContent(e.target.value)}
+              onChange={(e) => setEditContent(e.target.value)}
               rows={8}
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white/80 leading-relaxed focus:outline-none focus:border-blue-400/50 resize-none"
             />
@@ -210,23 +214,152 @@ function ItemCard({
   );
 }
 
-// ─── Main Library Component ────────────────────────────────────────────────────
+// ─── Project Card ─────────────────────────────────────────────────────────────
 
-type LibraryView = "all" | ItemType | "trash";
+function ProjectCard({
+  project,
+  onOpen,
+  onDelete,
+  onRecover,
+  onRename,
+  isTrash = false,
+}: {
+  project: ResearchProject;
+  onOpen?: (project: ResearchProject) => void;
+  onDelete: (id: string) => void;
+  onRecover?: (id: string) => void;
+  onRename: (id: string, name: string) => void;
+  isTrash?: boolean;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(project.name);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const days = daysUntilPurge(project.deletedAt);
+  const sourceCount = project.sources?.length ?? 0;
+  const outputCount = Object.keys(project.studioOutputs ?? {}).length;
 
-export function Library({ onRestoreProject }: { onRestoreProject?: (project: SavedItem) => void }) {
+  const handleSave = async () => {
+    if (!editName.trim()) return;
+    setIsSaving(true);
+    await onRename(project.id, editName.trim());
+    setIsEditing(false);
+    setIsSaving(false);
+  };
+
+  return (
+    <div className={cn(
+      "group rounded-2xl border transition-all duration-200",
+      isTrash
+        ? "bg-red-500/[0.03] border-red-500/10 hover:border-red-500/20"
+        : "bg-white/[0.03] border-white/8 hover:border-violet-500/20 hover:bg-violet-500/[0.03]"
+    )}>
+      <div className="flex items-start gap-3 p-5">
+        <div className="w-8 h-8 rounded-xl bg-violet-500/10 border border-violet-500/15 flex items-center justify-center shrink-0 mt-0.5 text-violet-400">
+          <FolderOpen className="w-4 h-4" />
+        </div>
+        <div className="flex-1 min-w-0">
+          {isEditing ? (
+            <input
+              autoFocus
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") handleSave(); if (e.key === "Escape") setIsEditing(false); }}
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm font-semibold text-white focus:outline-none focus:border-violet-400/50 mb-2"
+            />
+          ) : (
+            <h4 className="text-sm font-semibold text-white truncate pr-2">{project.name}</h4>
+          )}
+          <div className="flex items-center gap-2 mt-1 flex-wrap">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-violet-400">Project</span>
+            <span className="text-[10px] text-white/40">·</span>
+            <span className="text-[10px] text-white/45">{sourceCount} source{sourceCount !== 1 ? "s" : ""}</span>
+            {outputCount > 0 && (
+              <>
+                <span className="text-[10px] text-white/40">·</span>
+                <span className="text-[10px] text-white/45">{outputCount} output{outputCount !== 1 ? "s" : ""}</span>
+              </>
+            )}
+            <span className="text-[10px] text-white/40">·</span>
+            <span className="text-[10px] text-white/40">{formatDate(project.updatedAt)}</span>
+            {isTrash && days <= 3 && (
+              <span className="flex items-center gap-1 text-[10px] text-red-400/80">
+                <AlertTriangle className="w-3 h-3" /> {days}d left
+              </span>
+            )}
+          </div>
+        </div>
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+          {!isTrash && onOpen && (
+            <button
+              onClick={() => onOpen(project)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 transition-all text-[10px] font-bold mr-1"
+            >
+              <FolderOpen className="w-3 h-3" /> Open
+            </button>
+          )}
+          {!isTrash && !isEditing && (
+            <button onClick={() => { setEditName(project.name); setIsEditing(true); }} className="p-1.5 rounded-lg hover:bg-white/8 text-white/30 hover:text-white/70 transition-colors">
+              <Pencil className="w-3.5 h-3.5" />
+            </button>
+          )}
+          {isEditing && (
+            <>
+              <button onClick={handleSave} disabled={isSaving} className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors">
+                {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+              </button>
+              <button onClick={() => setIsEditing(false)} className="p-1.5 rounded-lg hover:bg-white/8 text-white/30 transition-colors">
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </>
+          )}
+          {isTrash && onRecover && (
+            <button onClick={() => onRecover(project.id)} className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors" title="Recover">
+              <RotateCcw className="w-3.5 h-3.5" />
+            </button>
+          )}
+          {!isEditing && !confirmDelete && (
+            <button onClick={() => setConfirmDelete(true)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-white/30 hover:text-red-400 transition-colors">
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          )}
+          {confirmDelete && (
+            <div className="flex items-center gap-1">
+              <span className="text-[10px] text-red-400/80 font-medium">{isTrash ? "Delete forever?" : "Trash?"}</span>
+              <button onClick={() => { onDelete(project.id); setConfirmDelete(false); }} className="px-2 py-1 rounded-lg bg-red-500/20 text-red-400 text-[10px] font-bold hover:bg-red-500/30 transition-colors">Yes</button>
+              <button onClick={() => setConfirmDelete(false)} className="px-2 py-1 rounded-lg hover:bg-white/8 text-white/30 text-[10px] font-bold transition-colors">No</button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Library ─────────────────────────────────────────────────────────────
+
+type LibraryView = "all" | ItemType | "projects" | "trash";
+
+export function Library({
+  onRestoreProject,
+  onOpenResearchProject,
+}: {
+  onRestoreProject?: (project: SavedItem) => void;
+  onOpenResearchProject?: (project: ResearchProject) => void;
+}) {
   const { user } = useAuth();
-  const [view, setView] = useState<LibraryView>("all");
+  const [view, setView] = useState<LibraryView>("projects");
   const [items, setItems] = useState<SavedItem[]>([]);
   const [trashItems, setTrashItems] = useState<SavedItem[]>([]);
+  const [projects, setProjects] = useState<ResearchProject[]>([]);
+  const [deletedProjects, setDeletedProjects] = useState<ResearchProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Subscribe to active items
   useEffect(() => {
     if (!user) return;
     setLoading(true);
-    const type = view === "trash" || view === "all" ? "all" : view;
+    const type = view === "trash" || view === "all" || view === "projects" ? "all" : view;
     const unsub = subscribeToItems(user.uid, type, (data) => {
       setItems(data);
       setLoading(false);
@@ -234,14 +367,24 @@ export function Library({ onRestoreProject }: { onRestoreProject?: (project: Sav
     return unsub;
   }, [user, view]);
 
-  // Subscribe to trash
   useEffect(() => {
     if (!user) return;
     const unsub = subscribeToTrash(user.uid, setTrashItems);
     return unsub;
   }, [user]);
 
-  // Auto-purge expired items on mount
+  useEffect(() => {
+    if (!user) return;
+    const unsub = subscribeToProjects(user.uid, setProjects);
+    return unsub;
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    const unsub = subscribeToDeletedProjects(user.uid, setDeletedProjects);
+    return unsub;
+  }, [user]);
+
   useEffect(() => {
     if (user) purgeExpiredItems(user.uid).catch(console.warn);
   }, [user]);
@@ -262,20 +405,44 @@ export function Library({ onRestoreProject }: { onRestoreProject?: (project: Sav
     await updateItem(user.uid, id, { title, content });
   }, [user]);
 
+  const handleDeleteProject = useCallback(async (id: string) => {
+    if (!user) return;
+    if (view === "trash") await hardDeleteProject(user.uid, id);
+    else await softDeleteProject(user.uid, id);
+  }, [user, view]);
+
+  const handleRecoverProject = useCallback(async (id: string) => {
+    if (!user) return;
+    await recoverProject(user.uid, id);
+  }, [user]);
+
+  const handleRenameProject = useCallback(async (id: string, name: string) => {
+    if (!user) return;
+    await updateProject(user.uid, id, { name });
+  }, [user]);
+
+  const trashCount = trashItems.length + deletedProjects.length;
   const displayItems = view === "trash" ? trashItems : items;
-  const filtered = displayItems.filter(item =>
-    !searchQuery || item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  const filtered = displayItems.filter((item) =>
+    !searchQuery ||
+    item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.content.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const filteredProjects = projects.filter((p) =>
+    !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const filteredDeletedProjects = deletedProjects.filter((p) =>
+    !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const NAV: { id: LibraryView; label: string; icon: any; color: string }[] = [
-    { id: "all", label: "All", icon: BookOpen, color: "text-white/60" },
-    { id: "flow", label: "Flow", icon: Mic, color: "text-blue-400" },
-    { id: "journal", label: "Journal", icon: BookOpen, color: "text-amber-400" },
-    { id: "memo", label: "Memos", icon: StickyNote, color: "text-sky-400" },
-    { id: "research", label: "Research", icon: Search, color: "text-violet-400" },
-    { id: "deepdive", label: "Deep Dive", icon: Headphones, color: "text-emerald-400" },
-    { id: "trash", label: `Trash${trashItems.length > 0 ? ` (${trashItems.length})` : ""}`, icon: Trash2, color: "text-red-400" },
+    { id: "projects", label: "Projects", icon: FolderOpen, color: "text-violet-400" },
+    { id: "all",      label: "All",      icon: BookOpen,   color: "text-white/60" },
+    { id: "flow",     label: "Flow",     icon: Mic,        color: "text-blue-400" },
+    { id: "journal",  label: "Journal",  icon: BookOpen,   color: "text-amber-400" },
+    { id: "memo",     label: "Memos",    icon: StickyNote, color: "text-sky-400" },
+    { id: "deepdive", label: "Deep Dive",icon: Headphones, color: "text-emerald-400" },
+    { id: "trash",    label: `Trash${trashCount > 0 ? ` (${trashCount})` : ""}`, icon: Trash2, color: "text-red-400" },
   ];
 
   return (
@@ -312,7 +479,7 @@ export function Library({ onRestoreProject }: { onRestoreProject?: (project: Sav
         <input
           type="text"
           value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
+          onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search your library…"
           className="w-full bg-white/[0.04] border border-white/8 rounded-full pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-white/20 transition-colors"
         />
@@ -323,44 +490,117 @@ export function Library({ onRestoreProject }: { onRestoreProject?: (project: Sav
         <div className="flex items-center gap-3 px-5 py-3 bg-red-500/[0.06] border border-red-500/15 rounded-2xl">
           <AlertTriangle className="w-4 h-4 text-red-400/70 shrink-0" />
           <p className="text-sm text-red-400/70">
-            Items in the trash are <strong className="text-red-400">permanently deleted after 30 days</strong>. Recover items before they expire.
+            Items in the trash are <strong className="text-red-400">permanently deleted after 30 days</strong>. Recover before they expire.
           </p>
         </div>
       )}
 
-      {/* Items List */}
-      {loading ? (
-        <div className="flex justify-center pt-12">
-          <Loader2 className="w-6 h-6 text-white/20 animate-spin" />
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="text-center pt-16 space-y-3">
-          <div className="w-14 h-14 rounded-2xl bg-white/[0.04] border border-white/8 flex items-center justify-center mx-auto">
-            {view === "trash" ? <Trash2 className="w-6 h-6 text-white/20" /> : <BookOpen className="w-6 h-6 text-white/20" />}
-          </div>
-          <p className="text-white/30 text-sm font-medium">
-            {searchQuery ? "No results found." : view === "trash" ? "Your trash is empty." : "Nothing saved yet. Start creating!"}
-          </p>
-        </div>
-      ) : (
+      {/* ── PROJECTS VIEW ─────────────────────────────────────────────────── */}
+      {view === "projects" && (
         <div className="space-y-3">
-          {filtered.map(item => (
-            <ItemCard
-              key={item.id}
-              item={item}
-              onDelete={handleDelete}
-              onRecover={view === "trash" ? handleRecover : undefined}
-              onUpdate={handleUpdate}
-              onRestore={onRestoreProject}
-              isTrash={view === "trash"}
-            />
-          ))}
+          {loading ? (
+            <div className="flex justify-center pt-12">
+              <Loader2 className="w-6 h-6 text-white/20 animate-spin" />
+            </div>
+          ) : filteredProjects.length === 0 ? (
+            <div className="text-center pt-16 space-y-3">
+              <div className="w-14 h-14 rounded-2xl bg-white/[0.04] border border-white/8 flex items-center justify-center mx-auto">
+                <FolderOpen className="w-6 h-6 text-white/20" />
+              </div>
+              <p className="text-white/30 text-sm font-medium">
+                {searchQuery ? "No projects match your search." : "No projects yet. Start a research session to create one."}
+              </p>
+            </div>
+          ) : (
+            filteredProjects.map((project) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                onOpen={onOpenResearchProject}
+                onDelete={handleDeleteProject}
+                onRename={handleRenameProject}
+              />
+            ))
+          )}
+          {filteredProjects.length > 0 && (
+            <p className="text-center text-xs text-white/20">{filteredProjects.length} project{filteredProjects.length !== 1 ? "s" : ""}</p>
+          )}
         </div>
       )}
 
-      {/* Count */}
-      {filtered.length > 0 && (
-        <p className="text-center text-xs text-white/20">{filtered.length} item{filtered.length !== 1 ? "s" : ""}</p>
+      {/* ── TRASH VIEW ────────────────────────────────────────────────────── */}
+      {view === "trash" && (
+        <div className="space-y-3">
+          {loading ? (
+            <div className="flex justify-center pt-12">
+              <Loader2 className="w-6 h-6 text-white/20 animate-spin" />
+            </div>
+          ) : (
+            <>
+              {filteredDeletedProjects.map((project) => (
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  onDelete={handleDeleteProject}
+                  onRecover={handleRecoverProject}
+                  onRename={handleRenameProject}
+                  isTrash
+                />
+              ))}
+              {filtered.map((item) => (
+                <ItemCard
+                  key={item.id}
+                  item={item}
+                  onDelete={handleDelete}
+                  onRecover={handleRecover}
+                  onUpdate={handleUpdate}
+                  onRestore={onRestoreProject}
+                  isTrash
+                />
+              ))}
+              {filteredDeletedProjects.length === 0 && filtered.length === 0 && (
+                <div className="text-center pt-16 space-y-3">
+                  <div className="w-14 h-14 rounded-2xl bg-white/[0.04] border border-white/8 flex items-center justify-center mx-auto">
+                    <Trash2 className="w-6 h-6 text-white/20" />
+                  </div>
+                  <p className="text-white/30 text-sm font-medium">Your trash is empty.</p>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ── ALL / ITEM TYPE VIEWS ─────────────────────────────────────────── */}
+      {view !== "projects" && view !== "trash" && (
+        loading ? (
+          <div className="flex justify-center pt-12">
+            <Loader2 className="w-6 h-6 text-white/20 animate-spin" />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center pt-16 space-y-3">
+            <div className="w-14 h-14 rounded-2xl bg-white/[0.04] border border-white/8 flex items-center justify-center mx-auto">
+              <BookOpen className="w-6 h-6 text-white/20" />
+            </div>
+            <p className="text-white/30 text-sm font-medium">
+              {searchQuery ? "No results found." : "Nothing saved yet. Start creating!"}
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {filtered.map((item) => (
+              <ItemCard
+                key={item.id}
+                item={item}
+                onDelete={handleDelete}
+                onRecover={undefined}
+                onUpdate={handleUpdate}
+                onRestore={onRestoreProject}
+              />
+            ))}
+            <p className="text-center text-xs text-white/20">{filtered.length} item{filtered.length !== 1 ? "s" : ""}</p>
+          </div>
+        )
       )}
     </div>
   );
