@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import {
   Trash2, RotateCcw, Pencil, Check, X, ChevronDown, ChevronUp,
   Mic, BookOpen, StickyNote, Headphones, Search, Clock,
-  AlertTriangle, Loader2, FileText, Download, FolderOpen, Plus
+  AlertTriangle, Loader2, FileText, Download, FolderOpen, Plus, Globe
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";

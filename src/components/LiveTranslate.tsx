@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import { Mic, Square, Loader2, Play, Pause, Download, ChevronDown, ArrowRightLeft, Settings, Info, Save, RefreshCw, Share2, Sparkles, Check, X, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
