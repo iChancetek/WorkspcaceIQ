@@ -3,10 +3,18 @@
 import { cn } from "@/lib/utils";
 
 const LANGUAGES = [
-  { id: "English", label: "English", icon: "🇺🇸" },
-  { id: "Spanish", label: "Español", icon: "🇪🇸" },
-  { id: "French", label: "Français", icon: "🇫🇷" },
-  { id: "Mandarin", label: "中文", icon: "🇨🇳" },
+  { id: "English", code: "en-US", label: "English", icon: "🇺🇸" },
+  { id: "Spanish", code: "es-ES", label: "Español", icon: "🇪🇸" },
+  { id: "French", code: "fr-FR", label: "Français", icon: "🇫🇷" },
+  { id: "Mandarin", code: "zh-CN", label: "中文", icon: "🇨🇳" },
+  { id: "German", code: "de-DE", label: "Deutsch", icon: "🇩🇪" },
+  { id: "Italian", code: "it-IT", label: "Italiano", icon: "🇮🇹" },
+  { id: "Portuguese", code: "pt-BR", label: "Português", icon: "🇧🇷" },
+  { id: "Japanese", code: "ja-JP", label: "日本語", icon: "🇯🇵" },
+  { id: "Korean", code: "ko-KR", label: "한국어", icon: "🇰🇷" },
+  { id: "Russian", code: "ru-RU", label: "Русский", icon: "🇷🇺" },
+  { id: "Arabic", code: "ar-SA", label: "العربية", icon: "🇸🇦" },
+  { id: "Hindi", code: "hi-IN", label: "हिन्दी", icon: "🇮🇳" },
 ];
 
 interface LanguageSelectorProps {

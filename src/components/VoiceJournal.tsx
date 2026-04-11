@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import {
   Mic, Square, Loader2, Save, Sparkles, Check, BookOpen,
-  ChevronDown, Wand2, Type, X, StickyNote
+  ChevronDown, Wand2, Type, X, StickyNote, Play, Pause, Headphones
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
@@ -40,10 +40,13 @@ export function VoiceJournal({ entryType }: VoiceJournalProps) {
   const [showEnhanceMenu, setShowEnhanceMenu] = useState(false);
   const [activeMode, setActiveMode] = useState<EnhanceMode | null>(null);
   const [error, setError] = useState("");
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isTTSLoading, setIsTTSLoading] = useState(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const enhanceMenuRef = useRef<HTMLDivElement>(null);
+  const audioContextRef = useRef<HTMLAudioElement | null>(null);
 
   // ── Recording ──────────────────────────────────────────────────────────────
 
@@ -149,6 +152,44 @@ export function VoiceJournal({ entryType }: VoiceJournalProps) {
       setError("Failed to save. Please try again.");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  // ── Audio Playback ─────────────────────────────────────────────────────────
+
+  const handlePlayTTS = async () => {
+    if (isPlaying && audioContextRef.current) {
+      audioContextRef.current.pause();
+      setIsPlaying(false);
+      return;
+    }
+    
+    if (!content.trim()) return;
+
+    setError("");
+    setIsTTSLoading(true);
+    try {
+      const res = await fetch("/api/flow/tts", { 
+        method: "POST", 
+        headers: { "Content-Type": "application/json" },
+        // "nova" is standardly considered the calmest, most natural AI voice from OpenAI
+        body: JSON.stringify({ text: content, voice: "nova" }) 
+      });
+      
+      if (!res.ok) throw new Error("TTS generation failed");
+      
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audioContextRef.current = audio;
+      
+      audio.onended = () => setIsPlaying(false);
+      audio.play();
+      setIsPlaying(true);
+    } catch(err: any) {
+      setError("Failed to generate playback audio. Please try again.");
+    } finally {
+      setIsTTSLoading(false);
     }
   };
 
@@ -263,6 +304,25 @@ export function VoiceJournal({ entryType }: VoiceJournalProps) {
                 </div>
               )}
             </div>
+
+            {/* Listen Button */}
+            {content.trim() && (
+              <button
+                onClick={handlePlayTTS}
+                disabled={isTTSLoading}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold transition-all",
+                  isPlaying 
+                    ? "text-blue-400 border border-blue-400/30 bg-blue-400/10" 
+                    : "text-foreground/60 dark:text-white/60 hover:text-foreground dark:hover:text-white border border-foreground/10 dark:border-white/10 hover:bg-foreground/5 dark:hover:bg-white/5",
+                  "disabled:opacity-50"
+                )}
+                title="Listen using natural AI voice"
+              >
+                {isTTSLoading ? <Loader2 className="w-4 h-4 animate-spin text-blue-400" /> : isPlaying ? <Pause className="w-4 h-4" /> : <Headphones className="w-4 h-4" />}
+                <span className="hidden sm:inline">{isPlaying ? "Pause" : isTTSLoading ? "Loading…" : "Listen"}</span>
+              </button>
+            )}
 
             {/* Undo to original */}
             {rawContent && content !== rawContent && (

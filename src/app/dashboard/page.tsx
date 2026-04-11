@@ -17,6 +17,7 @@ import { ToneSelector } from "@/components/ToneSelector";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { AuthGuard } from "@/components/AuthGuard";
 import { VoiceJournal } from "@/components/VoiceJournal";
+import { LiveTranslate } from "@/components/LiveTranslate";
 import { Library as LibraryView } from "@/components/Library";
 import { WorkspaceHeader } from "@/components/WorkspaceHeader";
 import { ProjectSidebar } from "@/components/ProjectSidebar";
@@ -90,6 +91,7 @@ const TABS = [
   { id: "memo",     label: "Memo",      icon: StickyNote,color: "text-sky-400",     glow: "shadow-sky-500/20" },
   { id: "research", label: "Research",  icon: FileText,  color: "text-violet-400",  glow: "shadow-violet-500/20" },
   { id: "deepdive", label: "Deep Dive", icon: Headphones,color: "text-emerald-400", glow: "shadow-emerald-500/20" },
+  { id: "live",     label: "Live Translate", icon: Globe, color: "text-blue-500", glow: "shadow-blue-500/20" },
   { id: "library",  label: "Library",   icon: Library,   color: "text-rose-400",    glow: "shadow-rose-500/20" },
 ];
 
@@ -667,6 +669,13 @@ export default function Dashboard() {
                 onTranscriptGenerated={setDeepDiveTranscript}
               />
             </section>
+
+          {/* ── LIVE TRANSLATE TAB ─────────────────────────────────────────── */}
+          {activeTab === "live" && (
+            <section className="space-y-8">
+              <LiveTranslate />
+            </section>
+          )}
 
           {/* ── LIBRARY TAB ──────────────────────────────────────────────────── */}
           {activeTab === "library" && (

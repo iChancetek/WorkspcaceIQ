@@ -17,7 +17,7 @@ import { db } from "./config";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
-export type ItemType = "flow" | "journal" | "memo" | "research" | "deepdive";
+export type ItemType = "flow" | "journal" | "memo" | "research" | "deepdive" | "live";
 
 export interface SavedItem {
   id: string;

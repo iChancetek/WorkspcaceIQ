@@ -47,6 +47,7 @@ const TYPE_ICONS: Record<ItemType, any> = {
   memo: StickyNote,
   research: Search,
   deepdive: Headphones,
+  live: Globe,
 };
 
 const TYPE_COLORS: Record<ItemType, string> = {
@@ -55,6 +56,7 @@ const TYPE_COLORS: Record<ItemType, string> = {
   memo: "text-sky-600 dark:text-sky-400",
   research: "text-violet-600 dark:text-violet-400",
   deepdive: "text-emerald-600 dark:text-emerald-400",
+  live: "text-blue-500",
 };
 
 const TYPE_LABELS: Record<ItemType, string> = {
@@ -63,6 +65,7 @@ const TYPE_LABELS: Record<ItemType, string> = {
   memo: "Memo",
   research: "Research",
   deepdive: "Deep Dive",
+  live: "Live Session",
 };
 
 // ─── Item Card ────────────────────────────────────────────────────────────────
@@ -442,6 +445,7 @@ export function Library({
     { id: "journal",  label: "Journal",  icon: BookOpen,   color: "text-amber-400" },
     { id: "memo",     label: "Memos",    icon: StickyNote, color: "text-sky-400" },
     { id: "deepdive", label: "Deep Dive",icon: Headphones, color: "text-emerald-400" },
+    { id: "live",     label: "Live",      icon: Globe,      color: "text-blue-500" },
     { id: "trash",    label: `Trash${trashCount > 0 ? ` (${trashCount})` : ""}`, icon: Trash2, color: "text-red-400" },
   ];
 
