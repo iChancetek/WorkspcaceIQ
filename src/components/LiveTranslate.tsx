@@ -47,6 +47,9 @@ export function LiveTranslate() {
   const [showResults, setShowResults] = useState(false);
   const [autoPlayVoice, setAutoPlayVoice] = useState(true);
   const [isPlayingBlockId, setIsPlayingBlockId] = useState<string | null>(null);
+  const [podcastUrl, setPodcastUrl] = useState<string | null>(null);
+  const [fullSessionAudioUrl, setFullSessionAudioUrl] = useState<string | null>(null);
+  const [hasRecoverableSession, setHasRecoverableSession] = useState(false);
 
   // Conversation Mode State
   const [currentSpeaker, setCurrentSpeaker] = useState<"A" | "B">("A");
@@ -58,6 +61,49 @@ export function LiveTranslate() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const audioContextRef = useRef<HTMLAudioElement | null>(null);
+
+  // Recovery Check
+  useEffect(() => {
+    const backup = localStorage.getItem("workspace_iq_live_backup");
+    if (backup) {
+      const parsed = JSON.parse(backup);
+      if (parsed.blocks && parsed.blocks.length > 0) {
+        setHasRecoverableSession(true);
+      }
+    }
+  }, []);
+
+  // Real-Time LocalStorage Sync
+  useEffect(() => {
+    if (transcriptBlocks.length > 0) {
+      const backup = {
+        blocks: transcriptBlocks,
+        tab: activeTab,
+        source: sourceLanguage,
+        target: targetLanguage,
+        timestamp: Date.now()
+      };
+      localStorage.setItem("workspace_iq_live_backup", JSON.stringify(backup));
+    }
+  }, [transcriptBlocks, activeTab, sourceLanguage, targetLanguage]);
+
+  const restoreSession = () => {
+    const backup = localStorage.getItem("workspace_iq_live_backup");
+    if (backup) {
+      const parsed = JSON.parse(backup);
+      setTranscriptBlocks(parsed.blocks);
+      setActiveTab(parsed.tab);
+      setSourceLanguage(parsed.source);
+      setTargetLanguage(parsed.target);
+      setHasRecoverableSession(false);
+      setShowResults(true);
+    }
+  };
+
+  const clearBackup = () => {
+    localStorage.removeItem("workspace_iq_live_backup");
+    setHasRecoverableSession(false);
+  };
 
   // Auto-scroll
   useEffect(() => {
@@ -238,6 +284,11 @@ export function LiveTranslate() {
         audioContextRef.current.pause();
     }
     setInterimText("");
+    
+    // Auto-save to Workspace on stop
+    if (transcriptBlocks.length > 0) {
+      handleSave();
+    }
   };
 
   // ── AI Capabilities ────────────────────────────────────────────────────────
@@ -322,14 +373,33 @@ export function LiveTranslate() {
       if (!res.ok) throw new Error("Podcast generation failed");
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `conversation-${mode}-${Date.now()}.mp3`;
-      a.click();
+      setPodcastUrl(url);
     } catch (e) {
       setError("Failed to generate podcast. Please try again.");
     } finally {
       setIsPodcastGenerating(null);
+    }
+  };
+
+  const handleListenFullSession = async () => {
+    if (transcriptBlocks.length === 0) return;
+    setIsSaving(true); // Using isSaving as a generic loader here
+    setError("");
+    try {
+      const fullTranscript = transcriptBlocks.map(b => b.original).join(". ");
+      const res = await fetch("/api/flow/tts", { 
+        method: "POST", 
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: fullTranscript, voice: "onyx" }) 
+      });
+      if (!res.ok) throw new Error("TTS generation failed");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      setFullSessionAudioUrl(url);
+    } catch (e) {
+      setError("Failed to generate session audio.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -372,6 +442,7 @@ export function LiveTranslate() {
             }
         });
         setSaved(true);
+        clearBackup();
         setTimeout(() => setSaved(false), 2500);
     } catch (e) {
         setError("Failed to save session. Please try again.");
@@ -424,13 +495,17 @@ export function LiveTranslate() {
              <div className="flex items-center gap-2 w-full md:w-auto">
                  {/* Source Lang */}
                  <div className="flex-1 relative">
-                     <select 
-                        value={sourceLanguage}
-                        onChange={(e) => setSourceLanguage(e.target.value)}
-                        className="w-full appearance-none bg-background dark:bg-[#1a1d24] border border-border dark:border-white/10 text-foreground dark:text-white text-xs font-bold py-2 pl-3 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50"
-                     >
-                         {LANGUAGES.map(l => <option key={l.id} value={l.id}>{l.label}</option>)}
-                     </select>
+                      <select 
+                         value={sourceLanguage}
+                         onChange={(e) => setSourceLanguage(e.target.value)}
+                         className="w-full appearance-none bg-background dark:bg-[#1a1d24] border border-border dark:border-white/10 text-foreground dark:text-white text-xs font-bold py-2 pl-3 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
+                      >
+                          {LANGUAGES.map(l => (
+                            <option key={l.id} value={l.id} className="bg-white dark:bg-[#1a1d24] text-slate-900 dark:text-white">
+                              {l.label}
+                            </option>
+                          ))}
+                      </select>
                      <ChevronDown className="w-3.5 h-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 pointer-events-none" />
                  </div>
                  
@@ -441,17 +516,21 @@ export function LiveTranslate() {
 
                  {/* Target Lang (if translate/dubbing) */}
                  <div className="flex-1 relative">
-                     <select 
-                        value={targetLanguage}
-                        onChange={(e) => setTargetLanguage(e.target.value)}
-                        disabled={activeTab === "transcribe"}
-                        className={cn(
-                          "w-full appearance-none bg-background dark:bg-[#1a1d24] border border-border dark:border-white/10 text-foreground dark:text-white text-xs font-bold py-2 pl-3 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50",
-                          activeTab === "transcribe" && "opacity-50 cursor-not-allowed"
-                        )}
-                     >
-                         {LANGUAGES.map(l => <option key={l.id} value={l.id}>{l.label}</option>)}
-                     </select>
+                      <select 
+                         value={targetLanguage}
+                         onChange={(e) => setTargetLanguage(e.target.value)}
+                         disabled={activeTab === "transcribe"}
+                         className={cn(
+                           "w-full appearance-none bg-background dark:bg-[#1a1d24] border border-border dark:border-white/10 text-foreground dark:text-white text-xs font-bold py-2 pl-3 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer",
+                           activeTab === "transcribe" && "opacity-50 cursor-not-allowed"
+                         )}
+                      >
+                          {LANGUAGES.map(l => (
+                            <option key={l.id} value={l.id} className="bg-white dark:bg-[#1a1d24] text-slate-900 dark:text-white">
+                              {l.label}
+                            </option>
+                          ))}
+                      </select>
                      <ChevronDown className="w-3.5 h-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 pointer-events-none" />
                  </div>
              </div>
@@ -486,7 +565,35 @@ export function LiveTranslate() {
          </div>
 
          {/* Transcripts Area */}
-         <div ref={scrollRef} className="h-[300px] overflow-y-auto p-6 space-y-4 bg-background dark:bg-[#050508]/40">
+         <div ref={scrollRef} className="h-[300px] overflow-y-auto p-6 space-y-4 bg-background dark:bg-[#050508]/40 relative">
+             {hasRecoverableSession && (
+                <div className="absolute top-4 left-4 right-4 z-20 bg-blue-500/10 border border-blue-500/20 backdrop-blur-md rounded-2xl p-4 flex items-center justify-between animate-in slide-in-from-top-4 duration-500">
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
+                            <RefreshCw className="w-4 h-4 text-blue-400" />
+                        </div>
+                        <div>
+                            <p className="text-xs font-bold text-foreground dark:text-white">Unsaved Session Detected</p>
+                            <p className="text-[10px] text-foreground/40 dark:text-white/40">Would you like to restore your last transcription?</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button 
+                          onClick={clearBackup}
+                          className="px-3 py-1.5 text-[10px] font-bold text-foreground/40 hover:text-foreground/60 transition-colors"
+                        >
+                            Discard
+                        </button>
+                        <button 
+                          onClick={restoreSession}
+                          className="px-4 py-1.5 bg-blue-500 text-white text-[10px] font-bold rounded-lg shadow-lg shadow-blue-500/20 hover:bg-blue-600 transition-all"
+                        >
+                            Restore
+                        </button>
+                    </div>
+                </div>
+             )}
+
              {transcriptBlocks.length === 0 && !isRecording && (
                 <div className="h-full flex items-center justify-center">
                     <p className="text-sm font-medium text-foreground/60 dark:text-white/60 text-center max-w-[250px]">
@@ -585,9 +692,13 @@ export function LiveTranslate() {
                       <select 
                         value={summaryLanguage}
                         onChange={(e) => setSummaryLanguage(e.target.value)}
-                        className="bg-transparent border-none text-[10px] font-bold text-foreground/40 dark:text-white/40 focus:outline-none"
+                        className="bg-transparent border-none text-[10px] font-bold text-foreground/40 dark:text-white/40 focus:outline-none cursor-pointer"
                       >
-                        {LANGUAGES.map(l => <option key={l.id} value={l.id}>{l.label}</option>)}
+                        {LANGUAGES.map(l => (
+                          <option key={l.id} value={l.id} className="bg-white dark:bg-[#1a1d24] text-slate-900 dark:text-white">
+                            {l.label}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   </div>
@@ -619,7 +730,66 @@ export function LiveTranslate() {
                   )}
                 </div>
 
+                {/* Audio Players Section */}
+                {(podcastUrl || fullSessionAudioUrl) && (
+                   <div className="space-y-3 animate-in fade-in zoom-in-95 duration-500">
+                      {fullSessionAudioUrl && (
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center gap-4 transition-all hover:bg-white/[0.07]">
+                            <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/20">
+                                <Users className="w-5 h-5 text-emerald-400" />
+                            </div>
+                            <div className="flex-1 space-y-1">
+                                <h5 className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Full Session Recording</h5>
+                                <audio src={fullSessionAudioUrl} controls className="w-full h-8 accent-emerald-500" />
+                            </div>
+                            <button 
+                              onClick={() => {
+                                const a = document.createElement("a");
+                                a.href = fullSessionAudioUrl;
+                                a.download = `session-full-${Date.now()}.mp3`;
+                                a.click();
+                              }}
+                              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all"
+                            >
+                                <Download className="w-4 h-4" />
+                            </button>
+                        </div>
+                      )}
+
+                      {podcastUrl && (
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center gap-4 transition-all hover:bg-white/[0.07]">
+                            <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center border border-purple-500/20">
+                                <Headphones className="w-5 h-5 text-purple-400" />
+                            </div>
+                            <div className="flex-1 space-y-1">
+                                <h5 className="text-[10px] font-black uppercase tracking-widest text-purple-400">Podcast AI Preview</h5>
+                                <audio src={podcastUrl} controls className="w-full h-8 accent-purple-500" />
+                            </div>
+                            <button 
+                              onClick={() => {
+                                const a = document.createElement("a");
+                                a.href = podcastUrl;
+                                a.download = `podcast-${Date.now()}.mp3`;
+                                a.click();
+                              }}
+                              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all"
+                            >
+                                <Download className="w-4 h-4" />
+                            </button>
+                        </div>
+                      )}
+                   </div>
+                )}
+
                 <div className="flex flex-wrap gap-2 pt-2 border-t border-border dark:border-white/5">
+                    <button 
+                      onClick={handleListenFullSession}
+                      disabled={isSaving || transcriptBlocks.length === 0}
+                      className="flex-1 flex items-center justify-center gap-2 p-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-xl transition-all disabled:opacity-50"
+                    >
+                      {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4 fill-current" />}
+                      <span className="text-xs font-bold">Listen Full Session</span>
+                    </button>
                     <button 
                       onClick={() => handleGeneratePodcast("recap")}
                       disabled={isPodcastGenerating !== null}
@@ -692,6 +862,7 @@ export function LiveTranslate() {
                         <button 
                           onClick={() => {
                             stopRecording();
+                            handleSave(); // Explicitly trigger save on Finish
                             setShowResults(true);
                             setTimeout(() => {
                                scrollRef.current?.parentElement?.parentElement?.scrollIntoView({ behavior: "smooth", block: "end" });
