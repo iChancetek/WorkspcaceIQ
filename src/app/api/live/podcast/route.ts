@@ -41,7 +41,7 @@ ${transcript}`
         ],
       });
 
-      script = scriptCompletion[0]?.message?.content || "";
+      script = scriptCompletion.choices[0]?.message?.content || "";
     } else {
       // Enhanced Replay Mode
       // We refine the transcript to be more "podcast-like" while keeping the original flow
