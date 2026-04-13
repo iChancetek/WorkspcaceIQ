@@ -44,25 +44,25 @@ const dashboardFeatures = [
 ];
 
 const projectFeatures = [
-  { icon: Save, title: "Project Library", desc: "Save your entire research workspace — including sources and analysis — to your personal library." },
+  { icon: Save, title: "Project WorkSpace", desc: "Save your entire research history — including sources, analysis, and podcasts — to your personal WorkSpace." },
   { icon: RotateCcw, title: "Instant Restoration", desc: "Restore any saved project to your active workspace with one click. Pick up exactly where you left off." },
-  { icon: Download, title: "Markdown Export", desc: "Export your entire research project, including all sources and AI work, into a professional .md document." },
+  { icon: Download, title: "Professional Exports", desc: "Export your projects and conversations into beautifully formatted PDF, DOCX, or Markdown documents." },
   { icon: Trash2, title: "Soft Delete & Recovery", desc: "Accidentally trashed a project? You have 30 days to recover it before it is permanently purged." },
 ];
 
 const deepDiveFeatures = [
-  { icon: Headphones, title: "One-Click AI Podcast", desc: "Upload your sources, click Generate, and get a natural conversation between two AI hosts about your content." },
-  { icon: Volume2, title: "Dual-Voice Narration", desc: "Nova and Echo take turns discussing your research — making complex content feel like a real podcast." },
+  { icon: Headphones, title: "Chancellor & Sydney Podcast", desc: "Upload your sources and get an engaging discussion between Chancellor (The Strategist) and Sydney (The Investigator)." },
+  { icon: Volume2, title: "Dynamic Personalities", desc: "Chancellor provides strategic vision while Sydney investigates the details, making complex research feel alive." },
   { icon: Music, title: "Download as MP3", desc: "Every Deep Dive is fully downloadable. Listen while commuting, working out, or reviewing materials on the go." },
 ];
 
 const liveTranslateFeatures = [
-  { icon: Globe, title: "Zero-Latency Translation", desc: "Experience real-time, word-by-word translation and transcription. See words hit the screen the moment they are spoken." },
-  { icon: Zap, title: "3-4 Hour Continuous Loop", desc: "Powered by a high-stability watchdog engine, WorkSpaceIQ can handle massive sessions without manual restarts or data loss." },
-  { icon: Sparkles, title: "AI Session Summary", desc: "Instantly condense hours of translation into a clear 2-4 sentence GPT-5.4 summary for executive review." },
+  { icon: Globe, title: "AI Conversation Mode", desc: "Bilingual hands-free exchange between two people. Automatically detects language, translates, and plays back audio turns." },
+  { icon: Sparkles, title: "Recap & Enhanced Replay", desc: "Generate a strategic debrief of your session or an enhanced, stutter-free high-quality audio reconstruction." },
+  { icon: Save, title: "Auto-Save to WorkSpace", desc: "Every session, transcript, and podcast is automatically indexed and saved to your global WorkSpace for easy recovery." },
   { icon: RefreshCw, title: "Professional Polishing", desc: "Apply professional-grade formal enhancement to your live sessions, turning casual conversation into structured records." },
-  { icon: Save, title: "Auto-Save to Library", desc: "Every live session is automatically indexed and saved to your global workspace for easy search and recovery later." },
   { icon: Languages, title: "Global Language Support", desc: "Full support for English, Spanish, French, Mandarin, German, Italian, Portuguese, Japanese, Korean, Russian, Arabic, and Hindi." },
+  { icon: Zap, title: "Low-Latency watchdog", desc: "Powered by a high-stability watchdog engine for massive sessions without manual restarts or data loss." },
 ];
 
 const ichancellorFeatures = [
@@ -87,7 +87,7 @@ function FeatureSection({
       <div className="text-center mb-16">
         <span className={`text-xs font-bold tracking-[0.25em] uppercase ${accent} mb-4 block`}>{badge}</span>
         <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">{title}</h2>
-        <p className="text-lg text-white/40 max-w-2xl mx-auto font-light">{subtitle}</p>
+        <p className="text-lg text-white/70 max-w-2xl mx-auto font-light">{subtitle}</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {features.map(({ icon: Icon, title: t, desc }) => (
@@ -96,7 +96,7 @@ function FeatureSection({
               <Icon className={`w-5 h-5 ${accent}`} />
             </div>
             <h3 className="text-base font-semibold text-white mb-2">{t}</h3>
-            <p className="text-sm text-white/40 leading-relaxed">{desc}</p>
+            <p className="text-sm text-white/75 leading-relaxed">{desc}</p>
           </div>
         ))}
       </div>
@@ -119,7 +119,7 @@ export default function LearnMorePage() {
       <nav className="relative z-10 flex items-center justify-between max-w-6xl mx-auto px-8 py-6 border-b border-white/5">
         <BrandIdentifier size={28} />
         <div className="flex items-center gap-4">
-          <Link href="/" className="flex items-center gap-1.5 text-sm text-white/40 hover:text-white transition-colors">
+          <Link href="/" className="flex items-center gap-1.5 text-sm text-white/70 hover:text-white transition-colors">
             <ArrowLeft className="w-4 h-4" /> Back
           </Link>
           <Link href="/dashboard" className="px-5 py-2 bg-[#1a73e8] hover:bg-[#1a73e8]/90 text-white text-sm font-semibold rounded-full transition-all shadow-lg shadow-blue-500/25">
@@ -137,7 +137,7 @@ export default function LearnMorePage() {
             Unlimited intelligence.
           </span>
         </h1>
-        <p className="text-xl text-white/40 max-w-2xl mx-auto font-light mb-14">
+        <p className="text-xl text-white/80 max-w-2xl mx-auto font-light mb-14">
           From dictation to research to AI podcasts — every feature of WorkSpaceIQ, explained.
         </p>
 
@@ -149,7 +149,7 @@ export default function LearnMorePage() {
             { href: "#research", label: "Research", color: "border-violet-400/30 text-violet-400" },
             { href: "#studio", label: "Studio Module", color: "border-blue-400/30 text-blue-400" },
             { href: "#dashboard", label: "Data Dashboards", color: "border-amber-400/30 text-amber-400" },
-            { href: "#library", label: "Project Library", color: "border-rose-400/30 text-rose-400" },
+            { href: "#library", label: "Project WorkSpace", color: "border-rose-400/30 text-rose-400" },
             { href: "#ichancellor", label: "iChancellor", color: "border-pink-400/30 text-pink-400" },
           ].map(({ href, label, color }) => (
             <a key={href} href={href} className={`px-5 py-2 rounded-full border text-sm font-semibold bg-white/[0.03] hover:bg-white/[0.08] transition-all ${color}`}>
@@ -163,7 +163,7 @@ export default function LearnMorePage() {
           {heroFeatures.map(({ icon: Icon, label, color, bg }) => (
             <div key={label} className={`p-5 rounded-2xl bg-gradient-to-b ${bg} border border-white/8 flex flex-col items-center gap-3`}>
               <Icon className={`w-6 h-6 ${color}`} />
-              <span className="text-xs font-semibold text-white/70">{label}</span>
+              <span className="text-xs font-semibold text-white/90">{label}</span>
             </div>
           ))}
         </div>
@@ -226,9 +226,9 @@ export default function LearnMorePage() {
 
       <FeatureSection
         id="library"
-        badge="Project Library"
+        badge="Project WorkSpace"
         title="Never lose a breakthrough."
-        subtitle="Save your entire research history, restore projects instantly, and export to Markdown."
+        subtitle="Save your entire research history, restore projects instantly, and export to PDF, DOCX, or Markdown."
         features={projectFeatures}
         accent="text-rose-400"
       />
@@ -246,7 +246,7 @@ export default function LearnMorePage() {
       <section className="relative z-10 max-w-6xl mx-auto px-8 pb-24">
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1a73e8]/20 via-violet-600/10 to-emerald-600/10 border border-white/8 p-16 text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">Ready to think smarter?</h2>
-          <p className="text-lg text-white/45 mb-10 font-light">Start free. No credit card required.</p>
+          <p className="text-lg text-white/75 mb-10 font-light">Start free. No credit card required.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/login" className="flex items-center gap-2.5 px-10 py-4 bg-[#1a73e8] hover:bg-[#1a73e8]/90 text-white font-semibold rounded-full shadow-xl shadow-blue-500/30 hover:scale-[1.02] transition-all">
               Start for free <ArrowRight className="w-4 h-4" />
@@ -260,11 +260,11 @@ export default function LearnMorePage() {
 
       {/* Footer */}
       <footer className="relative z-10 border-t border-white/5 max-w-6xl mx-auto px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <span className="text-sm text-white/25">© {new Date().getFullYear()} | WorkSpaceIQ | Chancellor Minus | ChanceTEK LLC. All rights reserved.</span>
+        <span className="text-sm text-white/60">© {new Date().getFullYear()} | WorkSpaceIQ | Chancellor Minus | ChanceTEK LLC. All rights reserved.</span>
         <div className="flex gap-6">
-          <Link href="/privacy" className="text-xs text-white/20 hover:text-white/50 transition-colors">Privacy</Link>
-          <Link href="/terms" className="text-xs text-white/20 hover:text-white/50 transition-colors">Terms</Link>
-          <Link href="/support" className="text-xs text-white/20 hover:text-white/50 transition-colors">Support</Link>
+          <Link href="/privacy" className="text-xs text-white/50 hover:text-white/80 transition-colors">Privacy</Link>
+          <Link href="/terms" className="text-xs text-white/50 hover:text-white/80 transition-colors">Terms</Link>
+          <Link href="/support" className="text-xs text-white/50 hover:text-white/80 transition-colors">Support</Link>
         </div>
       </footer>
 

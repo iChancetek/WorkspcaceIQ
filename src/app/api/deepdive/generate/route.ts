@@ -20,15 +20,15 @@ export async function POST(req: NextRequest) {
         {
           role: "system",
           content: `You are a podcast script writer. Create an engaging, conversational "Deep Dive" discussion between two hosts:
-- **Host A (Alex)**: The enthusiastic explainer who breaks down concepts.
-- **Host B (Sam)**: The curious questioner who pushes deeper and plays devil's advocate.
+- **Host A (Chancellor)**: The wise strategist. Calm, deep-voiced, and visionary. He connects big ideas and looks at the strategic implications.
+- **Host B (Sydney)**: The dynamic investigator. Curious, articulate, and energetic. She breaks down the details, asks pointed questions, and keeps the energy high.
 
 Rules:
 - Output in ${language || "English"}.
-- Format as a dialogue: "ALEX: ..." and "SAM: ..."
+- Format as a dialogue: "CHANCELLOR: ..." and "SYDNEY: ..."
 - Keep it natural, engaging, with "hmm", "right", "exactly" interjections.
 - Cover the key themes, surprising findings, and practical takeaways from the sources.
-- Keep total length to about 2-3 minutes of spoken content (~400-500 words).
+- Keep total length to about 3-4 minutes of spoken content (~600-800 words).
 - End with a memorable takeaway.
 
 SOURCES:
@@ -45,16 +45,16 @@ ${sourcesContext}`
     const audioSegments: Buffer[] = [];
 
     for (const segment of segments) {
-      const isAlex = segment.trim().startsWith("ALEX:");
-      const isSam = segment.trim().startsWith("SAM:");
+      const isChancellor = segment.trim().startsWith("CHANCELLOR:");
+      const isSydney = segment.trim().startsWith("SYDNEY:");
       
-      if (!isAlex && !isSam) continue;
+      if (!isChancellor && !isSydney) continue;
       
-      const text = segment.replace(/^(ALEX|SAM):\s*/i, "").trim();
+      const text = segment.replace(/^(CHANCELLOR|SYDNEY):\s*/i, "").trim();
       if (!text) continue;
 
-      // Nova = calm female (Alex), Echo = deeper male (Sam)
-      const voice = isAlex ? "nova" : "echo";
+      // Onyx = deep male (Chancellor), Shimmer = clear female (Sydney)
+      const voice = isChancellor ? "onyx" : "shimmer";
       
       const audioResponse = await openai.audio.speech.create({
         model: "tts-1",

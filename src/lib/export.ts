@@ -1,4 +1,6 @@
-import { Source } from "@/components/SourceUploader";
+import { jsPDF } from "jspdf";
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from "docx";
+import { saveAs } from "file-saver"; // Need file-saver for browser saving of docx
 
 interface ProjectData {
   title: string;
@@ -40,6 +42,111 @@ export function generateProjectMarkdown(project: ProjectData): string {
 
   md += `\n*Produced with WorkSpaceIQ*`;
   return md;
+}
+
+/**
+ * Generates a professional PDF with headers and structured content
+ */
+export async function downloadPDF(project: ProjectData) {
+  const doc = new jsPDF();
+  let y = 20;
+
+  // Header
+  doc.setFontSize(24);
+  doc.setTextColor(30, 115, 232); // Blue primary
+  doc.text("WorkSpaceIQ Intelligence Brief", 105, y, { align: "center" });
+  y += 15;
+
+  doc.setFontSize(10);
+  doc.setTextColor(150, 150, 150);
+  doc.text(`Generated: ${new Date().toLocaleString()}`, 105, y, { align: "center" });
+  y += 20;
+
+  // Title
+  doc.setFontSize(18);
+  doc.setTextColor(0, 0, 0);
+  doc.text(project.title, 20, y);
+  y += 15;
+
+  // Content
+  doc.setFontSize(12);
+  const addText = (text: string, size = 12, isBold = false) => {
+    doc.setFont("helvetica", isBold ? "bold" : "normal");
+    doc.setFontSize(size);
+    const splitText = doc.splitTextToSize(text, 170);
+    if (y + (splitText.length * 7) > 280) {
+      doc.addPage();
+      y = 20;
+    }
+    doc.text(splitText, 20, y);
+    y += (splitText.length * 7) + 5;
+  };
+
+  addText(`Sources: ${project.sources.length}`, 14, true);
+  
+  project.sources.forEach((s, i) => {
+    addText(`Source ${i+1}: ${s.title}`, 12, true);
+    addText(s.text.substring(0, 500) + (s.text.length > 500 ? "..." : ""), 10);
+  });
+
+  if (project.deepDiveTranscript) {
+    addText("Chancellor & Sydney Podcast Script", 14, true);
+    addText(project.deepDiveTranscript, 10);
+  }
+
+  doc.save(`${project.title.toLowerCase().replace(/\s+/g, "-")}.pdf`);
+}
+
+/**
+ * Generates a professional DOCX document
+ */
+export async function downloadDOCX(project: ProjectData) {
+  const sections = [];
+
+  // Title Section
+  sections.push(
+    new Paragraph({
+      text: "WorkSpaceIQ Intelligence Brief",
+      heading: HeadingLevel.TITLE,
+      alignment: AlignmentType.CENTER,
+    }),
+    new Paragraph({
+      text: `Generated: ${new Date().toLocaleString()}`,
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 400 },
+    }),
+    new Paragraph({
+      text: project.title,
+      heading: HeadingLevel.HEADING_1,
+      spacing: { after: 400 },
+    })
+  );
+
+  // Sources
+  sections.push(new Paragraph({ text: `Sources: ${project.sources.length}`, heading: HeadingLevel.HEADING_2 }));
+  project.sources.forEach((s, i) => {
+    sections.push(
+      new Paragraph({ text: `Source ${i+1}: ${s.title}`, heading: HeadingLevel.HEADING_3 }),
+      new Paragraph({ text: s.text, spacing: { after: 200 } })
+    );
+  });
+
+  if (project.deepDiveTranscript) {
+    sections.push(
+      new Paragraph({ text: "Chancellor & Sydney Podcast Script", heading: HeadingLevel.HEADING_2 }),
+      new Paragraph({ text: project.deepDiveTranscript })
+    );
+  }
+
+  const docBlob = new Document({
+    sections: [{
+      properties: {},
+      children: sections,
+    }],
+  });
+
+  const blob = await Packer.toBlob(docBlob);
+  saveAs(blob, `${project.title.toLowerCase().replace(/\s+/g, "-")}.docx`);
 }
 
 export function downloadFile(content: string, filename: string, contentType: string) {

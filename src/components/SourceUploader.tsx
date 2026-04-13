@@ -161,7 +161,7 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
             <p className="text-sm font-semibold text-foreground/80 dark:text-white/80">
               {isUploading ? "Processing..." : "Drop files here or click to upload"}
             </p>
-            <p className="text-[10px] uppercase tracking-widest text-foreground/30 dark:text-white/40 mt-1">
+            <p className="text-[10px] uppercase tracking-widest text-foreground/70 dark:text-white/80 mt-1">
               PDF · DOCX · TXT · MP3 · WAV · XLSX · CSV
             </p>
           </div>
@@ -201,7 +201,7 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
       {/* Source cards */}
       {sources.length > 0 && (
         <div className="space-y-2">
-          <p className="text-[10px] uppercase tracking-widest font-bold text-foreground/30 dark:text-white/40 text-center sm:text-left">
+          <p className="text-[10px] uppercase tracking-widest font-bold text-foreground/60 dark:text-white/70 text-center sm:text-left">
             {sources.length} / {maxSources} Sources
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -215,7 +215,7 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-foreground/90 dark:text-white/90 truncate">{source.title}</p>
-                  <p className="text-[10px] text-foreground/50 dark:text-white/40 mt-0.5 line-clamp-2 leading-relaxed">
+                  <p className="text-[10px] text-foreground/75 dark:text-white/75 mt-0.5 line-clamp-2 leading-relaxed">
                     {source.text.substring(0, 120)}...
                   </p>
                 </div>

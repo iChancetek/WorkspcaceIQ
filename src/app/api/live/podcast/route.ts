@@ -25,14 +25,14 @@ export async function POST(req: NextRequest) {
             role: "system",
             content: `You are a podcast script writer. Create a debrief of the following conversation between two people.
 Two hosts:
-- **Alex**: The analytical host who summarizes the key points and takeaways.
-- **Sam**: The reflective host who adds context and asks "what's next?".
+- **Chancellor**: The wise strategist. Calm, deep-voiced, and visionary. He connects big ideas and looks at the strategic implications.
+- **Sydney**: The dynamic investigator. Curious, articulate, and energetic. She breaks down the details, asks pointed questions, and keeps the energy high.
 
 Rules:
 - Output in ${language || "English"}.
-- Format as a dialogue: "ALEX: ..." and "SAM: ..."
+- Format as a dialogue: "CHANCELLOR: ..." and "SYDNEY: ..."
 - Keep it professional yet engaging.
-- Total length: ~3-5 minutes of spoken content.
+- Total length: ~4-6 minutes of spoken content.
 
 CONVERSATION TRANSCRIPT:
 ${transcript}`
@@ -41,7 +41,7 @@ ${transcript}`
         ],
       });
 
-      script = scriptCompletion.choices[0]?.message?.content || "";
+      script = scriptCompletion[0]?.message?.content || "";
     } else {
       // Enhanced Replay Mode
       // We refine the transcript to be more "podcast-like" while keeping the original flow
@@ -55,8 +55,8 @@ ${transcript}`
             
 Rules:
 - Keep the original flow but remove stutters, fillers, and clarify ambiguous sentences.
-- Label the speakers as SPEAKER A and SPEAKER B.
-- Format as "SPEAKER A: ..." and "SPEAKER B: ..."
+- Label the speakers as CHANCELLOR (as Speaker A) and SYDNEY (as Speaker B).
+- Format as "CHANCELLOR: ..." and "SYDNEY: ..."
 - Language: ${language || "original languages used in transcript"}.
 
 CONVERSATION TRANSCRIPT:
@@ -73,20 +73,17 @@ ${transcript}`
     const segments = script.split("\n").filter(line => line.trim());
 
     for (const segment of segments) {
-      const isAlex = segment.trim().startsWith("ALEX:");
-      const isSam = segment.trim().startsWith("SAM:");
-      const isSpeakerA = segment.trim().startsWith("SPEAKER A:");
-      const isSpeakerB = segment.trim().startsWith("SPEAKER B:");
+      const isChancellor = segment.trim().startsWith("CHANCELLOR:");
+      const isSydney = segment.trim().startsWith("SYDNEY:");
       
-      if (!isAlex && !isSam && !isSpeakerA && !isSpeakerB) continue;
+      if (!isChancellor && !isSydney) continue;
       
-      const text = segment.replace(/^(ALEX|SAM|SPEAKER A|SPEAKER B):\s*/i, "").trim();
+      const text = segment.replace(/^(CHANCELLOR|SYDNEY):\s*/i, "").trim();
       if (!text) continue;
 
       // Assign voices
-      // Recap: Alex=Nova, Sam=Echo
-      // Replay: Speaker A=Onyx, Speaker B=Shimmer (or similar)
-      const voice = isAlex || isSpeakerA ? (mode === "recap" ? "nova" : "onyx") : (mode === "recap" ? "echo" : "shimmer");
+      // Chancellor = Onyx (Male), Sydney = Shimmer (Female)
+      const voice = isChancellor ? "onyx" : "shimmer";
       
       const audioResponse = await openai.audio.speech.create({
         model: "tts-1",

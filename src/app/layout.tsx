@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     siteName: "WorkSpaceIQ",
     images: [
       {
-        url: "/og-image.png",
+        url: "/icon.png",
         width: 1024,
         height: 1024,
       },
@@ -37,12 +37,12 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "WorkSpaceIQ — Power your thinking with WorkSpaceIQ",
     description: "Frictionless Intelligence. Privacy-Native. Dictate, research, and understand deeper with GPT-5.4.",
-    images: ["/og-image.png"],
+    images: ["/icon.png"],
   },
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
   },
 };
 

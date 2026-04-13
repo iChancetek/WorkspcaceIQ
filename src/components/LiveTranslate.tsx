@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Mic, Square, Loader2, Play, Pause, Download, ChevronDown, ArrowRightLeft, Settings, Info, Save, RefreshCw, Share2, Sparkles, Check, X, Globe, User, Users, Headphones, Volume2 } from "lucide-react";
+import { Mic, Square, Loader2, Play, Pause, Download, ChevronDown, ArrowRightLeft, Settings, Info, Save, RefreshCw, Share2, Sparkles, Check, X, Globe, User, Users, Headphones, Volume2, FileText, FileDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { saveItem } from "@/lib/firebase/items";
+import { downloadPDF, downloadDOCX } from "@/lib/export";
 
 const LANGUAGES = [
   { id: "English", code: "en-US", label: "English", icon: "🇺🇸" },
@@ -105,7 +106,12 @@ export function LiveTranslate() {
       // If dubbing or conversation is active, play TTS
       if (activeTab === "dubbing" || activeTab === "conversation") {
          const voice = activeTab === "conversation" ? (currentSpeaker === "A" ? "shimmer" : "onyx") : "nova";
-         await playTTS(data.translatedText || text, voice);
+         // Chancellor = Onyx (A), Sydney = Shimmer (B)
+         // Wait, the logic above has shimmer for A and onyx for B. 
+         // Let's swap to match the user's personality request: 
+         // Chancellor (Male) = A, Sydney (Female) = B
+         const assignedVoice = activeTab === "conversation" ? (currentSpeaker === "A" ? "onyx" : "shimmer") : "nova";
+         await playTTS(data.translatedText || text, assignedVoice);
          
          if (activeTab === "conversation") {
            // Swap speaker for next turn
@@ -329,12 +335,30 @@ export function LiveTranslate() {
     }
   };
 
+  const handleExport = async (format: "pdf" | "docx") => {
+    if (transcriptBlocks.length === 0) return;
+    const projectData = {
+      title: `WorkSpaceIQ Conversation — ${new Date().toLocaleDateString()}`,
+      sources: transcriptBlocks.map(b => ({
+          id: b.id,
+          title: b.speaker ? `Speaker ${b.speaker}` : "Transcription",
+          text: b.original,
+          type: "text" as any
+      })),
+      deepDiveTranscript: fullTranslatedText,
+      createdAt: new Date().toISOString()
+    };
+
+    if (format === "pdf") await downloadPDF(projectData);
+    else await downloadDOCX(projectData);
+  };
+
   const handleSave = async () => {
     if (!user || transcriptBlocks.length === 0) return;
     setIsSaving(true);
     setError("");
     try {
-        const autoTitle = `Live Session — ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
+        const autoTitle = `Conversation WorkSpace — ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
         await saveItem(user.uid, "live", {
             title: autoTitle,
             content: fullTranslatedText,
@@ -345,7 +369,8 @@ export function LiveTranslate() {
                 summary: summaryText,
                 enhanced: enhancedText,
                 sessionDuration: elapsedTime,
-                transcript: transcriptBlocks
+                transcript: transcriptBlocks,
+                branding: "Chancellor & Sydney"
             }
         });
         setSaved(true);
@@ -363,7 +388,7 @@ export function LiveTranslate() {
       {/* Header */}
       <div className="text-center space-y-2 pt-4">
           <h2 className="text-3xl md:text-4xl font-black text-foreground dark:text-white tracking-tight">Live Translate</h2>
-          <p className="text-sm font-medium text-foreground/50 dark:text-white/50">
+          <p className="text-sm font-medium text-foreground/70 dark:text-white/70">
             Generate translated captions and audio in real-time. Experience frictionless intelligence.
           </p>
           {error && (
@@ -446,7 +471,7 @@ export function LiveTranslate() {
          <div ref={scrollRef} className="h-[300px] overflow-y-auto p-6 space-y-4 bg-background dark:bg-[#050508]/40">
              {transcriptBlocks.length === 0 && !isRecording && (
                 <div className="h-full flex items-center justify-center">
-                    <p className="text-sm font-medium text-foreground/30 dark:text-white/30 text-center max-w-[250px]">
+                    <p className="text-sm font-medium text-foreground/60 dark:text-white/60 text-center max-w-[250px]">
                         Conversations and translations will appear here in real-time.
                     </p>
                 </div>
@@ -467,7 +492,7 @@ export function LiveTranslate() {
                       )}>
                         {block.speaker || <User className="w-3 h-3" />}
                       </div>
-                      <span className="text-[10px] font-bold text-foreground/30 dark:text-white/20 uppercase tracking-tighter">
+                      <span className="text-[10px] font-bold text-foreground/60 dark:text-white/60 uppercase tracking-tighter">
                         {block.language || sourceLanguage}
                       </span>
                     </div>
@@ -504,7 +529,7 @@ export function LiveTranslate() {
                  <div className="h-full flex items-center justify-center">
                      <div className="flex items-center gap-2 bg-secondary/50 dark:bg-white/5 px-4 py-2 rounded-full border border-border dark:border-white/10">
                          <Loader2 className="w-3.5 h-3.5 text-primary animate-spin" />
-                         <span className="text-xs font-bold text-foreground/50 dark:text-white/50">Listening for {sourceLanguage}...</span>
+                         <span className="text-xs font-bold text-foreground/70 dark:text-white/70">Listening for {sourceLanguage}...</span>
                      </div>
                  </div>
              )}
@@ -580,9 +605,9 @@ export function LiveTranslate() {
                     </button>
                 </div>
 
-                <button 
+                  <button 
                   onClick={() => setShowResults(false)}
-                  className="w-full py-2 text-[10px] font-bold text-foreground/30 dark:text-white/20 hover:text-foreground/50 dark:hover:text-white/40 transition-colors uppercase tracking-widest"
+                  className="w-full py-2 text-[10px] font-bold text-foreground/60 dark:text-white/60 hover:text-foreground dark:hover:text-white transition-colors uppercase tracking-widest"
                 >
                     Dismiss Analysis
                 </button>
@@ -649,7 +674,7 @@ export function LiveTranslate() {
                  {isSummarizing ? <Loader2 className="w-4 h-4 text-primary animate-spin" /> : <Sparkles className="w-4 h-4 text-primary dark:text-blue-400 group-hover:scale-110 transition-transform" />}
                  <h4 className="text-sm font-bold text-foreground dark:text-white">AI Summarize</h4>
              </div>
-             <p className="text-[11px] font-medium text-foreground/50 dark:text-white/40 leading-relaxed">
+             <p className="text-[11px] font-medium text-foreground/80 dark:text-white/80 leading-relaxed">
                  Generate an instant high-level summary of the entire session.
              </p>
           </button>
@@ -663,7 +688,7 @@ export function LiveTranslate() {
                  {isEnhancing ? <Loader2 className="w-4 h-4 text-violet-400 animate-spin" /> : <RefreshCw className="w-4 h-4 text-violet-400 group-hover:rotate-180 transition-transform duration-500" />}
                  <h4 className="text-sm font-bold text-foreground dark:text-white">Enhance Professionally</h4>
              </div>
-             <p className="text-[11px] font-medium text-foreground/50 dark:text-white/40 leading-relaxed">
+             <p className="text-[11px] font-medium text-foreground/80 dark:text-white/80 leading-relaxed">
                  Apply professional-grade polishing to the final translated text.
              </p>
           </button>
@@ -680,11 +705,30 @@ export function LiveTranslate() {
           >
              <div className="flex items-center gap-2 mb-2">
                  {isSaving ? <Loader2 className="w-4 h-4 text-emerald-500 animate-spin" /> : saved ? <Check className="w-4 h-4 text-emerald-500" /> : <Save className="w-4 h-4 text-emerald-500 group-hover:scale-110 transition-transform" />}
-                 <h4 className="text-sm font-bold text-foreground dark:text-white">{saved ? "Saved to Library" : "Save Session"}</h4>
+                 <h4 className="text-sm font-bold text-foreground dark:text-white">{saved ? "Saved to WorkSpace" : "Save to WorkSpace"}</h4>
              </div>
-             <p className="text-[11px] font-medium text-foreground/50 dark:text-white/40 leading-relaxed">
-                 Securely store this session in your WorkSpace library for later.
+             <p className="text-[11px] font-medium text-foreground/80 dark:text-white/80 leading-relaxed">
+                 Securely store this entire session and podcast to your personal WorkSpace.
              </p>
+          </button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+          <button 
+            onClick={() => handleExport("pdf")}
+            disabled={isRecording || transcriptBlocks.length === 0}
+            className="flex items-center justify-center gap-2 p-3 bg-secondary/30 dark:bg-white/[0.02] border border-border dark:border-white/5 rounded-xl text-xs font-bold hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20 transition-all disabled:opacity-30"
+          >
+              <FileDown className="w-4 h-4" />
+              Intelligence Brief (PDF)
+          </button>
+          <button 
+            onClick={() => handleExport("docx")}
+            disabled={isRecording || transcriptBlocks.length === 0}
+            className="flex items-center justify-center gap-2 p-3 bg-secondary/30 dark:bg-white/[0.02] border border-border dark:border-white/5 rounded-xl text-xs font-bold hover:bg-blue-500/10 hover:text-blue-400 hover:border-blue-500/20 transition-all disabled:opacity-30"
+          >
+              <FileText className="w-4 h-4" />
+              Formal Transcript (DOCX)
           </button>
       </div>
 

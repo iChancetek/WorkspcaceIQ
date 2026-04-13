@@ -171,10 +171,10 @@ export function IChancellor() {
   };
 
   const suggestions = [
-    "What is WorkSpaceIQ?",
-    "How does Flow mode work?",
-    "Tell me about Deep Dive",
-    "How do I upload research sources?",
+    "Tell me about AI Conversation Mode",
+    "How do I export to PDF or DOCX?",
+    "Who are Chancellor and Sydney?",
+    "How does WorkSpaceIQ handle privacy?",
   ];
 
   return (
@@ -183,7 +183,7 @@ export function IChancellor() {
       <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
         {/* Tooltip */}
         {!isOpen && showPulse && (
-          <div className="bg-white/10 backdrop-blur-sm border border-white/10 text-white/80 text-xs font-medium px-3 py-1.5 rounded-full animate-bounce">
+          <div className="bg-white/20 backdrop-blur-md border border-white/20 text-white font-semibold px-3 py-1.5 rounded-full animate-bounce shadow-xl">
             Ask iChancellor ✨
           </div>
         )}
@@ -238,10 +238,10 @@ export function IChancellor() {
                 <Volume2 className="w-3.5 h-3.5" />
               </button>
             )}
-            <button onClick={clearChat} className="p-1.5 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors">
+            <button onClick={clearChat} className="p-1.5 rounded-lg hover:bg-white/10 text-white/90 hover:text-white transition-colors">
               <RotateCcw className="w-3.5 h-3.5" />
             </button>
-            <button onClick={() => setIsOpen(false)} className="p-1.5 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors">
+            <button onClick={() => setIsOpen(false)} className="p-1.5 rounded-lg hover:bg-white/10 text-white/90 hover:text-white transition-colors">
               <ChevronDown className="w-4 h-4" />
             </button>
           </div>
@@ -300,7 +300,7 @@ export function IChancellor() {
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === "Enter" && !e.shiftKey && sendMessage(input)}
               placeholder="Ask iChancellor anything..."
-              className="flex-1 bg-transparent text-sm text-white placeholder:text-white/50 focus:outline-none"
+              className="flex-1 bg-transparent text-sm text-white placeholder:text-white/80 focus:outline-none"
             />
             <button
               onClick={toggleVoiceInput}
@@ -316,7 +316,7 @@ export function IChancellor() {
               {isStreaming ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
             </button>
           </div>
-          <p className="text-[10px] text-white/40 text-center mt-1.5">Powered by Pinecone RAG · GPT-5.4</p>
+          <p className="text-[10px] text-white/80 text-center mt-1.5">Powered by Pinecone RAG · GPT-5.4</p>
         </div>
       </div>
     </>
