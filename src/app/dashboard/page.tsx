@@ -673,7 +673,7 @@ export default function Dashboard() {
           {/* ── LIVE TRANSLATE TAB ─────────────────────────────────────────── */}
           {activeTab === "live" && (
             <section className="space-y-8">
-              <LiveTranslate />
+              <LiveTranslate globalLanguage={activeLanguage} />
             </section>
           )}
 

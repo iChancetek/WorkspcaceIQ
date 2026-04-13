@@ -22,7 +22,11 @@ const LANGUAGES = [
   { id: "Hindi", code: "hi-IN", label: "हिन्दी", icon: "🇮🇳" },
 ];
 
-export function LiveTranslate() {
+interface LiveTranslateProps {
+  globalLanguage?: string;
+}
+
+export function LiveTranslate({ globalLanguage }: LiveTranslateProps) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<"transcribe" | "translate" | "dubbing" | "conversation">("translate");
   const [sourceLanguage, setSourceLanguage] = useState("English");
@@ -47,9 +51,11 @@ export function LiveTranslate() {
   const [showResults, setShowResults] = useState(false);
   const [autoPlayVoice, setAutoPlayVoice] = useState(true);
   const [isPlayingBlockId, setIsPlayingBlockId] = useState<string | null>(null);
-  const [podcastUrl, setPodcastUrl] = useState<string | null>(null);
   const [fullSessionAudioUrl, setFullSessionAudioUrl] = useState<string | null>(null);
+  const [recapUrl, setRecapUrl] = useState<string | null>(null);
+  const [enhancedReplayUrl, setEnhancedReplayUrl] = useState<string | null>(null);
   const [hasRecoverableSession, setHasRecoverableSession] = useState(false);
+  const [selectedVoice, setSelectedVoice] = useState("nova");
 
   // Conversation Mode State
   const [currentSpeaker, setCurrentSpeaker] = useState<"A" | "B">("A");
@@ -105,6 +111,34 @@ export function LiveTranslate() {
     setHasRecoverableSession(false);
   };
 
+  // Global Language Sync
+  useEffect(() => {
+    if (globalLanguage) {
+      setTargetLanguage(globalLanguage);
+      setSummaryLanguage(globalLanguage);
+    }
+  }, [globalLanguage]);
+
+  // Handle Source Language Hot-Swap while recording
+  useEffect(() => {
+    if (isRecording && recognitionRef.current) {
+        // Hot-swap language without stopping the session
+        const needsRestart = recognitionRef.current.lang !== (LANGUAGES.find(l => l.id === sourceLanguage)?.code || 'en-US');
+        
+        if (needsRestart) {
+            console.log("Hot-swapping recognition language to:", sourceLanguage);
+            isIntentionallyStopped.current = true;
+            recognitionRef.current.stop();
+            
+            // Short delay to let the engine close before restarting
+            setTimeout(() => {
+                isIntentionallyStopped.current = false;
+                startRecording(true); // restart flag
+            }, 100);
+        }
+    }
+  }, [sourceLanguage]);
+
   // Auto-scroll
   useEffect(() => {
     if (scrollRef.current) {
@@ -153,7 +187,10 @@ export function LiveTranslate() {
 
       // If auto-play is enabled or dubbing/conversation is active, play TTS
       if (autoPlayVoice || activeTab === "dubbing" || activeTab === "conversation") {
-         const assignedVoice = activeTab === "conversation" ? (currentSpeaker === "A" ? "onyx" : "shimmer") : "nova";
+         const assignedVoice = activeTab === "conversation" 
+            ? (currentSpeaker === "A" ? "onyx" : "shimmer") 
+            : selectedVoice;
+            
          setIsPlayingBlockId(blockId);
          await playTTS(data.translatedText || text, assignedVoice);
          setIsPlayingBlockId(null);
@@ -204,7 +241,7 @@ export function LiveTranslate() {
     });
   };
 
-  const startRecording = () => {
+  const startRecording = (isRestart = false) => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       alert("Your browser does not support Live Translate. Please use Chrome, Edge, or Safari.");
@@ -213,9 +250,12 @@ export function LiveTranslate() {
 
     isIntentionallyStopped.current = false;
     setIsRecording(true);
-    setElapsedTime(0);
-    setTranscriptBlocks([]);
-    setInterimText("");
+    
+    if (!isRestart) {
+        setElapsedTime(0);
+        setTranscriptBlocks([]);
+        setInterimText("");
+    }
 
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
@@ -247,7 +287,10 @@ export function LiveTranslate() {
               original: final.trim(),
               translated: "",
               isTranslating: needsTranslation,
-              speaker: activeTab === "conversation" ? currentSpeaker : undefined
+              speaker: activeTab === "conversation" ? currentSpeaker : undefined,
+              language: activeTab === "conversation" 
+                ? (currentSpeaker === "A" ? sourceLanguage : targetLanguage)
+                : sourceLanguage
           }]);
 
           if (needsTranslation) {
@@ -373,7 +416,9 @@ export function LiveTranslate() {
       if (!res.ok) throw new Error("Podcast generation failed");
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
-      setPodcastUrl(url);
+      
+      if (mode === "recap") setRecapUrl(url);
+      else setEnhancedReplayUrl(url);
     } catch (e) {
       setError("Failed to generate podcast. Please try again.");
     } finally {
@@ -501,7 +546,7 @@ export function LiveTranslate() {
                          className="w-full appearance-none bg-background dark:bg-[#1a1d24] border border-border dark:border-white/10 text-foreground dark:text-white text-xs font-bold py-2 pl-3 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
                       >
                           {LANGUAGES.map(l => (
-                            <option key={l.id} value={l.id} className="bg-white dark:bg-[#1a1d24] text-slate-900 dark:text-white">
+                            <option key={l.id} value={l.id}>
                               {l.label}
                             </option>
                           ))}
@@ -526,7 +571,7 @@ export function LiveTranslate() {
                          )}
                       >
                           {LANGUAGES.map(l => (
-                            <option key={l.id} value={l.id} className="bg-white dark:bg-[#1a1d24] text-slate-900 dark:text-white">
+                            <option key={l.id} value={l.id}>
                               {l.label}
                             </option>
                           ))}
@@ -535,33 +580,43 @@ export function LiveTranslate() {
                  </div>
              </div>
 
-             <div className="flex items-center gap-4 shrink-0">
-                  {/* Auto-Play Toggle */}
-                  <button 
-                    onClick={() => setAutoPlayVoice(!autoPlayVoice)}
-                    className={cn(
-                        "flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all",
-                        autoPlayVoice 
-                          ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500" 
-                          : "bg-white/5 border-white/10 text-white/40"
-                    )}
-                    title={autoPlayVoice ? "Live Voice Enabled" : "Live Voice Muted"}
-                  >
-                      {autoPlayVoice ? <Headphones className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5 opacity-40" />}
-                      <span className="text-[10px] font-bold uppercase tracking-wider">{autoPlayVoice ? "Live Audio" : "Silent"}</span>
-                  </button>
+             <div className="flex items-center gap-3 shrink-0">
+                   {/* Voice Selection */}
+                   <div className="relative group">
+                       <select 
+                          value={selectedVoice}
+                          onChange={(e) => setSelectedVoice(e.target.value)}
+                          className="appearance-none bg-background dark:bg-white/5 border border-border dark:border-white/10 text-[10px] font-black uppercase tracking-tighter py-1.5 pl-2.5 pr-7 rounded-full focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer text-foreground/70 dark:text-white/70 hover:text-foreground dark:hover:text-white transition-colors"
+                       >
+                           {["alloy", "echo", "fable", "onyx", "nova", "shimmer"].map(v => (
+                             <option key={v} value={v}>
+                               {v}
+                             </option>
+                           ))}
+                       </select>
+                       <ChevronDown className="w-3 h-3 absolute right-2.5 top-1/2 -translate-y-1/2 text-foreground/40 pointer-events-none" />
+                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0 bg-white/5 px-3 py-1.5 rounded-full border border-white/10" title="Ultra-smart neural transcription. Near-perfect accuracy. Exclusively for Premium Plus Subscribers.">
-                      <div className="flex flex-col">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-primary dark:text-blue-400">Premium Plus</span>
-                      </div>
-                      {/* Premium Toggle */}
-                      <div className="w-9 h-5 rounded-full bg-secondary dark:bg-white/10 relative flex items-center transition-all cursor-help border border-border dark:border-white/20 shadow-inner">
-                          <div className="w-3.5 h-3.5 rounded-full bg-foreground/10 dark:bg-white/10 absolute left-0.5" />
-                          <Sparkles className="w-2.5 h-2.5 text-blue-400 absolute right-1.5 opacity-40" />
-                      </div>
-                  </div>
-             </div>
+                   {/* Auto-Play Toggle */}
+                   <button 
+                     onClick={() => setAutoPlayVoice(!autoPlayVoice)}
+                     className={cn(
+                         "flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all shadow-sm",
+                         autoPlayVoice 
+                           ? "bg-blue-500/10 border-blue-500/30 text-blue-500" 
+                           : "bg-white/5 border-white/10 text-white/30"
+                     )}
+                     title={autoPlayVoice ? "Live Voice Enabled" : "Live Voice Muted"}
+                   >
+                       {autoPlayVoice ? <Headphones className="w-3.5 h-3.5 animate-pulse" /> : <Volume2 className="w-3.5 h-3.5 opacity-40" />}
+                       <span className="text-[10px] font-black uppercase tracking-widest">{autoPlayVoice ? "Live Audio" : "Silent Mode"}</span>
+                   </button>
+
+                   <div className="hidden xs:flex items-center gap-2 shrink-0 bg-blue-500/5 px-3 py-1.5 rounded-full border border-blue-500/10" title="Ultra-smart neural transcription. Near-perfect accuracy. Exclusively for Premium Plus Subscribers.">
+                       <span className="text-[10px] font-black uppercase tracking-widest text-primary dark:text-blue-400">Premium Plus</span>
+                       <Sparkles className="w-2.5 h-2.5 text-blue-400 opacity-60" />
+                   </div>
+              </div>
          </div>
 
          {/* Transcripts Area */}
@@ -630,7 +685,7 @@ export function LiveTranslate() {
                     )}>
                       <p className="text-sm font-semibold text-foreground/80 dark:text-white/80">{block.original}</p>
                       {(activeTab === "translate" || activeTab === "dubbing" || activeTab === "conversation") && (
-                          <div className="flex items-center gap-2 mt-1">
+                            <div className="flex items-center gap-2 mt-1 px-2">
                                   {block.isTranslating && <Loader2 className="w-3 h-3 text-primary animate-spin" />}
                                   <p className={cn(
                                     "text-lg font-bold leading-tight",
@@ -730,49 +785,86 @@ export function LiveTranslate() {
                   )}
                 </div>
 
-                {/* Audio Players Section */}
-                {(podcastUrl || fullSessionAudioUrl) && (
+                {/* Audio Hub Section */}
+                {(recapUrl || enhancedReplayUrl || fullSessionAudioUrl) && (
                    <div className="space-y-3 animate-in fade-in zoom-in-95 duration-500">
+                      <div className="flex items-center justify-between px-1">
+                          <h4 className="text-[10px] font-black uppercase tracking-widest text-foreground/40 dark:text-white/30">Your Intelligence Hub</h4>
+                          <Volume2 className="w-3 h-3 text-foreground/20" />
+                      </div>
+
                       {fullSessionAudioUrl && (
-                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center gap-4 transition-all hover:bg-white/[0.07]">
-                            <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/20">
+                        <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-2xl p-4 flex items-center gap-4 transition-all hover:bg-emerald-500/10 group">
+                            <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/20 group-hover:scale-105 transition-transform">
                                 <Users className="w-5 h-5 text-emerald-400" />
                             </div>
-                            <div className="flex-1 space-y-1">
-                                <h5 className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Full Session Recording</h5>
-                                <audio src={fullSessionAudioUrl} controls className="w-full h-8 accent-emerald-500" />
+                            <div className="flex-1 space-y-2">
+                                <div className="flex items-center justify-between">
+                                  <h5 className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Full Session Recording</h5>
+                                  <span className="text-[9px] font-bold text-emerald-400/50">WAVE-HIFI</span>
+                                </div>
+                                <audio src={fullSessionAudioUrl} controls className="w-full h-7 accent-emerald-500" />
                             </div>
                             <button 
                               onClick={() => {
                                 const a = document.createElement("a");
                                 a.href = fullSessionAudioUrl;
-                                a.download = `session-full-${Date.now()}.mp3`;
+                                a.download = `full-session-${Date.now()}.mp3`;
                                 a.click();
                               }}
-                              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all"
+                              className="w-10 h-10 flex items-center justify-center rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 transition-all border border-emerald-500/10"
                             >
                                 <Download className="w-4 h-4" />
                             </button>
                         </div>
                       )}
 
-                      {podcastUrl && (
-                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center gap-4 transition-all hover:bg-white/[0.07]">
-                            <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center border border-purple-500/20">
+                      {recapUrl && (
+                        <div className="bg-purple-500/5 border border-purple-500/10 rounded-2xl p-4 flex items-center gap-4 transition-all hover:bg-purple-500/10 group">
+                            <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center border border-purple-500/20 group-hover:scale-105 transition-transform">
                                 <Headphones className="w-5 h-5 text-purple-400" />
                             </div>
-                            <div className="flex-1 space-y-1">
-                                <h5 className="text-[10px] font-black uppercase tracking-widest text-purple-400">Podcast AI Preview</h5>
-                                <audio src={podcastUrl} controls className="w-full h-8 accent-purple-500" />
+                            <div className="flex-1 space-y-2">
+                                <div className="flex items-center justify-between">
+                                  <h5 className="text-[10px] font-black uppercase tracking-widest text-purple-400">Recap Podcast</h5>
+                                  <span className="text-[9px] font-bold text-purple-400/50">AI-CAST</span>
+                                </div>
+                                <audio src={recapUrl} controls className="w-full h-7 accent-purple-500" />
                             </div>
                             <button 
                               onClick={() => {
                                 const a = document.createElement("a");
-                                a.href = podcastUrl;
-                                a.download = `podcast-${Date.now()}.mp3`;
+                                a.href = recapUrl;
+                                a.download = `recap-podcast-${Date.now()}.mp3`;
                                 a.click();
                               }}
-                              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all"
+                              className="w-10 h-10 flex items-center justify-center rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 transition-all border border-purple-500/10"
+                            >
+                                <Download className="w-4 h-4" />
+                            </button>
+                        </div>
+                      )}
+
+                      {enhancedReplayUrl && (
+                        <div className="bg-blue-500/5 border border-blue-500/10 rounded-2xl p-4 flex items-center gap-4 transition-all hover:bg-blue-500/10 group">
+                            <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/20 group-hover:scale-105 transition-transform">
+                                <Sparkles className="w-5 h-5 text-blue-400" />
+                            </div>
+                            <div className="flex-1 space-y-2">
+                                <div className="flex items-center justify-between">
+                                  <h5 className="text-[10px] font-black uppercase tracking-widest text-blue-400">Enhanced Replay</h5>
+                                  <span className="text-[9px] font-bold text-blue-400/50">NEURAL-SYNTH</span>
+                                </div>
+                                <audio src={enhancedReplayUrl} controls className="w-full h-7 accent-blue-500" />
+                            </div>
+                            <button 
+                              onClick={() => {
+                                const a = document.createElement("a");
+                                a.href = enhancedReplayUrl;
+                                a.download = `enhanced-replay-${Date.now()}.mp3`;
+                                a.click();
+                              }}
+                              className="w-10 h-10 flex items-center justify-center rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 transition-all border border-blue-500/10"
                             >
                                 <Download className="w-4 h-4" />
                             </button>
@@ -833,29 +925,71 @@ export function LiveTranslate() {
                      {formatTime(elapsedTime)}
                  </div>
 
-                 <button
-                    onClick={isRecording ? stopRecording : startRecording}
-                    className={cn(
-                        "w-16 h-16 rounded-full flex items-center justify-center transition-all shadow-xl active:scale-95 group",
-                        isRecording 
-                          ? "bg-red-500 text-white shadow-red-500/30 hover:bg-red-600" 
-                          : "bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 hover:scale-105"
-                    )}
-                 >
-                     {isRecording ? (
-                         <Square className="w-5 h-5 fill-current" />
-                     ) : (
-                         <Mic className="w-7 h-7 text-primary-foreground group-hover:scale-110 transition-transform" />
-                     )}
-                     
-                     {/* Pulse rings */}
-                     {isRecording && (
-                        <>
-                          <div className="absolute inset-0 rounded-full border-2 border-red-500 opacity-50 animate-ping" />
-                          <div className="absolute -inset-2 rounded-full border border-red-500 opacity-20 animate-ping delay-150" />
-                        </>
-                     )}
-                 </button>
+                 {/* Active Speaker Toggle (Conversation Mode) */}
+                 {activeTab === "conversation" && isRecording && (
+                    <div className="flex bg-secondary/20 dark:bg-white/5 rounded-2xl p-0.5 border border-border dark:border-white/10 shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-300">
+                      <button 
+                          onClick={() => {
+                              setCurrentSpeaker("A");
+                              if (recognitionRef.current) {
+                                  recognitionRef.current.lang = LANGUAGES.find(l => l.id === sourceLanguage)?.code || 'en-US';
+                              }
+                          }}
+                          className={cn(
+                              "flex items-center gap-2 px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all",
+                              currentSpeaker === "A" ? "bg-primary text-primary-foreground shadow-md" : "text-foreground/40 hover:text-foreground/60"
+                          )}
+                      >
+                          <span className="text-sm">👤</span> {sourceLanguage}
+                      </button>
+                      <button 
+                          onClick={() => {
+                              setCurrentSpeaker("B");
+                              if (recognitionRef.current) {
+                                  recognitionRef.current.lang = LANGUAGES.find(l => l.id === targetLanguage)?.code || 'en-US';
+                              }
+                          }}
+                          className={cn(
+                              "flex items-center gap-2 px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all",
+                              currentSpeaker === "B" ? "bg-primary text-primary-foreground shadow-md" : "text-foreground/40 hover:text-foreground/60"
+                          )}
+                      >
+                          <span className="text-sm">👥</span> {targetLanguage}
+                      </button>
+                    </div>
+                  )}
+
+                 <div className="flex flex-col items-center gap-1">
+                    <button
+                        onClick={isRecording ? stopRecording : startRecording}
+                        className={cn(
+                            "w-16 h-16 rounded-full flex items-center justify-center transition-all shadow-xl active:scale-95 group relative mb-1",
+                            isRecording 
+                            ? "bg-red-500 text-white shadow-red-500/30 hover:bg-red-600" 
+                            : "bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 hover:scale-105"
+                        )}
+                    >
+                        {isRecording ? (
+                            <Square className="w-5 h-5 fill-current" />
+                        ) : (
+                            <Mic className="w-7 h-7 text-primary-foreground group-hover:scale-110 transition-transform" />
+                        )}
+                        
+                        {/* Pulse rings */}
+                        {isRecording && (
+                            <>
+                            <div className="absolute inset-0 rounded-full border-2 border-red-500 opacity-50 animate-ping" />
+                            <div className="absolute -inset-2 rounded-full border border-red-500 opacity-20 animate-ping delay-150" />
+                            </>
+                        )}
+                    </button>
+                    <span className={cn(
+                        "text-[9px] font-black uppercase tracking-widest",
+                        isRecording ? "text-red-500 animate-pulse" : "text-foreground/40 dark:text-white/40"
+                    )}>
+                        {isRecording ? "Stop" : "Start"}
+                    </span>
+                  </div>
 
                  <div className="flex items-center gap-2 w-16">
                       {isRecording ? (
@@ -870,10 +1004,10 @@ export function LiveTranslate() {
                           }}
                           className="flex flex-col items-center gap-1 group"
                         >
-                            <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center border border-white/10 group-hover:bg-red-500/20 group-hover:border-red-500/40 transition-all shadow-lg">
-                                <Square className="w-4 h-4 text-white group-hover:text-red-400" />
+                            <div className="w-10 h-10 rounded-full bg-red-500/10 dark:bg-red-500/20 flex items-center justify-center border border-red-500/20 group-hover:bg-red-500/30 group-hover:border-red-500/40 transition-all shadow-lg">
+                                <Square className="w-4 h-4 text-red-500" />
                             </div>
-                            <span className="text-[10px] font-bold text-white/40 group-hover:text-red-400 uppercase tracking-tighter">Finish</span>
+                            <span className="text-[10px] font-bold text-red-500/80 dark:text-red-400 uppercase tracking-tighter">Finish</span>
                         </button>
                       ) : (
                         <button className="p-2 rounded-full hover:bg-secondary dark:hover:bg-white/10 text-foreground/40 dark:text-white/40 transition-colors">
