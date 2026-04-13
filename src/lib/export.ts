@@ -1,6 +1,7 @@
 import { jsPDF } from "jspdf";
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from "docx";
 import { saveAs } from "file-saver"; // Need file-saver for browser saving of docx
+import { Source } from "@/components/SourceUploader";
 
 interface ProjectData {
   title: string;
