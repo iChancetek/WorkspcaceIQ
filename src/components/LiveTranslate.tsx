@@ -45,6 +45,8 @@ export function LiveTranslate() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
   const [showResults, setShowResults] = useState(false);
+  const [autoPlayVoice, setAutoPlayVoice] = useState(true);
+  const [isPlayingBlockId, setIsPlayingBlockId] = useState<string | null>(null);
 
   // Conversation Mode State
   const [currentSpeaker, setCurrentSpeaker] = useState<"A" | "B">("A");
@@ -103,15 +105,12 @@ export function LiveTranslate() {
         prev.map(block => block.id === blockId ? { ...block, translated: data.translatedText || text, isTranslating: false, language: data.detectedLanguage } : block)
       );
 
-      // If dubbing or conversation is active, play TTS
-      if (activeTab === "dubbing" || activeTab === "conversation") {
-         const voice = activeTab === "conversation" ? (currentSpeaker === "A" ? "shimmer" : "onyx") : "nova";
-         // Chancellor = Onyx (A), Sydney = Shimmer (B)
-         // Wait, the logic above has shimmer for A and onyx for B. 
-         // Let's swap to match the user's personality request: 
-         // Chancellor (Male) = A, Sydney (Female) = B
+      // If auto-play is enabled or dubbing/conversation is active, play TTS
+      if (autoPlayVoice || activeTab === "dubbing" || activeTab === "conversation") {
          const assignedVoice = activeTab === "conversation" ? (currentSpeaker === "A" ? "onyx" : "shimmer") : "nova";
+         setIsPlayingBlockId(blockId);
          await playTTS(data.translatedText || text, assignedVoice);
+         setIsPlayingBlockId(null);
          
          if (activeTab === "conversation") {
            // Swap speaker for next turn
@@ -143,6 +142,7 @@ export function LiveTranslate() {
               audioContextRef.current = audio;
               audio.onended = () => {
                 isSpeakingRef.current = false;
+                setIsPlayingBlockId(null);
                 resolve();
               };
               audio.play();
@@ -212,12 +212,10 @@ export function LiveTranslate() {
 
     recognition.onerror = (event: any) => {
        console.warn("Speech recognition error", event.error);
-       // Ignore "no-speech" errors, restart immediately on "audio-capture" or others if not intentionally stopped
     };
 
     recognition.onend = () => {
        if (!isIntentionallyStopped.current) {
-          // The Watchdog: Auto-restart to maintain absolute continuity
           try { recognition.start(); } catch(e) {}
        }
     };
@@ -458,16 +456,32 @@ export function LiveTranslate() {
                  </div>
              </div>
 
-             <div className="flex items-center gap-2 shrink-0 bg-white/5 px-3 py-1.5 rounded-full border border-white/10" title="Ultra-smart neural transcription. Near-perfect accuracy. Exclusively for Premium Plus Subscribers.">
-                 <div className="flex flex-col">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-primary dark:text-blue-400">Premium Plus</span>
-                 </div>
- 
-                 {/* Premium Toggle */}
-                 <div className="w-9 h-5 rounded-full bg-secondary dark:bg-white/10 relative flex items-center transition-all cursor-help border border-border dark:border-white/20 shadow-inner">
-                     <div className="w-3.5 h-3.5 rounded-full bg-foreground/10 dark:bg-white/10 absolute left-0.5" />
-                     <Sparkles className="w-2.5 h-2.5 text-blue-400 absolute right-1.5 opacity-40" />
-                 </div>
+             <div className="flex items-center gap-4 shrink-0">
+                  {/* Auto-Play Toggle */}
+                  <button 
+                    onClick={() => setAutoPlayVoice(!autoPlayVoice)}
+                    className={cn(
+                        "flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all",
+                        autoPlayVoice 
+                          ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500" 
+                          : "bg-white/5 border-white/10 text-white/40"
+                    )}
+                    title={autoPlayVoice ? "Live Voice Enabled" : "Live Voice Muted"}
+                  >
+                      {autoPlayVoice ? <Headphones className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5 opacity-40" />}
+                      <span className="text-[10px] font-bold uppercase tracking-wider">{autoPlayVoice ? "Live Audio" : "Silent"}</span>
+                  </button>
+
+                  <div className="flex items-center gap-2 shrink-0 bg-white/5 px-3 py-1.5 rounded-full border border-white/10" title="Ultra-smart neural transcription. Near-perfect accuracy. Exclusively for Premium Plus Subscribers.">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-primary dark:text-blue-400">Premium Plus</span>
+                      </div>
+                      {/* Premium Toggle */}
+                      <div className="w-9 h-5 rounded-full bg-secondary dark:bg-white/10 relative flex items-center transition-all cursor-help border border-border dark:border-white/20 shadow-inner">
+                          <div className="w-3.5 h-3.5 rounded-full bg-foreground/10 dark:bg-white/10 absolute left-0.5" />
+                          <Sparkles className="w-2.5 h-2.5 text-blue-400 absolute right-1.5 opacity-40" />
+                      </div>
+                  </div>
              </div>
          </div>
 
@@ -510,13 +524,28 @@ export function LiveTranslate() {
                       <p className="text-sm font-semibold text-foreground/80 dark:text-white/80">{block.original}</p>
                       {(activeTab === "translate" || activeTab === "dubbing" || activeTab === "conversation") && (
                           <div className="flex items-center gap-2 mt-1">
-                              {block.isTranslating && <Loader2 className="w-3 h-3 text-primary animate-spin" />}
-                              <p className={cn(
-                                "text-lg font-bold leading-tight",
-                                block.speaker === "B" ? "text-purple-400" : "text-primary dark:text-blue-400"
-                              )}>
-                                  {block.translated || "..."}
-                              </p>
+                                  {block.isTranslating && <Loader2 className="w-3 h-3 text-primary animate-spin" />}
+                                  <p className={cn(
+                                    "text-lg font-bold leading-tight",
+                                    block.speaker === "B" ? "text-purple-400" : "text-primary dark:text-blue-400"
+                                  )}>
+                                      {block.translated || "..."}
+                                  </p>
+                                  {block.translated && !block.isTranslating && (
+                                    <button 
+                                      onClick={() => {
+                                        setIsPlayingBlockId(block.id);
+                                        const voice = activeTab === "conversation" ? (block.speaker === "A" ? "onyx" : "shimmer") : "nova";
+                                        playTTS(block.translated, voice).finally(() => setIsPlayingBlockId(null));
+                                      }}
+                                      className={cn(
+                                        "p-1.5 rounded-lg transition-all",
+                                        isPlayingBlockId === block.id ? "bg-primary/20 text-primary" : "text-primary/40 hover:bg-primary/10 hover:text-primary"
+                                      )}
+                                    >
+                                      {isPlayingBlockId === block.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Volume2 className="w-3.5 h-3.5" />}
+                                    </button>
+                                  )}
                           </div>
                       )}
                     </div>
@@ -609,7 +638,7 @@ export function LiveTranslate() {
                     </button>
                 </div>
 
-                  <button 
+                <button 
                   onClick={() => setShowResults(false)}
                   className="w-full py-2 text-[10px] font-bold text-foreground/60 dark:text-white/60 hover:text-foreground dark:hover:text-white transition-colors uppercase tracking-widest"
                 >
@@ -659,9 +688,27 @@ export function LiveTranslate() {
                  </button>
 
                  <div className="flex items-center gap-2 w-16">
-                     <button className="p-2 rounded-full hover:bg-secondary dark:hover:bg-white/10 text-foreground/40 dark:text-white/40 transition-colors">
-                         <Settings className="w-4 h-4" />
-                     </button>
+                      {isRecording ? (
+                        <button 
+                          onClick={() => {
+                            stopRecording();
+                            setShowResults(true);
+                            setTimeout(() => {
+                               scrollRef.current?.parentElement?.parentElement?.scrollIntoView({ behavior: "smooth", block: "end" });
+                            }, 300);
+                          }}
+                          className="flex flex-col items-center gap-1 group"
+                        >
+                            <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center border border-white/10 group-hover:bg-red-500/20 group-hover:border-red-500/40 transition-all shadow-lg">
+                                <Square className="w-4 h-4 text-white group-hover:text-red-400" />
+                            </div>
+                            <span className="text-[10px] font-bold text-white/40 group-hover:text-red-400 uppercase tracking-tighter">Finish</span>
+                        </button>
+                      ) : (
+                        <button className="p-2 rounded-full hover:bg-secondary dark:hover:bg-white/10 text-foreground/40 dark:text-white/40 transition-colors">
+                            <Settings className="w-4 h-4" />
+                        </button>
+                      )}
                  </div>
              </div>
          </div>
@@ -717,7 +764,7 @@ export function LiveTranslate() {
           </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <button 
             onClick={() => handleExport("pdf")}
             disabled={isRecording || transcriptBlocks.length === 0}
