@@ -34,8 +34,10 @@ export function BackButton({
   const handleClick = () => {
     if (href) {
       router.push(href);
-    } else {
+    } else if (window.history.length > 1) {
       router.back();
+    } else {
+      router.push("/");
     }
   };
 
