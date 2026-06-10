@@ -60,7 +60,7 @@ const itemVariants = {
   visible: { 
     opacity: 1, 
     scale: 1,
-    transition: { type: "spring", stiffness: 400, damping: 30 }
+    transition: { type: "spring" as const, stiffness: 400, damping: 30 }
   },
 };
 
@@ -77,29 +77,43 @@ const fadeUpVariants = {
 function parseSlideDeck(raw: string): Slide[] {
   if (!raw) return [];
   
-  // Split by "---" on its own line OR lookahead for "## Slide"
-  const sections = raw
-    .split(/(?:^---$|\n---\n|(?=##\s*Slide))/im)
+  // Normalize line endings and whitespace
+  const cleanRaw = raw.replace(/\r\n/g, "\n").trim();
+  
+  // Split by "---" on its own line OR lookahead for "## Slide" or "Slide N:"
+  // We handle various whitespace and Markdown flavors
+  const sections = cleanRaw
+    .split(/(?:\n|^)\s*---\s*(?:\n|$)|(?=\n##\s*Slide)|(?=\nSlide\s*\d+:)/im)
     .map(s => s.trim())
-    .filter(Boolean);
+    .filter(s => s.length > 20); // Ensure it's not a tiny fragment
 
-  return sections.map((section, idx) => {
-    const titleMatch = section.match(/##\s*Slide\s*\d*:?\s*(.+)/i);
+  // If we still have only 1 section but it's massive, try a fallback split by Slide headers
+  let finalSections = sections;
+  if (finalSections.length === 1 && finalSections[0].length > 1000) {
+    const fallbackSplit = finalSections[0].split(/(?=##\s*Slide)|(?=##\s*\[)|(?=Slide\s*\d+:)/im);
+    if (fallbackSplit.length > 1) {
+      finalSections = fallbackSplit.map(s => s.trim()).filter(Boolean);
+    }
+  }
+
+  return finalSections.map((section, idx) => {
+    // Title extraction: ## Slide N: Title OR ## Title OR Slide N: Title
+    const titleMatch = section.match(/(?:##\s*Slide\s*\d*:?\s*|##\s*|Slide\s*\d*:?\s*)(.+)/i);
     const title = titleMatch ? titleMatch[1].trim() : (idx === 0 ? "Introduction" : `Slide ${idx + 1}`);
     
     const subtitleMatch = section.match(/###\s*(.+)/i);
     const subtitle = subtitleMatch ? subtitleMatch[1].trim() : "";
 
-    const speakerMatch = section.match(/\*\*Speaker\s*Note[s]?:\*\*[\s]*(.+)/i);
+    const speakerMatch = section.match(/(?:\*\*Speaker\s*Note[s]?:\*\*|Speaker\s*Note[s]?:\s*)(.+)/i);
     const speakerNote = speakerMatch ? speakerMatch[1].trim() : "";
     
-    const visualMatch = section.match(/\*\*Visual\s*Idea:\*\*[\s]*(.+)/i);
+    const visualMatch = section.match(/(?:\*\*Visual\s*Idea:\*\*|Visual\s*Idea:\s*)(.+)/i);
     const visualIdea = visualMatch ? visualMatch[1].trim() : "";
 
     const bulletMatches = [...section.matchAll(/^[-*]\s+(.+)/gm)];
     const bullets = bulletMatches
       .map(m => m[1].trim())
-      .filter(b => !b.toLowerCase().includes("speaker note") && !b.toLowerCase().includes("visual idea"));
+      .filter(b => !b.toLowerCase().includes("speaker note") && !b.toLowerCase().includes("visual idea") && !b.toLowerCase().includes("key points"));
     
     return { number: idx + 1, title, subtitle, bullets, visualIdea, speakerNote };
   }).filter(s => s.title || s.bullets.length > 0);
