@@ -51,9 +51,7 @@ const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.05,
-    },
+    transition: { staggerChildren: 0.05 },
   },
 };
 
@@ -62,11 +60,7 @@ const itemVariants = {
   visible: { 
     opacity: 1, 
     scale: 1,
-    transition: {
-      type: "spring" as const,
-      stiffness: 400,
-      damping: 30,
-    }
+    transition: { type: "spring", stiffness: 400, damping: 30 }
   },
 };
 
@@ -79,13 +73,19 @@ const fadeUpVariants = {
   },
 };
 
-
 // ─── Slide Deck Parser ──────────────────────────────────────────────────────
 function parseSlideDeck(raw: string): Slide[] {
-  const sections = raw.split(/^---$/m).map(s => s.trim()).filter(Boolean);
+  if (!raw) return [];
+  
+  // Split by "---" on its own line OR lookahead for "## Slide"
+  const sections = raw
+    .split(/(?:^---$|\n---\n|(?=##\s*Slide))/im)
+    .map(s => s.trim())
+    .filter(Boolean);
+
   return sections.map((section, idx) => {
     const titleMatch = section.match(/##\s*Slide\s*\d*:?\s*(.+)/i);
-    const title = titleMatch ? titleMatch[1].trim() : `Slide ${idx + 1}`;
+    const title = titleMatch ? titleMatch[1].trim() : (idx === 0 ? "Introduction" : `Slide ${idx + 1}`);
     
     const subtitleMatch = section.match(/###\s*(.+)/i);
     const subtitle = subtitleMatch ? subtitleMatch[1].trim() : "";
@@ -99,7 +99,7 @@ function parseSlideDeck(raw: string): Slide[] {
     const bulletMatches = [...section.matchAll(/^[-*]\s+(.+)/gm)];
     const bullets = bulletMatches
       .map(m => m[1].trim())
-      .filter(b => !b.toLowerCase().startsWith("speaker") && !b.toLowerCase().startsWith("visual"));
+      .filter(b => !b.toLowerCase().includes("speaker note") && !b.toLowerCase().includes("visual idea"));
     
     return { number: idx + 1, title, subtitle, bullets, visualIdea, speakerNote };
   }).filter(s => s.title || s.bullets.length > 0);
@@ -118,22 +118,17 @@ function SlideCard({ slide, total, onPrev, onNext, onPresent }: {
       exit={{ opacity: 0, x: -20 }}
       className="flex flex-col gap-4"
     >
-      {/* Slide card */}
       <div className="relative rounded-3xl bg-gradient-to-br from-violet-600/5 to-violet-600/10 dark:from-violet-500/10 dark:to-violet-500/5 border border-violet-500/20 p-8 md:p-10 min-h-[340px] flex flex-col shadow-xl shadow-violet-500/5 group hover:border-violet-500/40 transition-colors duration-500">
-        {/* Slide number badge */}
         <span className="absolute top-6 right-6 text-[10px] font-black uppercase tracking-[0.2em] text-violet-600 dark:text-violet-400 bg-violet-500/10 px-3 py-1.5 rounded-full border border-violet-500/20">
           {slide.number} / {total}
         </span>
         
-        {/* Subtitle/Hook */}
         {slide.subtitle && (
           <p className="text-xs font-black uppercase tracking-widest text-violet-500 mb-2">{slide.subtitle}</p>
         )}
         
-        {/* Title */}
         <h3 className="text-2xl md:text-3xl font-black text-foreground dark:text-white leading-tight mb-6 pr-16 group-hover:text-violet-500 dark:group-hover:text-violet-400 transition-colors">{slide.title}</h3>
         
-        {/* Bullet points */}
         {slide.bullets.length > 0 && (
           <ul className="flex-1 space-y-4">
             {slide.bullets.map((b, i) => (
@@ -151,7 +146,6 @@ function SlideCard({ slide, total, onPrev, onNext, onPresent }: {
           </ul>
         )}
 
-        {/* Visual Idea Tag */}
         {slide.visualIdea && (
           <div className="mt-8 pt-6 border-t border-violet-500/10">
             <div className="flex items-center gap-2 mb-2">
@@ -163,7 +157,6 @@ function SlideCard({ slide, total, onPrev, onNext, onPresent }: {
         )}
       </div>
 
-      {/* Presentation Tools */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2">
         <div className="flex items-center gap-2">
           <button
@@ -181,7 +174,6 @@ function SlideCard({ slide, total, onPrev, onNext, onPresent }: {
                 i + 1 === slide.number ? "bg-violet-500 scale-150 shadow-[0_0_8px_rgba(139,92,246,0.5)]" : "bg-foreground/10 dark:bg-white/10"
               )} />
             ))}
-            {total > 8 && <span className="text-[10px] text-foreground/30 dark:text-white/30 font-bold">...</span>}
           </div>
           <button
             onClick={onNext}
@@ -222,13 +214,11 @@ function PresentationOverlay({ slides, currentIndex, onClose, onPrev, onNext, is
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[100] bg-background dark:bg-black flex flex-col items-center justify-center p-6 md:p-12 overflow-hidden"
     >
-      {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-violet-600/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px]" />
       </div>
 
-      {/* Header */}
       <div className="absolute top-0 inset-x-0 p-6 md:p-10 flex items-center justify-between z-10">
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-xl bg-violet-500 flex items-center justify-center text-white shadow-lg shadow-violet-500/20">
@@ -239,15 +229,11 @@ function PresentationOverlay({ slides, currentIndex, onClose, onPrev, onNext, is
             <p className="text-[10px] text-foreground/40 dark:text-white/40 font-bold uppercase tracking-[0.2em]">Live Session · Slide {slide.number} of {slides.length}</p>
           </div>
         </div>
-        <button 
-          onClick={onClose}
-          className="w-10 h-10 rounded-full bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 flex items-center justify-center transition-colors group"
-        >
+        <button onClick={onClose} className="w-10 h-10 rounded-full bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 flex items-center justify-center transition-colors group">
           <X className="w-5 h-5 text-foreground/40 dark:text-white/40 group-hover:text-foreground dark:group-hover:text-white" />
         </button>
       </div>
 
-      {/* Slide Content */}
       <div className="relative w-full max-w-5xl aspect-video flex flex-col justify-center gap-8 md:gap-12 z-10">
         <motion.div
           key={currentIndex}
@@ -257,34 +243,19 @@ function PresentationOverlay({ slides, currentIndex, onClose, onPrev, onNext, is
           transition={{ type: "spring", damping: 25, stiffness: 200 }}
           className="flex flex-col gap-6 md:gap-8"
         >
-          {slide.subtitle && (
-            <p className="text-violet-500 font-black uppercase tracking-[0.3em] text-xs md:text-sm text-center md:text-left">{slide.subtitle}</p>
-          )}
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-foreground dark:text-white leading-[1.1] text-center md:text-left balance">
-            {slide.title}
-          </h1>
+          {slide.subtitle && <p className="text-violet-500 font-black uppercase tracking-[0.3em] text-xs md:text-sm text-center md:text-left">{slide.subtitle}</p>}
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-foreground dark:text-white leading-[1.1] text-center md:text-left balance">{slide.title}</h1>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <ul className="space-y-6 md:space-y-8">
               {slide.bullets.map((b, i) => (
-                <motion.li 
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 + i * 0.1 }}
-                  className="flex items-start gap-6"
-                >
+                <motion.li key={i} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 + i * 0.1 }} className="flex items-start gap-6">
                   <span className="w-3 h-3 rounded-full bg-violet-500 mt-2.5 shrink-0 shadow-[0_0_15px_rgba(139,92,246,0.6)]" />
                   <span className="text-lg md:text-xl lg:text-2xl text-foreground/70 dark:text-white/80 font-medium leading-relaxed">{b}</span>
                 </motion.li>
               ))}
             </ul>
             {slide.visualIdea && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9, rotate: -2 }}
-                animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                transition={{ delay: 0.5, duration: 1 }}
-                className="hidden md:flex aspect-square rounded-[3rem] bg-gradient-to-br from-violet-500/20 to-blue-500/20 border border-white/10 items-center justify-center p-12 text-center group"
-              >
+              <motion.div initial={{ opacity: 0, scale: 0.9, rotate: -2 }} animate={{ opacity: 1, scale: 1, rotate: 0 }} transition={{ delay: 0.5, duration: 1 }} className="hidden md:flex aspect-square rounded-[3rem] bg-gradient-to-br from-violet-500/20 to-blue-500/20 border border-white/10 items-center justify-center p-12 text-center group">
                 <div className="space-y-4">
                   <div className="w-16 h-16 rounded-2xl bg-white/10 mx-auto flex items-center justify-center text-violet-400 group-hover:scale-110 transition-transform duration-500">
                     <Sparkles className="w-8 h-8" />
@@ -298,68 +269,36 @@ function PresentationOverlay({ slides, currentIndex, onClose, onPrev, onNext, is
         </motion.div>
       </div>
 
-      {/* Footer Controls */}
       <div className="absolute bottom-0 inset-x-0 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 z-20">
-        {/* Speaker Note Preview */}
         <div className="flex-1 max-w-xl order-2 md:order-1">
           <div className="flex items-center gap-3 mb-2">
             <div className={cn("w-2 h-2 rounded-full", isPlaying ? "bg-red-500 animate-pulse" : "bg-violet-500")} />
             <span className="text-[10px] font-black uppercase tracking-widest text-foreground/40 dark:text-white/40">Speaker Perspective</span>
           </div>
-          <p className="text-xs md:text-sm text-foreground/60 dark:text-white/60 leading-relaxed italic line-clamp-2 hover:line-clamp-none transition-all cursor-default">
-            {slide.speakerNote}
-          </p>
+          <p className="text-xs md:text-sm text-foreground/60 dark:text-white/60 leading-relaxed italic line-clamp-2 hover:line-clamp-none transition-all cursor-default">{slide.speakerNote}</p>
         </div>
 
-        {/* Playback Controls */}
         <div className="flex items-center gap-4 md:gap-8 order-1 md:order-2">
-          <button 
-            onClick={onPrev}
-            disabled={currentIndex === 0}
-            className="w-12 h-12 rounded-full border border-foreground/10 dark:border-white/10 flex items-center justify-center text-foreground/40 dark:text-white/40 hover:text-foreground dark:hover:text-white hover:border-foreground/20 dark:hover:border-white/20 transition-all disabled:opacity-10"
-          >
+          <button onClick={onPrev} disabled={currentIndex === 0} className="w-12 h-12 rounded-full border border-foreground/10 dark:border-white/10 flex items-center justify-center text-foreground/40 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-all disabled:opacity-10">
             <ChevronLeft className="w-6 h-6" />
           </button>
-          
           <div className="flex flex-col items-center gap-3">
-            <button 
-              onClick={onTogglePlay}
-              className="w-20 h-20 rounded-full bg-violet-600 hover:bg-violet-500 text-white flex items-center justify-center shadow-2xl shadow-violet-600/40 transition-all active:scale-90 relative group"
-            >
+            <button onClick={onTogglePlay} className="w-20 h-20 rounded-full bg-violet-600 hover:bg-violet-500 text-white flex items-center justify-center shadow-2xl shadow-violet-600/40 transition-all active:scale-90 relative group">
               {isPlaying ? <Square className="w-8 h-8 fill-current" /> : <Play className="w-8 h-8 fill-current ml-1" />}
-              {isPlaying && (
-                <div className="absolute inset-0 rounded-full border-4 border-white/20 animate-ping" />
-              )}
+              {isPlaying && <div className="absolute inset-0 rounded-full border-4 border-white/20 animate-ping" />}
             </button>
-            <button 
-              onClick={onToggleAuto}
-              className={cn(
-                "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all",
-                autoAdvance ? "bg-violet-500 text-white shadow-lg shadow-violet-500/20" : "bg-foreground/5 dark:bg-white/5 text-foreground/40 dark:text-white/40"
-              )}
-            >
+            <button onClick={onToggleAuto} className={cn("px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all", autoAdvance ? "bg-violet-500 text-white shadow-lg shadow-violet-500/20" : "bg-foreground/5 dark:bg-white/5 text-foreground/40 dark:text-white/40")}>
               Auto-Advance {autoAdvance ? "ON" : "OFF"}
             </button>
           </div>
-
-          <button 
-            onClick={onNext}
-            disabled={currentIndex === slides.length - 1}
-            className="w-12 h-12 rounded-full border border-foreground/10 dark:border-white/10 flex items-center justify-center text-foreground/40 dark:text-white/40 hover:text-foreground dark:hover:text-white hover:border-foreground/20 dark:hover:border-white/20 transition-all disabled:opacity-10"
-          >
+          <button onClick={onNext} disabled={currentIndex === slides.length - 1} className="w-12 h-12 rounded-full border border-foreground/10 dark:border-white/10 flex items-center justify-center text-foreground/40 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-all disabled:opacity-10">
             <ChevronRight className="w-6 h-6" />
           </button>
         </div>
       </div>
 
-      {/* Progress Bar */}
       <div className="absolute bottom-0 inset-x-0 h-1.5 bg-foreground/5 dark:bg-white/5">
-        <motion.div 
-          className="h-full bg-violet-600 shadow-[0_0_15px_rgba(139,92,246,0.5)]"
-          initial={{ width: 0 }}
-          animate={{ width: `${((currentIndex + 1) / slides.length) * 100}%` }}
-          transition={{ duration: 0.5 }}
-        />
+        <motion.div className="h-full bg-violet-600 shadow-[0_0_15px_rgba(139,92,246,0.5)]" initial={{ width: 0 }} animate={{ width: `${((currentIndex + 1) / slides.length) * 100}%` }} transition={{ duration: 0.5 }} />
       </div>
     </motion.div>
   );
@@ -368,11 +307,7 @@ function PresentationOverlay({ slides, currentIndex, onClose, onPrev, onNext, is
 function MindMapViz({ node, depth = 0 }: { node: MindMapNode; depth?: number }) {
   const colors = ["text-teal-300", "text-blue-300", "text-violet-300", "text-pink-300"];
   return (
-    <motion.div 
-      initial={{ opacity: 0, x: -10 }}
-      animate={{ opacity: 1, x: 0 }}
-      className={cn("flex flex-col gap-1.5", depth > 0 && "ml-6 pl-3 border-l border-white/10")}
-    >
+    <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className={cn("flex flex-col gap-1.5", depth > 0 && "ml-6 pl-3 border-l border-white/10")}>
       <div className={cn("flex items-center gap-2 group", colors[depth % colors.length])}>
         {depth > 0 && <ChevronRight className="w-3 h-3 opacity-40 shrink-0" />}
         <span className={cn("font-semibold text-foreground dark:text-white", depth === 0 ? "text-base" : depth === 1 ? "text-sm" : "text-xs text-foreground/70 dark:text-white/70")}>{node.label}</span>
@@ -399,150 +334,86 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
   const bottomRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  // Memoize parsed slides to prevent jitter during streaming
   const slides = useMemo(() => {
-    if (activeMode === "slides" && streamText) {
-      return parseSlideDeck(streamText);
-    }
+    if (activeMode === "slides" && streamText) return parseSlideDeck(streamText);
     return [];
   }, [streamText, activeMode]);
 
   useEffect(() => {
-    // Restore existing content for this mode if available
     const existing = studioOutputs?.[activeMode];
-    
-    // Only update if the content actually differs from current state
     if (existing) {
       if (typeof existing === "string") {
-        if (streamText !== existing) {
-          setStreamText(existing);
-          setJsonData(null);
-        }
+        if (streamText !== existing) { setStreamText(existing); setJsonData(null); }
       } else {
-        if (JSON.stringify(jsonData) !== JSON.stringify(existing)) {
-          setJsonData(existing);
-          setStreamText("");
-        }
+        if (JSON.stringify(jsonData) !== JSON.stringify(existing)) { setJsonData(existing); setStreamText(""); }
       }
-    } else {
-      if (streamText !== "" || jsonData !== null) {
-        setStreamText("");
-        setJsonData(null);
-      }
+    } else if (streamText !== "" || jsonData !== null) {
+      setStreamText(""); setJsonData(null);
     }
-    
-    setError("");
-    setQuizSelected({});
-    setQuizRevealed(false);
-    setFlippedCard(null);
-    setIsPresenting(false);
-    stopAudio();
+    setError(""); setQuizSelected({}); setQuizRevealed(false); setFlippedCard(null); setIsPresenting(false); stopAudio();
   }, [activeMode, studioOutputs]);
 
   const stopAudio = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
+    if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
     setIsAudioPlaying(false);
   };
 
   const playSlideAudio = async (index: number) => {
     const slide = slides[index];
     if (!slide?.speakerNote) return;
-
-    stopAudio();
-    setIsAudioPlaying(true);
-
+    stopAudio(); setIsAudioPlaying(true);
     try {
       const res = await fetch("/api/ichancellor/tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: slide.speakerNote, voice: "nova" }), // "nova" is calm and professional
+        body: JSON.stringify({ text: slide.speakerNote, voice: "nova" }),
       });
-
       if (!res.ok) throw new Error("TTS failed");
-
       const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const audio = new Audio(url);
+      const audio = new Audio(URL.createObjectURL(blob));
       audioRef.current = audio;
-      
       audio.onended = () => {
         setIsAudioPlaying(false);
         if (autoAdvance && index < slides.length - 1) {
-          const nextIndex = index + 1;
-          setSlideIndex(nextIndex);
-          playSlideAudio(nextIndex);
+          const nextIdx = index + 1; setSlideIndex(nextIdx); playSlideAudio(nextIdx);
         }
       };
-
       audio.play();
-    } catch (err) {
-      console.error("Audio playback error:", err);
-      setIsAudioPlaying(false);
-    }
+    } catch (err) { console.error(err); setIsAudioPlaying(false); }
   };
 
-  // Synchronize internal state with parent, but avoid cycles during active streaming
   useEffect(() => {
     if (!isGenerating && onOutputChange && (streamText || jsonData)) {
-      // Check if current internal state matches what parent already has
       const existing = studioOutputs?.[activeMode];
-      const isDifferent = typeof existing === "string" 
-        ? existing !== streamText 
-        : JSON.stringify(existing) !== JSON.stringify(jsonData);
-
-      if (isDifferent) {
-        onOutputChange({ text: streamText, json: jsonData, mode: activeMode });
-      }
+      const isDiff = typeof existing === "string" ? existing !== streamText : JSON.stringify(existing) !== JSON.stringify(jsonData);
+      if (isDiff) onOutputChange({ text: streamText, json: jsonData, mode: activeMode });
     }
   }, [streamText, jsonData, isGenerating, onOutputChange, activeMode, studioOutputs]);
 
-  const cancelGeneration = () => {
-    abortRef.current?.abort();
-    setIsGenerating(false);
-  };
+  const cancelGeneration = () => { abortRef.current?.abort(); setIsGenerating(false); };
 
   const generate = async (overrideMode?: string) => {
     const mode = overrideMode || activeMode;
     if (!sources.length || isGenerating) return;
-
     if (mode === "audio") { onNavigateToDeepDive?.(); return; }
     if (mode === "video") return;
 
-    // Cancel any in-flight request
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
 
-    setIsGenerating(true);
-    setStreamText("");
-    setJsonData(null);
-    setError("");
-    setSlideIndex(0);
-
-    const streamingModes = ["report", "slides"];
+    setIsGenerating(true); setStreamText(""); setJsonData(null); setError(""); setSlideIndex(0);
 
     try {
       const res = await fetch("/api/studio/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,
-        body: JSON.stringify({
-          sources: sources.map(s => ({ title: s.title, text: s.text })),
-          mode,
-          tone,
-          language,
-        }),
+        body: JSON.stringify({ sources: sources.map(s => ({ title: s.title, text: s.text })), mode, tone, language }),
       });
+      if (!res.ok) throw new Error("Generation failed");
 
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || "Generation failed");
-      }
-
-      if (streamingModes.includes(mode)) {
+      if (["report", "slides"].includes(mode)) {
         const reader = res.body!.getReader();
         const decoder = new TextDecoder();
         let full = "";
@@ -553,15 +424,11 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
           setStreamText(full);
         }
       } else {
-        const data = await res.json();
-        setJsonData(data.data);
+        const data = await res.json(); setJsonData(data.data);
       }
     } catch (err: any) {
-      if (err.name === "AbortError") return; // User cancelled — silent
-      setError(err.message || "Failed to generate. Please try again.");
-    } finally {
-      setIsGenerating(false);
-    }
+      if (err.name !== "AbortError") setError(err.message || "Failed to generate.");
+    } finally { setIsGenerating(false); }
   };
 
   const downloadText = (text: string, filename: string) => {
@@ -574,278 +441,104 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
 
   const currentMode = MODES.find(m => m.id === activeMode)!;
   const hasOutput = streamText || jsonData;
-
-  // Resolve flashcards & quiz from either array or wrapped object
-  const flashcards: Flashcard[] = jsonData
-    ? (Array.isArray(jsonData) ? jsonData : jsonData.flashcards || [])
-    : [];
-  const quizQuestions: QuizQuestion[] = jsonData
-    ? (Array.isArray(jsonData) ? jsonData : jsonData.questions || jsonData.quiz || [])
-    : [];
+  const flashcards = jsonData ? (Array.isArray(jsonData) ? jsonData : jsonData.flashcards || []) : [];
+  const quizQuestions = jsonData ? (Array.isArray(jsonData) ? jsonData : jsonData.questions || jsonData.quiz || []) : [];
 
   return (
     <div className="space-y-6 w-full items-stretch flex flex-col">
-      {/* Mode Selector */}
       <div className="relative w-full overflow-hidden">
-        <motion.div 
-          className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x w-full justify-start items-center px-2"
-        >
+        <motion.div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x w-full justify-start items-center px-2">
           {MODES.map(mode => (
-            <motion.button
-              key={mode.id}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setActiveMode(mode.id)}
-              disabled={mode.comingSoon}
-              className={cn(
-                "group flex-shrink-0 flex flex-col items-center gap-1.5 px-4 py-3 rounded-2xl border transition-all duration-200 min-w-[90px] snap-start",
-                activeMode === mode.id
-                  ? cn("bg-gradient-to-br shadow-lg", mode.bg, mode.border)
-                  : "border-foreground/10 dark:border-white/8 bg-foreground/5 dark:bg-white/[0.03] hover:bg-foreground/10 dark:hover:bg-white/[0.06]",
-                mode.comingSoon && "opacity-40 cursor-not-allowed"
-              )}
-            >
+            <motion.button key={mode.id} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setActiveMode(mode.id)} disabled={mode.comingSoon}
+              className={cn("group flex-shrink-0 flex flex-col items-center gap-1.5 px-4 py-3 rounded-2xl border transition-all duration-200 min-w-[90px] snap-start",
+                activeMode === mode.id ? cn("bg-gradient-to-br shadow-lg", mode.bg, mode.border) : "border-foreground/10 dark:border-white/8 bg-foreground/5 dark:bg-white/[0.03] hover:bg-foreground/10 dark:hover:bg-white/[0.06]",
+                mode.comingSoon && "opacity-40 cursor-not-allowed")}>
               <mode.icon className={cn("w-5 h-5", activeMode === mode.id ? "text-white" : "text-foreground/40 dark:text-white/60 group-hover:text-foreground/70 dark:group-hover:text-white/80")} />
               <span className={cn("text-[10px] font-bold uppercase tracking-wide", activeMode === mode.id ? "text-white" : "text-foreground/60 dark:text-white/60")}>{mode.label}</span>
-              {mode.comingSoon && <span className="text-[8px] text-amber-500 font-bold uppercase tracking-wide">Soon</span>}
             </motion.button>
           ))}
         </motion.div>
       </div>
 
-      {/* Output area */}
-      <motion.div 
-        layout={!isGenerating}
-        className={cn(
-          "min-h-[320px] rounded-[2rem] md:rounded-3xl border bg-gradient-to-br p-4 md:p-6 flex flex-col w-full max-w-full relative",
-          currentMode.bg, currentMode.border
-        )}
-      >
-        {/* Header */}
+      <motion.div layout={!isGenerating} className={cn("min-h-[320px] rounded-[2rem] md:rounded-3xl border bg-gradient-to-br p-4 md:p-6 flex flex-col w-full max-w-full relative", currentMode.bg, currentMode.border)}>
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-5 text-center sm:text-left">
           <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col sm:flex-row items-center gap-2.5">
-            <div className={cn("p-2 rounded-xl bg-foreground/5 dark:bg-white/5")}>
-              <currentMode.icon className={cn("w-5 h-5", currentMode.color)} />
-            </div>
+            <div className="p-2 rounded-xl bg-foreground/5 dark:bg-white/5"><currentMode.icon className={cn("w-5 h-5", currentMode.color)} /></div>
             <div>
               <p className="text-sm font-bold text-foreground dark:text-white">{currentMode.label}</p>
               <p className="text-[10px] text-foreground/50 dark:text-white/70">{currentMode.desc}</p>
             </div>
           </motion.div>
           <div className="flex items-center gap-2">
-            {isGenerating && (
-              <button
-                onClick={cancelGeneration}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-400 text-xs font-bold border border-red-500/30 transition-colors"
-                title="Stop generation"
-              >
-                <Square className="w-3 h-3 fill-current" />
-                Stop
-              </button>
-            )}
+            {isGenerating && <button onClick={cancelGeneration} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-400 text-xs font-bold border border-red-500/30 transition-colors"><Square className="w-3 h-3 fill-current" /> Stop</button>}
             {hasOutput && !isGenerating && (
               <>
-                <button
-                  onClick={onManualSave}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-violet-500/20 hover:bg-violet-500/30 text-violet-400 text-xs font-bold border border-violet-500/30 transition-colors group"
-                  title="Save to WorkSpace"
-                >
-                  <Save className="w-3.5 h-3.5" />
-                  Save
-                </button>
-                <button
-                  onClick={() => generate()}
-                  className="p-2 rounded-xl bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 text-foreground/40 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-colors"
-                  title="Regenerate"
-                >
-                  <RefreshCw className="w-4 h-4" />
-                </button>
+                <button onClick={onManualSave} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-violet-500/20 hover:bg-violet-500/30 text-violet-400 text-xs font-bold border border-violet-500/30 transition-colors group"><Save className="w-3.5 h-3.5" /> Save</button>
+                <button onClick={() => generate()} className="p-2 rounded-xl bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 text-foreground/40 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-colors"><RefreshCw className="w-4 h-4" /></button>
               </>
             )}
-            {streamText && !isGenerating && (
-              <button
-                onClick={() => downloadText(streamText, `workspaceiq-${activeMode}.md`)}
-                className="p-2 rounded-xl bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 text-foreground/40 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-colors"
-                title="Download"
-              >
-                <Download className="w-4 h-4" />
-              </button>
-            )}
+            {streamText && !isGenerating && <button onClick={() => downloadText(streamText, `workspaceiq-${activeMode}.md`)} className="p-2 rounded-xl bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 text-foreground/40 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-colors"><Download className="w-4 h-4" /></button>}
           </div>
         </div>
 
-        {/* Content */}
         <div className="flex-1 overflow-y-auto">
           <AnimatePresence mode="wait">
-            {/* Empty state */}
             {!hasOutput && !isGenerating && (
-              <motion.div 
-                key="empty"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="h-full flex flex-col items-center justify-center gap-4 text-center py-8"
-              >
-                <div className={cn("p-4 rounded-2xl bg-foreground/5 dark:bg-white/5")}>
-                  <currentMode.icon className={cn("w-8 h-8", currentMode.color)} />
-                </div>
+              <motion.div key="empty" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="h-full flex flex-col items-center justify-center gap-4 text-center py-8">
+                <div className="p-4 rounded-2xl bg-foreground/5 dark:bg-white/5"><currentMode.icon className={cn("w-8 h-8", currentMode.color)} /></div>
                 <div>
                   <p className="text-base font-bold text-foreground dark:text-white mb-1">Generate {currentMode.label}</p>
-                  <p className="text-xs text-foreground/50 dark:text-white/70 max-w-xs">{currentMode.desc} from your {sources.length} source{sources.length !== 1 ? "s" : ""}</p>
+                  <p className="text-xs text-foreground/50 dark:text-white/70 max-w-xs">{currentMode.desc} from your {sources.length} sources</p>
                 </div>
-                <motion.button
-                layout
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => generate()}
-                disabled={!sources.length || currentMode.comingSoon}
-                className={cn(
-                  "flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-sm transition-all duration-200 shadow-xl shadow-black/10",
-                  "bg-foreground/5 dark:bg-white/10 hover:bg-foreground/10 dark:hover:bg-white/15 text-foreground dark:text-white border border-foreground/10 dark:border-white/15 hover:border-foreground/20 dark:hover:border-white/30 hover:shadow-[0_0_20px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_0_20px_rgba(255,255,255,0.05)]",
-                  (!sources.length || currentMode.comingSoon) && "opacity-40 cursor-not-allowed"
-                )}
-              >
-                <Sparkles className="w-4 h-4" />
-                Generate
-              </motion.button>
-                {!sources.length && (
-                  <p className="text-[10px] text-foreground/40 dark:text-white/60 font-medium bg-foreground/5 dark:bg-white/5 px-3 py-1 rounded-full">Add sources to the Research panel first</p>
-                )}
+                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => generate()} disabled={!sources.length || currentMode.comingSoon} className={cn("flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-sm transition-all shadow-xl bg-foreground/5 dark:bg-white/10 hover:bg-foreground/10 text-foreground dark:text-white border border-foreground/10", (!sources.length || currentMode.comingSoon) && "opacity-40 cursor-not-allowed")}><Sparkles className="w-4 h-4" /> Generate</motion.button>
               </motion.div>
             )}
 
-            {/* Generating state */}
             {isGenerating && (
-              <motion.div 
-                key="generating"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex flex-col items-center justify-center gap-4 py-12"
-              >
-                <div className="relative">
-                  <Loader2 className={cn("w-8 h-8 animate-spin", currentMode.color)} />
-                </div>
+              <motion.div key="generating" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center gap-4 py-12">
+                <Loader2 className={cn("w-8 h-8 animate-spin", currentMode.color)} />
                 <div className="text-center">
                   <p className="text-sm font-semibold text-foreground/70 dark:text-white/70">Generating {currentMode.label}...</p>
                   <p className="text-xs text-foreground/40 dark:text-white/40 mt-1">This may take a moment</p>
                 </div>
-                <button
-                  onClick={cancelGeneration}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 dark:bg-red-500/15 hover:bg-red-500/20 dark:hover:bg-red-500/25 text-red-600 dark:text-red-400 text-xs font-bold border border-red-500/20 dark:border-red-500/25 transition-all"
-                >
-                  <Square className="w-3 h-3 fill-current" />
-                  Cancel Generation
-                </button>
-                {streamText && (
-                  <div className="w-full mt-2 text-sm text-foreground/70 dark:text-white/70 whitespace-pre-wrap font-mono max-h-48 overflow-y-auto leading-relaxed">
-                    {streamText}
-                  </div>
-                )}
+                {streamText && <div className="w-full mt-2 text-sm text-foreground/70 dark:text-white/70 whitespace-pre-wrap font-mono max-h-48 overflow-y-auto leading-relaxed">{streamText}</div>}
               </motion.div>
             )}
 
-            {/* Slide Deck — parsed visual cards */}
             {!isGenerating && activeMode === "slides" && slides.length > 0 && (
-              <motion.div 
-                key="slides"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="space-y-4"
-              >
+              <motion.div key="slides" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between mb-3">
                     <p className="text-xs text-foreground/40 dark:text-white/40 font-semibold">{slides.length} slides generated</p>
-                    <button
-                      onClick={() => downloadText(streamText, "workspaceiq-slides.md")}
-                      className="flex items-center gap-1.5 text-[10px] text-foreground/30 dark:text-white/30 hover:text-foreground/60 dark:hover:text-white/60 transition-colors"
-                    >
-                      <Download className="w-3 h-3" />
-                      Download all slides
-                    </button>
+                    <button onClick={() => downloadText(streamText, "workspaceiq-slides.md")} className="flex items-center gap-1.5 text-[10px] text-foreground/30 dark:text-white/30 hover:text-foreground/60 dark:hover:text-white/60 transition-colors"><Download className="w-3 h-3" /> Download all slides</button>
                   </div>
-                  <SlideCard
-                    slide={slides[slideIndex] || slides[0]}
-                    total={slides.length}
-                    onPrev={() => setSlideIndex(i => Math.max(0, i - 1))}
-                    onNext={() => setSlideIndex(i => Math.min(slides.length - 1, i + 1))}
-                    onPresent={() => {
-                      setIsPresenting(true);
-                      setSlideIndex(0);
-                    }}
-                  />
+                  <SlideCard slide={slides[slideIndex] || slides[0]} total={slides.length} onPrev={() => setSlideIndex(i => Math.max(0, i - 1))} onNext={() => setSlideIndex(i => Math.min(slides.length - 1, i + 1))} onPresent={() => { setIsPresenting(true); setSlideIndex(0); }} />
                 </div>
               </motion.div>
             )}
 
-            {/* Streaming text output (report only) */}
             {!isGenerating && activeMode === "report" && streamText && (
-              <motion.div 
-                key="report"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="prose prose-invert prose-sm dark:prose-invert max-w-none text-foreground/80 dark:text-white/80 whitespace-pre-wrap leading-relaxed text-sm"
-              >
+              <motion.div key="report" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="prose prose-invert prose-sm dark:prose-invert max-w-none text-foreground/80 dark:text-white/80 whitespace-pre-wrap leading-relaxed text-sm">
                 {streamText}
               </motion.div>
             )}
 
-            {/* Flashcards */}
             {!isGenerating && activeMode === "flashcards" && jsonData && (
-              <motion.div 
-                key="flashcards"
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                className="grid grid-cols-1 sm:grid-cols-2 gap-3"
-              >
-                {flashcards.length === 0 ? (
-                  <p className="text-sm text-foreground/40 dark:text-white/50 col-span-2 text-center py-8 font-medium">No flashcards were generated. Try again.</p>
-                ) : flashcards.map((card: Flashcard, i: number) => (
-                  <motion.div
-                    key={i}
-                    variants={itemVariants}
-                    onClick={() => setFlippedCard(flippedCard === i ? null : i)}
-                    className={cn(
-                      "relative p-5 rounded-2xl border cursor-pointer transition-all duration-300 hover:scale-[1.01] min-h-[140px] flex flex-col justify-center text-center shadow-sm dark:shadow-none",
-                      flippedCard === i 
-                        ? "bg-violet-500/10 border-violet-500/30" 
-                        : "bg-foreground/5 dark:bg-white/5 border-foreground/10 dark:border-white/10 hover:bg-foreground/10 dark:hover:bg-white/10"
-                    )}
-                  >
-                    <div className="text-[9px] uppercase tracking-widest font-bold text-foreground/30 dark:text-white/30 mb-3">
-                      {flippedCard === i ? "Answer" : `Card ${i + 1}`}
-                    </div>
-                    <p className={cn(
-                      "text-sm font-semibold leading-relaxed",
-                      flippedCard === i ? "text-violet-700 dark:text-violet-200" : "text-foreground dark:text-white"
-                    )}>
-                      {flippedCard === i ? card.answer : card.question}
-                    </p>
-                    <div className="absolute bottom-3 right-3 text-[9px] text-foreground/20 dark:text-white/20">
-                      {flippedCard === i ? "Tap to flip back" : "Tap to reveal"}
-                    </div>
+              <motion.div key="flashcards" variants={containerVariants} initial="hidden" animate="visible" exit="hidden" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {flashcards.map((card: Flashcard, i: number) => (
+                  <motion.div key={i} variants={itemVariants} onClick={() => setFlippedCard(flippedCard === i ? null : i)} className={cn("relative p-5 rounded-2xl border cursor-pointer transition-all duration-300 hover:scale-[1.01] min-h-[140px] flex flex-col justify-center text-center shadow-sm dark:shadow-none", flippedCard === i ? "bg-violet-500/10 border-violet-500/30" : "bg-foreground/5 dark:bg-white/5 border-foreground/10 dark:border-white/10 hover:bg-foreground/10")}>
+                    <div className="text-[9px] uppercase tracking-widest font-bold text-foreground/30 dark:text-white/30 mb-3">{flippedCard === i ? "Answer" : `Card ${i + 1}`}</div>
+                    <p className={cn("text-sm font-semibold leading-relaxed", flippedCard === i ? "text-violet-700 dark:text-violet-200" : "text-foreground dark:text-white")}>{flippedCard === i ? card.answer : card.question}</p>
+                    <div className="absolute bottom-3 right-3 text-[9px] text-foreground/20 dark:text-white/20">{flippedCard === i ? "Tap to flip back" : "Tap to reveal"}</div>
                   </motion.div>
                 ))}
               </motion.div>
             )}
 
-            {/* Quiz */}
             {!isGenerating && activeMode === "quiz" && jsonData && (
-              <motion.div 
-                key="quiz"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="space-y-5"
-              >
-                {quizQuestions.length === 0 ? (
-                  <p className="text-sm text-white/50 text-center py-8">No quiz questions were generated. Try again.</p>
-                ) : quizQuestions.map((q: QuizQuestion, qi: number) => (
-                  <motion.div variants={fadeUpVariants} initial="hidden" animate="visible" key={qi} className="space-y-2">
+              <motion.div key="quiz" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-5">
+                {quizQuestions.map((q: QuizQuestion, qi: number) => (
+                  <div key={qi} className="space-y-2">
                     <p className="text-sm font-bold text-foreground dark:text-white">{qi + 1}. {q.question}</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {q.options.map((opt, oi) => {
@@ -853,43 +546,20 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
                         const isCorrect = quizRevealed && opt === q.correct;
                         const isWrong = quizRevealed && isSelected && opt !== q.correct;
                         return (
-                          <button
-                            key={oi}
-                            onClick={() => !quizRevealed && setQuizSelected(prev => ({ ...prev, [qi]: opt }))}
-                            className={cn(
-                              "text-left px-4 py-2.5 rounded-xl border text-xs font-medium transition-all outline-none",
-                              isCorrect ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-700 dark:text-emerald-300" :
-                              isWrong ? "bg-red-500/20 border-red-500/40 text-red-700 dark:text-red-300" :
-                              isSelected ? "bg-foreground/10 dark:bg-white/15 border-foreground/20 dark:border-white/25 text-foreground dark:text-white" :
-                              "bg-foreground/5 dark:bg-white/5 border-foreground/5 dark:border-white/10 text-foreground/60 dark:text-white/60 hover:bg-foreground/10 dark:hover:bg-white/10"
-                            )}
-                          >
-                            {opt}
-                          </button>
+                          <button key={oi} onClick={() => !quizRevealed && setQuizSelected(prev => ({ ...prev, [qi]: opt }))} className={cn("text-left px-4 py-2.5 rounded-xl border text-xs font-medium transition-all outline-none", isCorrect ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-700 dark:text-emerald-300" : isWrong ? "bg-red-500/20 border-red-500/40 text-red-700 dark:text-red-300" : isSelected ? "bg-foreground/10 dark:bg-white/15 border-foreground/20 dark:border-white/25 text-foreground dark:text-white" : "bg-foreground/5 dark:bg-white/5 border-foreground/5 dark:border-white/10 hover:bg-foreground/10")}>{opt}</button>
                         );
                       })}
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
-                {quizQuestions.length > 0 && !quizRevealed && Object.keys(quizSelected).length > 0 && (
-                  <button
-                    onClick={() => setQuizRevealed(true)}
-                    className="px-6 py-2.5 rounded-xl bg-foreground/5 dark:bg-white/10 hover:bg-foreground/10 dark:hover:bg-white/15 text-sm font-bold text-foreground dark:text-white border border-foreground/10 dark:border-white/15 transition-all shadow-lg shadow-black/5 dark:shadow-none"
-                  >
-                    Check Answers
-                  </button>
-                )}
+                {!quizRevealed && Object.keys(quizSelected).length > 0 && <button onClick={() => setQuizRevealed(true)} className="px-6 py-2.5 rounded-xl bg-foreground/5 dark:bg-white/10 hover:bg-foreground/10 text-sm font-bold text-foreground dark:text-white border border-foreground/10 transition-all">Check Answers</button>}
               </motion.div>
             )}
 
-            {/* Mind Map */}
             {!isGenerating && activeMode === "mindmap" && jsonData && (
-              <motion.div key="mindmap" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-2">
-                <MindMapViz node={jsonData} />
-              </motion.div>
+              <motion.div key="mindmap" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-2"><MindMapViz node={jsonData} /></motion.div>
             )}
 
-            {/* Infographic */}
             {!isGenerating && activeMode === "infographic" && jsonData && (
               <motion.div key="infographic" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-5">
                 <div className="text-center space-y-1 pb-4 border-b border-foreground/10 dark:border-white/10">
@@ -899,33 +569,19 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
                 {jsonData.keyStats?.length > 0 && (
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-3">
                     {jsonData.keyStats.map((stat: any, i: number) => (
-                      <motion.div 
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: i * 0.1 }}
-                        key={i} 
-                        className="text-center p-3 md:p-4 bg-foreground/5 dark:bg-white/5 rounded-2xl border border-foreground/10 dark:border-white/8 shadow-sm dark:shadow-none"
-                      >
+                      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.1 }} key={i} className="text-center p-3 md:p-4 bg-foreground/5 dark:bg-white/5 rounded-2xl border border-foreground/10 dark:border-white/8 shadow-sm dark:shadow-none">
                         <p className="text-xl md:text-2xl font-black text-orange-600 dark:text-orange-400">{stat.value}</p>
                         <p className="text-[9px] md:text-[10px] font-bold text-foreground/70 dark:text-white/70 mt-1">{stat.label}</p>
-                        {stat.context && <p className="text-[8px] md:text-[9px] text-foreground/30 dark:text-white/35 mt-1">{stat.context}</p>}
                       </motion.div>
                     ))}
                   </div>
-                )}
-                {jsonData.pullQuote && (
-                  <blockquote className="border-l-4 border-orange-500/30 dark:border-orange-400/50 pl-4 italic text-sm text-foreground/70 dark:text-white/70">
-                    "{jsonData.pullQuote}"
-                  </blockquote>
                 )}
                 {jsonData.sections?.map((section: any, i: number) => (
                   <div key={i}>
                     <p className="text-xs font-bold text-foreground/50 dark:text-white/60 uppercase tracking-wider mb-2">{section.heading}</p>
                     <ul className="space-y-1">
                       {section.bullets?.map((b: string, j: number) => (
-                        <li key={j} className="text-xs text-foreground/60 dark:text-white/60 flex items-start gap-2">
-                          <span className="text-orange-600 dark:text-orange-400 mt-0.5">•</span>{b}
-                        </li>
+                        <li key={j} className="text-xs text-foreground/60 dark:text-white/60 flex items-start gap-2"><span className="text-orange-600 dark:text-orange-400 mt-0.5">•</span>{b}</li>
                       ))}
                     </ul>
                   </div>
@@ -933,7 +589,6 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
               </motion.div>
             )}
 
-            {/* Data Table */}
             {!isGenerating && activeMode === "datatable" && jsonData && (
               <motion.div key="datatable" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
                 <p className="text-sm font-bold text-foreground dark:text-white">{jsonData.title}</p>
@@ -941,88 +596,40 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
                   <table className="w-full text-xs">
                     <thead>
                       <tr className="border-b border-foreground/10 dark:border-white/10 bg-foreground/5 dark:bg-white/5">
-                        {jsonData.headers?.map((h: string, i: number) => (
-                          <th key={i} className="px-4 py-2.5 text-left font-bold text-foreground/40 dark:text-white/60 whitespace-nowrap">{h}</th>
-                        ))}
+                        {jsonData.headers?.map((h: string, i: number) => (<th key={i} className="px-4 py-2.5 text-left font-bold text-foreground/40 dark:text-white/60 whitespace-nowrap">{h}</th>))}
                       </tr>
                     </thead>
                     <tbody>
                       {jsonData.rows?.map((row: string[], i: number) => (
-                        <tr key={i} className="border-b border-foreground/5 dark:border-white/5 hover:bg-foreground/5 dark:hover:bg-white/5 transition-colors">
-                          {row.map((cell, j) => (
-                            <td key={j} className="px-4 py-2 text-foreground/80 dark:text-white/70 whitespace-nowrap">{cell}</td>
-                          ))}
+                        <tr key={i} className="border-b border-foreground/5 dark:border-white/5 hover:bg-foreground/5 transition-colors">
+                          {row.map((cell, j) => (<td key={j} className="px-4 py-2 text-foreground/80 dark:text-white/70 whitespace-nowrap">{cell}</td>))}
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-                {jsonData.summary && (
-                  <p className="text-xs text-foreground/40 dark:text-white/50 italic p-3 bg-foreground/5 dark:bg-white/5 rounded-xl">{jsonData.summary}</p>
-                )}
               </motion.div>
             )}
 
-            {/* Error */}
             {error && (
-              <motion.div 
-                key="error"
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 10 }}
-                className="flex items-center gap-2 text-red-400 text-sm bg-red-500/10 border border-red-500/20 px-4 py-3 rounded-xl"
-              >
-                <X className="w-4 h-4 shrink-0" />
-                {error}
+              <motion.div key="error" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} className="flex items-center gap-2 text-red-400 text-sm bg-red-500/10 border border-red-500/20 px-4 py-3 rounded-xl">
+                <X className="w-4 h-4 shrink-0" /> {error}
               </motion.div>
             )}
           </AnimatePresence>
-
           <div ref={bottomRef} />
         </div>
       </motion.div>
 
-      {/* Presentation Overlay */}
       <AnimatePresence>
         {isPresenting && (
-          <PresentationOverlay 
-            slides={slides}
-            currentIndex={slideIndex}
-            onClose={() => {
-              setIsPresenting(false);
-              stopAudio();
-            }}
-            onPrev={() => {
-              const newIndex = Math.max(0, slideIndex - 1);
-              setSlideIndex(newIndex);
-              if (isAudioPlaying) playSlideAudio(newIndex);
-            }}
-            onNext={() => {
-              const newIndex = Math.min(slides.length - 1, slideIndex + 1);
-              setSlideIndex(newIndex);
-              if (isAudioPlaying) playSlideAudio(newIndex);
-            }}
-            isPlaying={isAudioPlaying}
-            onTogglePlay={() => {
-              if (isAudioPlaying) stopAudio();
-              else playSlideAudio(slideIndex);
-            }}
-            autoAdvance={autoAdvance}
-            onToggleAuto={() => setAutoAdvance(!autoAdvance)}
-          />
+          <PresentationOverlay slides={slides} currentIndex={slideIndex} onClose={() => { setIsPresenting(false); stopAudio(); }} onPrev={() => { const next = Math.max(0, slideIndex - 1); setSlideIndex(next); if (isAudioPlaying) playSlideAudio(next); }} onNext={() => { const next = Math.min(slides.length - 1, slideIndex + 1); setSlideIndex(next); if (isAudioPlaying) playSlideAudio(next); }} isPlaying={isAudioPlaying} onTogglePlay={() => isAudioPlaying ? stopAudio() : playSlideAudio(slideIndex)} autoAdvance={autoAdvance} onToggleAuto={() => setAutoAdvance(!autoAdvance)} />
         )}
       </AnimatePresence>
 
-      {/* Regenerate button when output exists */}
       {hasOutput && !isGenerating && (
         <div className="flex justify-center">
-          <button
-            onClick={() => generate()}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 border border-foreground/10 dark:border-white/10 text-sm font-semibold text-foreground/50 hover:text-foreground dark:text-white/60 dark:hover:text-white transition-all shadow-sm dark:shadow-none"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Regenerate
-          </button>
+          <button onClick={() => generate()} className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 border border-foreground/10 text-sm font-semibold text-foreground/50 hover:text-foreground dark:text-white/60 transition-all"><RefreshCw className="w-4 h-4" /> Regenerate</button>
         </div>
       )}
     </div>

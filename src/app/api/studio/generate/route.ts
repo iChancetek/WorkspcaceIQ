@@ -25,18 +25,20 @@ Structure: # Executive Summary, ## Key Findings, ## Detailed Analysis, ## Recomm
 Use markdown formatting. Be specific, cite source data where possible, and maintain a professional tone.`,
 
   slides: `You are a world-class presentation designer. Create a bold, amazing, and comprehensive slide deck outline based on the sources.
+IMPORTANT: You MUST separate each slide with a line containing exactly three dashes "---".
+
 Format each slide as:
 ---
 ## Slide N: [Main Title]
 ### [Subtitle/Hook]
 **Key Points:**
-- [Comprehensive Point 1 with detail]
-- [Comprehensive Point 2 with detail]
-- [Comprehensive Point 3 with detail]
+- [Comprehensive Point 1]
+- [Comprehensive Point 2]
+- [Comprehensive Point 3]
 **Visual Idea:** [Describe a bold visual or chart for this slide]
-**Speaker Note:** [A natural, calm, and professional speaking guide for this slide. Write it in first person as if you are the presenter.]
+**Speaker Note:** [A natural, calm, and professional speaking guide. Write in first person.]
 
-Generate 8-12 polished slides. Include an agenda slide, deep-dive content slides, and a strong call-to-action conclusion slide.`,
+Generate 8-12 polished slides.`,
 
   infographic: `You are a data storyteller. Extract the most compelling facts, stats, and insights from the sources.
 Return ONLY a valid JSON object. Format:

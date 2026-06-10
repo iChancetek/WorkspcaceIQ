@@ -66,7 +66,7 @@ ${sourcesContext}`
     });
 
     const audioSegmentsResults = await Promise.all(audioPromises);
-    const audioSegments = audioSegmentsResults.filter((s): s is Buffer => s !== null);
+    const audioSegments = audioSegmentsResults.filter((s): s is any => s !== null);
 
     // Concatenate all audio segments into a single MP3
     const fullAudio = Buffer.concat(audioSegments);
