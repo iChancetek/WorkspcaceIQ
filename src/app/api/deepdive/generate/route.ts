@@ -42,16 +42,16 @@ ${sourcesContext}`
     
     // Step 2: Parse script into segments
     const segments = script.split("\n").filter(line => line.trim());
-    const audioSegments: Buffer[] = [];
 
-    for (const segment of segments) {
+    // Generate audio segments in parallel to avoid timeouts
+    const audioPromises = segments.map(async (segment) => {
       const isChancellor = segment.trim().startsWith("CHANCELLOR:");
       const isSydney = segment.trim().startsWith("SYDNEY:");
       
-      if (!isChancellor && !isSydney) continue;
+      if (!isChancellor && !isSydney) return null;
       
       const text = segment.replace(/^(CHANCELLOR|SYDNEY):\s*/i, "").trim();
-      if (!text) continue;
+      if (!text) return null;
 
       // Onyx = deep male (Chancellor), Shimmer = clear female (Sydney)
       const voice = isChancellor ? "onyx" : "shimmer";
@@ -62,9 +62,11 @@ ${sourcesContext}`
         input: text,
       });
 
-      const buffer = Buffer.from(await audioResponse.arrayBuffer());
-      audioSegments.push(buffer);
-    }
+      return Buffer.from(await audioResponse.arrayBuffer());
+    });
+
+    const audioSegmentsResults = await Promise.all(audioPromises);
+    const audioSegments = audioSegmentsResults.filter((s): s is Buffer => s !== null);
 
     // Concatenate all audio segments into a single MP3
     const fullAudio = Buffer.concat(audioSegments);

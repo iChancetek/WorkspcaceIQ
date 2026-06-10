@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import {
   Headphones, CreditCard, HelpCircle, GitBranch, FileText,
-  Layout, Table2, BarChart3, Video, Loader2,
+  Layout, Table2, BarChart3, Video, Loader2, Play,
   Download, RefreshCw, ChevronRight, ChevronLeft, Sparkles, X, Square,
   Save, Check
 } from "lucide-react";
@@ -36,7 +36,14 @@ const MODES = [
 interface Flashcard { question: string; answer: string; }
 interface QuizQuestion { question: string; options: string[]; correct: string; }
 interface MindMapNode { label: string; children: MindMapNode[]; }
-interface Slide { number: number; title: string; bullets: string[]; speakerNote: string; }
+interface Slide { 
+  number: number; 
+  title: string; 
+  subtitle: string;
+  bullets: string[]; 
+  visualIdea: string;
+  speakerNote: string; 
+}
 
 // ─── Animation Variants ────────────────────────────────────────────────────────
 
@@ -79,20 +86,30 @@ function parseSlideDeck(raw: string): Slide[] {
   return sections.map((section, idx) => {
     const titleMatch = section.match(/##\s*Slide\s*\d*:?\s*(.+)/i);
     const title = titleMatch ? titleMatch[1].trim() : `Slide ${idx + 1}`;
+    
+    const subtitleMatch = section.match(/###\s*(.+)/i);
+    const subtitle = subtitleMatch ? subtitleMatch[1].trim() : "";
+
     const speakerMatch = section.match(/\*\*Speaker\s*Note[s]?:\*\*[\s]*(.+)/i);
     const speakerNote = speakerMatch ? speakerMatch[1].trim() : "";
+    
+    const visualMatch = section.match(/\*\*Visual\s*Idea:\*\*[\s]*(.+)/i);
+    const visualIdea = visualMatch ? visualMatch[1].trim() : "";
+
     const bulletMatches = [...section.matchAll(/^[-*]\s+(.+)/gm)];
     const bullets = bulletMatches
       .map(m => m[1].trim())
-      .filter(b => !b.toLowerCase().startsWith("speaker"));
-    return { number: idx + 1, title, bullets, speakerNote };
+      .filter(b => !b.toLowerCase().startsWith("speaker") && !b.toLowerCase().startsWith("visual"));
+    
+    return { number: idx + 1, title, subtitle, bullets, visualIdea, speakerNote };
   }).filter(s => s.title || s.bullets.length > 0);
 }
 
 // ─── Slide Card ─────────────────────────────────────────────────────────────
-function SlideCard({ slide, total, onPrev, onNext }: {
+function SlideCard({ slide, total, onPrev, onNext, onPresent }: {
   slide: Slide; total: number;
   onPrev: () => void; onNext: () => void;
+  onPresent: () => void;
 }) {
   return (
     <motion.div 
@@ -102,69 +119,247 @@ function SlideCard({ slide, total, onPrev, onNext }: {
       className="flex flex-col gap-4"
     >
       {/* Slide card */}
-      <div className="relative rounded-2xl bg-foreground/5 dark:bg-violet-950/10 border border-foreground/10 dark:border-violet-500/20 p-8 min-h-[280px] flex flex-col shadow-sm dark:shadow-none">
+      <div className="relative rounded-3xl bg-gradient-to-br from-violet-600/5 to-violet-600/10 dark:from-violet-500/10 dark:to-violet-500/5 border border-violet-500/20 p-8 md:p-10 min-h-[340px] flex flex-col shadow-xl shadow-violet-500/5 group hover:border-violet-500/40 transition-colors duration-500">
         {/* Slide number badge */}
-        <span className="absolute top-4 right-4 text-[10px] font-black uppercase tracking-widest text-violet-600/50 dark:text-violet-400/50 bg-violet-500/10 px-2.5 py-1 rounded-full border border-violet-500/15">
+        <span className="absolute top-6 right-6 text-[10px] font-black uppercase tracking-[0.2em] text-violet-600 dark:text-violet-400 bg-violet-500/10 px-3 py-1.5 rounded-full border border-violet-500/20">
           {slide.number} / {total}
         </span>
+        
+        {/* Subtitle/Hook */}
+        {slide.subtitle && (
+          <p className="text-xs font-black uppercase tracking-widest text-violet-500 mb-2">{slide.subtitle}</p>
+        )}
+        
         {/* Title */}
-        <h3 className="text-xl font-black text-foreground dark:text-white leading-tight mb-5 pr-16">{slide.title}</h3>
+        <h3 className="text-2xl md:text-3xl font-black text-foreground dark:text-white leading-tight mb-6 pr-16 group-hover:text-violet-500 dark:group-hover:text-violet-400 transition-colors">{slide.title}</h3>
+        
         {/* Bullet points */}
         {slide.bullets.length > 0 && (
-          <ul className="flex-1 space-y-2.5">
+          <ul className="flex-1 space-y-4">
             {slide.bullets.map((b, i) => (
               <motion.li 
                 key={i} 
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className="flex items-start gap-3"
+                className="flex items-start gap-4"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-violet-500 dark:bg-violet-400/70 shrink-0 mt-2" />
-                <span className="text-sm text-foreground/80 dark:text-white/80 leading-relaxed">{b}</span>
+                <span className="w-2 h-2 rounded-full bg-violet-500 dark:bg-violet-400 mt-2.5 shrink-0 shadow-[0_0_10px_rgba(139,92,246,0.5)]" />
+                <span className="text-sm md:text-base text-foreground/80 dark:text-white/90 leading-relaxed font-medium">{b}</span>
               </motion.li>
             ))}
           </ul>
         )}
+
+        {/* Visual Idea Tag */}
+        {slide.visualIdea && (
+          <div className="mt-8 pt-6 border-t border-violet-500/10">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="w-3.5 h-3.5 text-violet-500" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-violet-500">Visual Direction</span>
+            </div>
+            <p className="text-[11px] text-foreground/50 dark:text-white/40 italic leading-relaxed">{slide.visualIdea}</p>
+          </div>
+        )}
       </div>
-      {/* Speaker Note */}
-      {slide.speakerNote && (
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-start gap-3 px-4 py-3 bg-foreground/5 dark:bg-white/[0.03] border border-foreground/10 dark:border-white/8 rounded-xl"
-        >
-          <span className="text-[10px] font-black uppercase tracking-widest text-foreground/30 dark:text-white/25 mt-0.5 shrink-0">Note</span>
-          <p className="text-xs text-foreground/60 dark:text-white/50 leading-relaxed italic">{slide.speakerNote}</p>
-        </motion.div>
-      )}
-      {/* Navigation */}
-      <div className="flex items-center justify-between">
-        <button
-          onClick={onPrev}
-          disabled={slide.number === 1}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-white/50 hover:text-white transition-all disabled:opacity-20 disabled:cursor-not-allowed"
-        >
-          <ChevronLeft className="w-3.5 h-3.5" />
-          Previous
-        </button>
-        {/* Dot indicators */}
-        <div className="flex items-center gap-1.5">
-          {Array.from({ length: total }).map((_, i) => (
-            <span key={i} className={cn(
-              "w-1.5 h-1.5 rounded-full transition-all",
-              i + 1 === slide.number ? "bg-violet-400 scale-125" : "bg-white/15"
-            )} />
-          ))}
+
+      {/* Presentation Tools */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onPrev}
+            disabled={slide.number === 1}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 border border-foreground/10 dark:border-white/10 text-xs font-bold text-foreground/50 dark:text-white/50 hover:text-foreground dark:hover:text-white transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+            Previous
+          </button>
+          <div className="flex items-center gap-1.5 px-3">
+            {Array.from({ length: Math.min(total, 8) }).map((_, i) => (
+              <span key={i} className={cn(
+                "w-1.5 h-1.5 rounded-full transition-all duration-300",
+                i + 1 === slide.number ? "bg-violet-500 scale-150 shadow-[0_0_8px_rgba(139,92,246,0.5)]" : "bg-foreground/10 dark:bg-white/10"
+              )} />
+            ))}
+            {total > 8 && <span className="text-[10px] text-foreground/30 dark:text-white/30 font-bold">...</span>}
+          </div>
+          <button
+            onClick={onNext}
+            disabled={slide.number === total}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 border border-foreground/10 dark:border-white/10 text-xs font-bold text-foreground/50 dark:text-white/50 hover:text-foreground dark:hover:text-white transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+          >
+            Next
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
         </div>
+
         <button
-          onClick={onNext}
-          disabled={slide.number === total}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-white/50 hover:text-white transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+          onClick={onPresent}
+          className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-black uppercase tracking-widest shadow-lg shadow-violet-500/20 hover:shadow-violet-500/40 transition-all active:scale-95"
         >
-          Next
-          <ChevronRight className="w-3.5 h-3.5" />
+          <Play className="w-3.5 h-3.5 fill-current" />
+          Start Presentation
         </button>
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── Presentation Overlay ──────────────────────────────────────────────────
+function PresentationOverlay({ slides, currentIndex, onClose, onPrev, onNext, isPlaying, onTogglePlay, autoAdvance, onToggleAuto }: {
+  slides: Slide[]; currentIndex: number; onClose: () => void;
+  onPrev: () => void; onNext: () => void;
+  isPlaying: boolean; onTogglePlay: () => void;
+  autoAdvance: boolean; onToggleAuto: () => void;
+}) {
+  const slide = slides[currentIndex];
+  if (!slide) return null;
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[100] bg-background dark:bg-black flex flex-col items-center justify-center p-6 md:p-12 overflow-hidden"
+    >
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-violet-600/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px]" />
+      </div>
+
+      {/* Header */}
+      <div className="absolute top-0 inset-x-0 p-6 md:p-10 flex items-center justify-between z-10">
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-violet-500 flex items-center justify-center text-white shadow-lg shadow-violet-500/20">
+            <Layout className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-sm font-black uppercase tracking-widest text-foreground dark:text-white">WorkspaceIQ Presenter</h2>
+            <p className="text-[10px] text-foreground/40 dark:text-white/40 font-bold uppercase tracking-[0.2em]">Live Session · Slide {slide.number} of {slides.length}</p>
+          </div>
+        </div>
+        <button 
+          onClick={onClose}
+          className="w-10 h-10 rounded-full bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 flex items-center justify-center transition-colors group"
+        >
+          <X className="w-5 h-5 text-foreground/40 dark:text-white/40 group-hover:text-foreground dark:group-hover:text-white" />
+        </button>
+      </div>
+
+      {/* Slide Content */}
+      <div className="relative w-full max-w-5xl aspect-video flex flex-col justify-center gap-8 md:gap-12 z-10">
+        <motion.div
+          key={currentIndex}
+          initial={{ opacity: 0, y: 20, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -20, scale: 0.98 }}
+          transition={{ type: "spring", damping: 25, stiffness: 200 }}
+          className="flex flex-col gap-6 md:gap-8"
+        >
+          {slide.subtitle && (
+            <p className="text-violet-500 font-black uppercase tracking-[0.3em] text-xs md:text-sm text-center md:text-left">{slide.subtitle}</p>
+          )}
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-foreground dark:text-white leading-[1.1] text-center md:text-left balance">
+            {slide.title}
+          </h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <ul className="space-y-6 md:space-y-8">
+              {slide.bullets.map((b, i) => (
+                <motion.li 
+                  key={i}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 + i * 0.1 }}
+                  className="flex items-start gap-6"
+                >
+                  <span className="w-3 h-3 rounded-full bg-violet-500 mt-2.5 shrink-0 shadow-[0_0_15px_rgba(139,92,246,0.6)]" />
+                  <span className="text-lg md:text-xl lg:text-2xl text-foreground/70 dark:text-white/80 font-medium leading-relaxed">{b}</span>
+                </motion.li>
+              ))}
+            </ul>
+            {slide.visualIdea && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, rotate: -2 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                transition={{ delay: 0.5, duration: 1 }}
+                className="hidden md:flex aspect-square rounded-[3rem] bg-gradient-to-br from-violet-500/20 to-blue-500/20 border border-white/10 items-center justify-center p-12 text-center group"
+              >
+                <div className="space-y-4">
+                  <div className="w-16 h-16 rounded-2xl bg-white/10 mx-auto flex items-center justify-center text-violet-400 group-hover:scale-110 transition-transform duration-500">
+                    <Sparkles className="w-8 h-8" />
+                  </div>
+                  <p className="text-sm lg:text-base text-foreground/40 dark:text-white/40 font-bold uppercase tracking-widest">Suggested Visual</p>
+                  <p className="text-base lg:text-lg text-foreground/80 dark:text-white/90 font-medium italic leading-relaxed">{slide.visualIdea}</p>
+                </div>
+              </motion.div>
+            )}
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Footer Controls */}
+      <div className="absolute bottom-0 inset-x-0 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 z-20">
+        {/* Speaker Note Preview */}
+        <div className="flex-1 max-w-xl order-2 md:order-1">
+          <div className="flex items-center gap-3 mb-2">
+            <div className={cn("w-2 h-2 rounded-full", isPlaying ? "bg-red-500 animate-pulse" : "bg-violet-500")} />
+            <span className="text-[10px] font-black uppercase tracking-widest text-foreground/40 dark:text-white/40">Speaker Perspective</span>
+          </div>
+          <p className="text-xs md:text-sm text-foreground/60 dark:text-white/60 leading-relaxed italic line-clamp-2 hover:line-clamp-none transition-all cursor-default">
+            {slide.speakerNote}
+          </p>
+        </div>
+
+        {/* Playback Controls */}
+        <div className="flex items-center gap-4 md:gap-8 order-1 md:order-2">
+          <button 
+            onClick={onPrev}
+            disabled={currentIndex === 0}
+            className="w-12 h-12 rounded-full border border-foreground/10 dark:border-white/10 flex items-center justify-center text-foreground/40 dark:text-white/40 hover:text-foreground dark:hover:text-white hover:border-foreground/20 dark:hover:border-white/20 transition-all disabled:opacity-10"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          
+          <div className="flex flex-col items-center gap-3">
+            <button 
+              onClick={onTogglePlay}
+              className="w-20 h-20 rounded-full bg-violet-600 hover:bg-violet-500 text-white flex items-center justify-center shadow-2xl shadow-violet-600/40 transition-all active:scale-90 relative group"
+            >
+              {isPlaying ? <Square className="w-8 h-8 fill-current" /> : <Play className="w-8 h-8 fill-current ml-1" />}
+              {isPlaying && (
+                <div className="absolute inset-0 rounded-full border-4 border-white/20 animate-ping" />
+              )}
+            </button>
+            <button 
+              onClick={onToggleAuto}
+              className={cn(
+                "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all",
+                autoAdvance ? "bg-violet-500 text-white shadow-lg shadow-violet-500/20" : "bg-foreground/5 dark:bg-white/5 text-foreground/40 dark:text-white/40"
+              )}
+            >
+              Auto-Advance {autoAdvance ? "ON" : "OFF"}
+            </button>
+          </div>
+
+          <button 
+            onClick={onNext}
+            disabled={currentIndex === slides.length - 1}
+            className="w-12 h-12 rounded-full border border-foreground/10 dark:border-white/10 flex items-center justify-center text-foreground/40 dark:text-white/40 hover:text-foreground dark:hover:text-white hover:border-foreground/20 dark:hover:border-white/20 transition-all disabled:opacity-10"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
+        </div>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="absolute bottom-0 inset-x-0 h-1.5 bg-foreground/5 dark:bg-white/5">
+        <motion.div 
+          className="h-full bg-violet-600 shadow-[0_0_15px_rgba(139,92,246,0.5)]"
+          initial={{ width: 0 }}
+          animate={{ width: `${((currentIndex + 1) / slides.length) * 100}%` }}
+          transition={{ duration: 0.5 }}
+        />
       </div>
     </motion.div>
   );
@@ -197,36 +392,112 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
   const [quizRevealed, setQuizRevealed] = useState(false);
   const [flippedCard, setFlippedCard] = useState<number | null>(null);
   const [slideIndex, setSlideIndex] = useState(0);
+  const [isPresenting, setIsPresenting] = useState(false);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const [autoAdvance, setAutoAdvance] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  // Memoize parsed slides to prevent jitter during streaming
+  const slides = useMemo(() => {
+    if (activeMode === "slides" && streamText) {
+      return parseSlideDeck(streamText);
+    }
+    return [];
+  }, [streamText, activeMode]);
 
   useEffect(() => {
     // Restore existing content for this mode if available
     const existing = studioOutputs?.[activeMode];
+    
+    // Only update if the content actually differs from current state
     if (existing) {
       if (typeof existing === "string") {
-        setStreamText(existing);
-        setJsonData(null);
+        if (streamText !== existing) {
+          setStreamText(existing);
+          setJsonData(null);
+        }
       } else {
-        setJsonData(existing);
-        setStreamText("");
+        if (JSON.stringify(jsonData) !== JSON.stringify(existing)) {
+          setJsonData(existing);
+          setStreamText("");
+        }
       }
     } else {
-      setStreamText("");
-      setJsonData(null);
+      if (streamText !== "" || jsonData !== null) {
+        setStreamText("");
+        setJsonData(null);
+      }
     }
     
     setError("");
     setQuizSelected({});
     setQuizRevealed(false);
     setFlippedCard(null);
+    setIsPresenting(false);
+    stopAudio();
   }, [activeMode, studioOutputs]);
 
-  useEffect(() => {
-    if (onOutputChange && (streamText || jsonData)) {
-      onOutputChange({ text: streamText, json: jsonData, mode: activeMode });
+  const stopAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
     }
-  }, [streamText, jsonData]);
+    setIsAudioPlaying(false);
+  };
+
+  const playSlideAudio = async (index: number) => {
+    const slide = slides[index];
+    if (!slide?.speakerNote) return;
+
+    stopAudio();
+    setIsAudioPlaying(true);
+
+    try {
+      const res = await fetch("/api/ichancellor/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: slide.speakerNote, voice: "nova" }), // "nova" is calm and professional
+      });
+
+      if (!res.ok) throw new Error("TTS failed");
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audioRef.current = audio;
+      
+      audio.onended = () => {
+        setIsAudioPlaying(false);
+        if (autoAdvance && index < slides.length - 1) {
+          const nextIndex = index + 1;
+          setSlideIndex(nextIndex);
+          playSlideAudio(nextIndex);
+        }
+      };
+
+      audio.play();
+    } catch (err) {
+      console.error("Audio playback error:", err);
+      setIsAudioPlaying(false);
+    }
+  };
+
+  // Synchronize internal state with parent, but avoid cycles during active streaming
+  useEffect(() => {
+    if (!isGenerating && onOutputChange && (streamText || jsonData)) {
+      // Check if current internal state matches what parent already has
+      const existing = studioOutputs?.[activeMode];
+      const isDifferent = typeof existing === "string" 
+        ? existing !== streamText 
+        : JSON.stringify(existing) !== JSON.stringify(jsonData);
+
+      if (isDifferent) {
+        onOutputChange({ text: streamText, json: jsonData, mode: activeMode });
+      }
+    }
+  }, [streamText, jsonData, isGenerating, onOutputChange, activeMode, studioOutputs]);
 
   const cancelGeneration = () => {
     abortRef.current?.abort();
@@ -344,9 +615,9 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
 
       {/* Output area */}
       <motion.div 
-        layout
+        layout={!isGenerating}
         className={cn(
-          "min-h-[320px] rounded-[2rem] md:rounded-3xl border bg-gradient-to-br p-4 md:p-6 flex flex-col w-full max-w-full",
+          "min-h-[320px] rounded-[2rem] md:rounded-3xl border bg-gradient-to-br p-4 md:p-6 flex flex-col w-full max-w-full relative",
           currentMode.bg, currentMode.border
         )}
       >
@@ -475,40 +746,36 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
             )}
 
             {/* Slide Deck — parsed visual cards */}
-            {!isGenerating && activeMode === "slides" && streamText && (
+            {!isGenerating && activeMode === "slides" && slides.length > 0 && (
               <motion.div 
                 key="slides"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 className="space-y-4"
               >
-                {(() => {
-                  const slides = parseSlideDeck(streamText);
-                  if (slides.length === 0) {
-                    return <p className="text-sm text-white/50 text-center py-8">Could not parse slides. Try regenerating.</p>;
-                  }
-                  const slide = slides[slideIndex] ?? slides[0];
-                  return (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between mb-3">
-                        <p className="text-xs text-foreground/40 dark:text-white/40 font-semibold">{slides.length} slides generated</p>
-                        <button
-                          onClick={() => downloadText(streamText, "workspaceiq-slides.md")}
-                          className="flex items-center gap-1.5 text-[10px] text-foreground/30 dark:text-white/30 hover:text-foreground/60 dark:hover:text-white/60 transition-colors"
-                        >
-                          <Download className="w-3 h-3" />
-                          Download all slides
-                        </button>
-                      </div>
-                      <SlideCard
-                        slide={slide}
-                        total={slides.length}
-                        onPrev={() => setSlideIndex(i => Math.max(0, i - 1))}
-                        onNext={() => setSlideIndex(i => Math.min(slides.length - 1, i + 1))}
-                      />
-                    </div>
-                  );
-                })()}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs text-foreground/40 dark:text-white/40 font-semibold">{slides.length} slides generated</p>
+                    <button
+                      onClick={() => downloadText(streamText, "workspaceiq-slides.md")}
+                      className="flex items-center gap-1.5 text-[10px] text-foreground/30 dark:text-white/30 hover:text-foreground/60 dark:hover:text-white/60 transition-colors"
+                    >
+                      <Download className="w-3 h-3" />
+                      Download all slides
+                    </button>
+                  </div>
+                  <SlideCard
+                    slide={slides[slideIndex] || slides[0]}
+                    total={slides.length}
+                    onPrev={() => setSlideIndex(i => Math.max(0, i - 1))}
+                    onNext={() => setSlideIndex(i => Math.min(slides.length - 1, i + 1))}
+                    onPresent={() => {
+                      setIsPresenting(true);
+                      setSlideIndex(0);
+                    }}
+                  />
+                </div>
               </motion.div>
             )}
 
@@ -518,6 +785,7 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
                 key="report"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 className="prose prose-invert prose-sm dark:prose-invert max-w-none text-foreground/80 dark:text-white/80 whitespace-pre-wrap leading-relaxed text-sm"
               >
                 {streamText}
@@ -531,6 +799,7 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
+                exit="hidden"
                 className="grid grid-cols-1 sm:grid-cols-2 gap-3"
               >
                 {flashcards.length === 0 ? (
@@ -570,6 +839,7 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
                 key="quiz"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 className="space-y-5"
               >
                 {quizQuestions.length === 0 ? (
@@ -614,14 +884,14 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
 
             {/* Mind Map */}
             {!isGenerating && activeMode === "mindmap" && jsonData && (
-              <motion.div key="mindmap" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-2">
+              <motion.div key="mindmap" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-2">
                 <MindMapViz node={jsonData} />
               </motion.div>
             )}
 
             {/* Infographic */}
             {!isGenerating && activeMode === "infographic" && jsonData && (
-              <motion.div key="infographic" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5">
+              <motion.div key="infographic" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-5">
                 <div className="text-center space-y-1 pb-4 border-b border-foreground/10 dark:border-white/10">
                   <p className="text-lg font-black text-foreground dark:text-white">{jsonData.title}</p>
                   <p className="text-xs text-foreground/40 dark:text-white/50">{jsonData.subtitle}</p>
@@ -665,7 +935,7 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
 
             {/* Data Table */}
             {!isGenerating && activeMode === "datatable" && jsonData && (
-              <motion.div key="datatable" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+              <motion.div key="datatable" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
                 <p className="text-sm font-bold text-foreground dark:text-white">{jsonData.title}</p>
                 <div className="overflow-x-auto rounded-xl border border-foreground/10 dark:border-white/10">
                   <table className="w-full text-xs">
@@ -699,6 +969,7 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
                 key="error"
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
                 className="flex items-center gap-2 text-red-400 text-sm bg-red-500/10 border border-red-500/20 px-4 py-3 rounded-xl"
               >
                 <X className="w-4 h-4 shrink-0" />
@@ -710,6 +981,37 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
           <div ref={bottomRef} />
         </div>
       </motion.div>
+
+      {/* Presentation Overlay */}
+      <AnimatePresence>
+        {isPresenting && (
+          <PresentationOverlay 
+            slides={slides}
+            currentIndex={slideIndex}
+            onClose={() => {
+              setIsPresenting(false);
+              stopAudio();
+            }}
+            onPrev={() => {
+              const newIndex = Math.max(0, slideIndex - 1);
+              setSlideIndex(newIndex);
+              if (isAudioPlaying) playSlideAudio(newIndex);
+            }}
+            onNext={() => {
+              const newIndex = Math.min(slides.length - 1, slideIndex + 1);
+              setSlideIndex(newIndex);
+              if (isAudioPlaying) playSlideAudio(newIndex);
+            }}
+            isPlaying={isAudioPlaying}
+            onTogglePlay={() => {
+              if (isAudioPlaying) stopAudio();
+              else playSlideAudio(slideIndex);
+            }}
+            autoAdvance={autoAdvance}
+            onToggleAuto={() => setAutoAdvance(!autoAdvance)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Regenerate button when output exists */}
       {hasOutput && !isGenerating && (

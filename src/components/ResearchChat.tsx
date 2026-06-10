@@ -9,6 +9,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Source } from "./SourceUploader";
 import { motion, AnimatePresence } from "framer-motion";
+import { VoiceSelector } from "./VoiceSelector";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -27,26 +28,44 @@ interface ResearchChatProps {
 
 // ─── Markdown Renderer ────────────────────────────────────────────────────────
 
-const MarkdownContent = ({ content }: { content: string }) => {
+const MarkdownContent = ({ content, isStreaming }: { content: string, isStreaming?: boolean }) => {
   const parts = useMemo(() => {
+    if (!content) return null;
     const lines = content.split("\n");
     return lines.map((line, idx) => {
       let formatted = line;
+      // Bold
       formatted = formatted.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-      
+
+      // Slide/Card Headers
+      if (line.trim().startsWith("Slide ") || line.trim().startsWith("Card ") || line.trim().startsWith("**Slide") || line.trim().startsWith("**Card")) {
+        return (
+          <div key={idx} className="mt-8 mb-4 flex items-center gap-3">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent to-violet-500/20" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-violet-500/60">{line.replace(/\*+/g, "")}</span>
+            <div className="h-px flex-1 bg-gradient-to-l from-transparent to-violet-500/20" />
+          </div>
+        );
+      }
+
+      // Bullet points
       if (line.trim().startsWith("- ") || line.trim().startsWith("* ")) {
         return (
           <li key={idx} className="ml-4 list-disc list-outside mb-1" dangerouslySetInnerHTML={{ __html: formatted.trim().substring(2) }} />
         );
       }
-      
+      // Empty lines
       if (line.trim() === "") return <div key={idx} className="h-2" />;
+      // Headers
+      if (line.trim().startsWith("### ")) return <h3 key={idx} className="text-base font-bold mt-4 mb-2" dangerouslySetInnerHTML={{ __html: formatted.trim().substring(4) }} />;
+      if (line.trim().startsWith("## ")) return <h2 key={idx} className="text-lg font-bold mt-5 mb-3 border-b border-white/5 pb-1" dangerouslySetInnerHTML={{ __html: formatted.trim().substring(3) }} />;
+      if (line.trim().startsWith("# ")) return <h1 key={idx} className="text-xl font-black mt-6 mb-4" dangerouslySetInnerHTML={{ __html: formatted.trim().substring(2) }} />;
 
-      return <p key={idx} className="mb-2" dangerouslySetInnerHTML={{ __html: formatted }} />;
+      return <p key={idx} className="mb-2 leading-relaxed" dangerouslySetInnerHTML={{ __html: formatted }} />;
     });
   }, [content]);
 
-  return <div className="markdown-chat">{parts}</div>;
+  return <div className={cn("markdown-chat transition-opacity duration-300", isStreaming ? "opacity-90" : "opacity-100")}>{parts}</div>;
 };
 
 // ─── Mode Presets ─────────────────────────────────────────────────────────────
@@ -68,6 +87,7 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [pendingImage, setPendingImage] = useState<{ base64: string; preview: string } | null>(null);
   const [autoSpeak, setAutoSpeak]   = useState(true);
+  const [activeVoice, setActiveVoice] = useState("nova");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [selectedSourceId, setSelectedSourceId] = useState<string | null>(null);
 
@@ -116,7 +136,7 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
       const res = await fetch("/api/ichancellor/tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: excerpt, voice: "nova" }),
+        body: JSON.stringify({ text: excerpt, voice: activeVoice }),
       });
       if (!res.ok) return;
       const blob = await res.blob();
@@ -128,7 +148,7 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
       audio.onerror = () => { setIsSpeaking(false); URL.revokeObjectURL(url); };
       await audio.play();
     } catch { }
-  }, []);
+  }, [activeVoice]);
 
   const startListening = async () => {
     try {
@@ -319,7 +339,12 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
           </motion.button>
         ))}
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex flex-wrap items-center justify-center lg:justify-end gap-2">
+          {autoSpeak && (
+            <div className="hidden md:block">
+              <VoiceSelector activeVoice={activeVoice} onVoiceChange={setActiveVoice} />
+            </div>
+          )}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -361,19 +386,27 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
               </div>
             )}
             {messages.map((msg) => (
-              <motion.div key={msg.id} layout className={cn("flex gap-3", msg.role === "user" ? "justify-end" : "justify-start")}>
+              <motion.div 
+                key={msg.id} 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={cn("flex gap-3", msg.role === "user" ? "justify-end" : "justify-start")}
+              >
                 {msg.role === "assistant" && (
                   <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center shrink-0 mt-0.5">
                     <Sparkles className="w-3.5 h-3.5 text-white" />
                   </div>
                 )}
                 <div className={cn(
-                  "group relative max-w-[95%] sm:max-w-[90%] md:max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm",
+                  "group relative max-w-[95%] sm:max-w-[90%] md:max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm transition-all duration-200",
                   msg.role === "user" ? "bg-violet-500/10 dark:bg-violet-500/20 text-violet-900 dark:text-violet-100 border border-violet-500/20" : "bg-white/[0.04] dark:bg-white/[0.07] border border-white/10"
                 )}>
                   {msg.imagePreview && <img src={msg.imagePreview} alt="Att" className="max-w-[200px] rounded-lg mb-2" />}
-                  <MarkdownContent content={msg.content} />
-                  {msg.role === "assistant" && msg.content && !isStreaming && (
+                  <MarkdownContent 
+                    content={msg.content} 
+                    isStreaming={isStreaming && messages[messages.length - 1].id === msg.id} 
+                  />
+                  {msg.role === "assistant" && msg.content && (!isStreaming || messages[messages.length - 1].id !== msg.id) && (
                     <div className="mt-3 pt-3 border-t border-white/5 flex items-center gap-4">
                       <button onClick={() => speakText(msg.content)} className="flex items-center gap-1 text-[10px] uppercase font-black tracking-widest text-white/20 hover:text-white/50 transition-colors">
                         <Volume2 className="w-3 h-3" /> Play
@@ -383,6 +416,9 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
                         {copiedId === msg.id ? "Copied" : "Copy"}
                       </button>
                     </div>
+                  )}
+                  {isStreaming && messages[messages.length - 1].id === msg.id && (
+                    <span className="inline-block w-1 h-4 ml-1 bg-violet-500/50 animate-pulse align-middle" />
                   )}
                 </div>
               </motion.div>

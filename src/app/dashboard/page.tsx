@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Mic, BookOpen, Headphones, LogOut, Library,
   Music, Globe, ArrowRight, Download, FolderOpen,
@@ -287,6 +287,20 @@ export default function Dashboard() {
 
   const showSharedControls = activeTab === "research" || activeTab === "deepdive";
   const activeProject = projects.find((p) => p.id === activeProjectId) ?? null;
+
+  // ── Studio Output Handler ─────────────────────────────────────────────────
+  
+  const handleStudioOutputChange = useCallback((out: { text?: string; json?: any; mode: string }) => {
+    setAllStudioOutputs(prev => {
+      const newValue = out.json ?? out.text;
+      if (prev[out.mode] === newValue) return prev;
+      // Also do a deep check for JSON to be safe
+      if (typeof newValue === 'object' && JSON.stringify(prev[out.mode]) === JSON.stringify(newValue)) {
+        return prev;
+      }
+      return { ...prev, [out.mode]: newValue };
+    });
+  }, []);
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
@@ -607,7 +621,7 @@ export default function Dashboard() {
                     language={activeLanguage}
                     studioOutputs={allStudioOutputs}
                     onNavigateToDeepDive={() => setActiveTab("deepdive")}
-                    onOutputChange={(out) => setAllStudioOutputs(prev => ({ ...prev, [out.mode]: out.json ?? out.text }))}
+                    onOutputChange={handleStudioOutputChange}
                     onManualSave={handleManualSave}
                   />
 

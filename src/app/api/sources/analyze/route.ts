@@ -16,7 +16,22 @@ export async function POST(req: NextRequest) {
     const modeInstructions: Record<string, string> = {
       summarize: `Provide a comprehensive summary of the sources. Extract key takeaways, main themes, and action items. Use bullet points for clarity.`,
       study: `Act as a patient tutor. Explain the key concepts from the sources in simple, accessible terms. Provide real-world examples and analogies. End with 3 quiz questions to test understanding.`,
-      organize: `Create a polished presentation outline from the sources. Include: Title, key sections with talking points, supporting evidence from the sources, and a conclusion. Format with clear hierarchy.`,
+      organize: `Act as a professional strategy consultant. Create a COMPREHENSIVE and POLISHED Presentation Deck outline based on the sources.
+Structure the response as a series of "CARDS" (Slides). Each card must include:
+- **Slide Title**: Clear and punchy.
+- **Key Points**: 3-5 high-impact bullet points with data or evidence from the sources.
+- **Visual Suggestion**: Brief description of a chart, image, or layout for this slide.
+- **Speaker Notes**: A conversational explanation of the slide's content for the presenter.
+
+Include at minimum these slides:
+1. **Title & Vision**: The "Big Idea" and strategic objective.
+2. **Executive Summary**: The core value proposition or main finding.
+3. **Problem/Context**: The challenge or background based on sources.
+4. **Deep Dive/Analysis**: The "meat" of the data or concepts.
+5. **Strategic Recommendations**: Actionable next steps.
+6. **Future Outlook**: Where things are headed.
+
+Format each slide clearly with dividers. Use professional, persuasive language.`,
       create: `Analyze the sources for hidden patterns, emerging trends, and unexplored connections. Generate creative ideas, new angles, and innovative opportunities based on this analysis.`,
       rewrite: `Rewrite and restructure the content from the sources into a cohesive, polished document.`,
       ask: `You are a conversational AI assistant grounded in the user's research sources. Answer the user's question using ONLY information from the provided sources. Cite sources using [Source N] notation. If the sources contain no relevant information, clearly say so but be helpful. Respond in a warm, clear, conversational tone — like a knowledgeable colleague.`,
@@ -35,6 +50,8 @@ LANGUAGE: Respond in ${language || "English"}.
 
 CITATION RULES:
 - Reference sources using [Source N] notation.
+- FOR YOUTUBE VIDEOS: You MUST include specific timestamps from the transcript (e.g., [Source 1 at 12:45]).
+- Every factual claim or summary point should be backed by a citation.
 - Quote key passages when highly relevant.
 - Never fabricate information not found in the sources.
 

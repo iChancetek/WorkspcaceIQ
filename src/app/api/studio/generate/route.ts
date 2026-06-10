@@ -24,17 +24,19 @@ Use 3-4 main branches with 2-4 sub-nodes each. Keep labels concise (3-6 words ma
 Structure: # Executive Summary, ## Key Findings, ## Detailed Analysis, ## Recommendations, ## Conclusion.
 Use markdown formatting. Be specific, cite source data where possible, and maintain a professional tone.`,
 
-  slides: `You are a presentation designer. Create a clear, compelling slide deck outline based on the sources.
+  slides: `You are a world-class presentation designer. Create a bold, amazing, and comprehensive slide deck outline based on the sources.
 Format each slide as:
 ---
-## Slide N: [Title]
+## Slide N: [Main Title]
+### [Subtitle/Hook]
 **Key Points:**
-- Point 1
-- Point 2
-- Point 3
-**Speaker Note:** [1-2 sentence speaking guide]
+- [Comprehensive Point 1 with detail]
+- [Comprehensive Point 2 with detail]
+- [Comprehensive Point 3 with detail]
+**Visual Idea:** [Describe a bold visual or chart for this slide]
+**Speaker Note:** [A natural, calm, and professional speaking guide for this slide. Write it in first person as if you are the presenter.]
 
-Generate 6-8 slides. Start with a title slide and end with a summary/CTA slide.`,
+Generate 8-12 polished slides. Include an agenda slide, deep-dive content slides, and a strong call-to-action conclusion slide.`,
 
   infographic: `You are a data storyteller. Extract the most compelling facts, stats, and insights from the sources.
 Return ONLY a valid JSON object. Format:

@@ -41,6 +41,8 @@ const Waveform = ({ isPlaying }: { isPlaying: boolean }) => {
 
 export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveProps) {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generationProgress, setGenerationProgress] = useState(0);
+  const [generationStatus, setGenerationStatus] = useState("");
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -50,6 +52,7 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
   const cancelGeneration = () => {
     abortRef.current?.abort();
     setIsGenerating(false);
+    setGenerationProgress(0);
   };
 
   const generateDeepDive = async () => {
@@ -61,6 +64,27 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
 
     setIsGenerating(true);
     setAudioUrl(null);
+    setGenerationProgress(5);
+    setGenerationStatus("Synthesizing your sources...");
+
+    // Simulate progress while waiting for the heavy API call
+    const progressInterval = setInterval(() => {
+      setGenerationProgress(prev => {
+        if (prev < 30) {
+          setGenerationStatus("Synthesizing your sources...");
+          return prev + 1;
+        }
+        if (prev < 60) {
+          setGenerationStatus("Chancellor & Sydney are drafting the script...");
+          return prev + 0.5;
+        }
+        if (prev < 90) {
+          setGenerationStatus("Generating high-fidelity audio...");
+          return prev + 0.2;
+        }
+        return prev;
+      });
+    }, 400);
 
     try {
       const res = await fetch("/api/deepdive/generate", {
@@ -75,6 +99,10 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
 
       if (!res.ok) throw new Error("Generation failed");
 
+      clearInterval(progressInterval);
+      setGenerationProgress(100);
+      setGenerationStatus("Deep Dive Ready!");
+
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       setAudioUrl(url);
@@ -85,10 +113,16 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
         onTranscriptGenerated(decodeURIComponent(encodedTranscript));
       }
     } catch (err: any) {
+      clearInterval(progressInterval);
       if (err.name === "AbortError") return; // Silent cancel
       console.error("Deep Dive error:", err);
+      setGenerationStatus("Generation failed. Please try again.");
+    } finally {
+      setTimeout(() => {
+        setIsGenerating(false);
+        setGenerationProgress(0);
+      }, 1000);
     }
-    setIsGenerating(false);
   };
 
   const togglePlayback = () => {
@@ -153,39 +187,45 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
             Upload sources in the Research tab first
           </p>
         ) : !audioUrl ? (
-          <div className="flex flex-col items-center gap-4">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={generateDeepDive}
-              disabled={isGenerating}
-              className={cn(
-                "px-8 py-4 bg-primary text-white rounded-full font-semibold text-base transition-all shadow-lg shadow-black/10",
-                isGenerating ? "animate-pulse cursor-wait" : "hover:bg-primary/90"
-              )}
-            >
-              {isGenerating ? (
-                <span className="flex items-center gap-3">
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Generating Discussion...
-                </span>
-              ) : (
-                <span className="flex items-center gap-3">
-                  <Headphones className="w-5 h-5" />
-                  Generate Deep Dive
-                </span>
-              )}
-            </motion.button>
-
-            {/* Cancel button during generation */}
-            {isGenerating && (
-              <button
-                onClick={cancelGeneration}
-                className="flex items-center gap-2 px-5 py-2 rounded-full bg-red-500/15 hover:bg-red-500/25 text-red-400 text-sm font-bold border border-red-500/25 transition-all"
+          <div className="flex flex-col items-center gap-4 w-full max-w-sm mx-auto">
+            {!isGenerating ? (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={generateDeepDive}
+                className="w-full px-8 py-4 bg-primary text-white rounded-full font-semibold text-base transition-all shadow-lg shadow-black/10 hover:bg-primary/90 flex items-center justify-center gap-3"
               >
-                <Square className="w-3.5 h-3.5 fill-current" />
-                Cancel
-              </button>
+                <Headphones className="w-5 h-5" />
+                Generate Deep Dive
+              </motion.button>
+            ) : (
+              <div className="w-full space-y-4">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="flex items-center gap-3 text-purple-500 font-bold text-sm animate-pulse">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    {generationStatus}
+                  </div>
+                  <div className="w-full h-1.5 bg-purple-500/10 rounded-full overflow-hidden">
+                    <motion.div 
+                      className="h-full bg-purple-500"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${generationProgress}%` }}
+                      transition={{ duration: 0.5 }}
+                    />
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-tighter text-foreground/30">
+                    {Math.round(generationProgress)}% complete
+                  </span>
+                </div>
+
+                <button
+                  onClick={cancelGeneration}
+                  className="flex items-center gap-2 px-5 py-2 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-500 text-xs font-bold border border-red-500/10 transition-all mx-auto"
+                >
+                  <Square className="w-3 h-3 fill-current" />
+                  Cancel
+                </button>
+              </div>
             )}
           </div>
         ) : (
