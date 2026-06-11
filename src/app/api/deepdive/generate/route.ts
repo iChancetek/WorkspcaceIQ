@@ -43,30 +43,46 @@ ${sourcesContext}`
     // Step 2: Parse script into segments
     const segments = script.split("\n").filter(line => line.trim());
 
-    // Generate audio segments in parallel to avoid timeouts
-    const audioPromises = segments.map(async (segment) => {
-      const isChancellor = segment.trim().startsWith("CHANCELLOR:");
-      const isSydney = segment.trim().startsWith("SYDNEY:");
-      
-      if (!isChancellor && !isSydney) return null;
-      
-      const text = segment.replace(/^(CHANCELLOR|SYDNEY):\s*/i, "").trim();
-      if (!text) return null;
+    // Process audio segments in smaller batches to avoid rate limits and timeouts
+    const audioSegments: Buffer[] = [];
+    const batchSize = 3; // Process 3 segments at a time
 
-      // Onyx = deep male (Chancellor), Shimmer = clear female (Sydney)
-      const voice = isChancellor ? "onyx" : "shimmer";
-      
-      const audioResponse = await openai.audio.speech.create({
-        model: "tts-1",
-        voice: voice,
-        input: text,
+    for (let i = 0; i < segments.length; i += batchSize) {
+      const batch = segments.slice(i, i + batchSize);
+      const batchPromises = batch.map(async (segment) => {
+        const isChancellor = segment.trim().startsWith("CHANCELLOR:");
+        const isSydney = segment.trim().startsWith("SYDNEY:");
+        
+        if (!isChancellor && !isSydney) return null;
+        
+        const text = segment.replace(/^(CHANCELLOR|SYDNEY):\s*/i, "").trim();
+        if (!text) return null;
+
+        // Onyx = deep male (Chancellor), Shimmer = clear female (Sydney)
+        const voice = isChancellor ? "onyx" : "shimmer";
+        
+        try {
+          const audioResponse = await openai.audio.speech.create({
+            model: "tts-1",
+            voice: voice,
+            input: text,
+          });
+          return Buffer.from(await audioResponse.arrayBuffer());
+        } catch (err) {
+          console.error(`TTS failed for segment: "${text.substring(0, 30)}..."`, err);
+          return null;
+        }
       });
 
-      return Buffer.from(await audioResponse.arrayBuffer());
-    });
+      const batchResults = await Promise.all(batchPromises);
+      for (const res of batchResults) {
+        if (res) audioSegments.push(res);
+      }
+    }
 
-    const audioSegmentsResults = await Promise.all(audioPromises);
-    const audioSegments = audioSegmentsResults.filter((s): s is any => s !== null);
+    if (audioSegments.length === 0) {
+      throw new Error("No audio segments were successfully generated.");
+    }
 
     // Concatenate all audio segments into a single MP3
     const fullAudio = Buffer.concat(audioSegments);

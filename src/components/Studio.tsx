@@ -353,19 +353,48 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
     return [];
   }, [streamText, activeMode]);
 
+  // Use a ref to prevent feedback loops between local state and parent props
+  const lastSyncedRef = useRef<Record<string, any>>({});
+
+  // Sync with prop studioOutputs
   useEffect(() => {
     const existing = studioOutputs?.[activeMode];
-    if (existing) {
-      if (typeof existing === "string") {
-        if (streamText !== existing) { setStreamText(existing); setJsonData(null); }
-      } else {
-        if (JSON.stringify(jsonData) !== JSON.stringify(existing)) { setJsonData(existing); setStreamText(""); }
+    
+    // Only update local state if the prop is different from what we last synced
+    if (existing !== undefined) {
+      const existingStr = typeof existing === "string" ? existing : JSON.stringify(existing);
+      const lastStr = typeof lastSyncedRef.current[activeMode] === "string" 
+        ? lastSyncedRef.current[activeMode] 
+        : JSON.stringify(lastSyncedRef.current[activeMode]);
+
+      if (existingStr !== lastStr) {
+        if (typeof existing === "string") {
+          setStreamText(existing);
+          setJsonData(null);
+        } else {
+          setJsonData(existing);
+          setStreamText("");
+        }
+        lastSyncedRef.current[activeMode] = existing;
       }
     } else if (streamText !== "" || jsonData !== null) {
-      setStreamText(""); setJsonData(null);
+      // If prop is missing but we have state, parent probably cleared it
+      setStreamText("");
+      setJsonData(null);
+      lastSyncedRef.current[activeMode] = undefined;
     }
-    setError(""); setQuizSelected({}); setQuizRevealed(false); setFlippedCard(null); setIsPresenting(false); stopAudio();
   }, [activeMode, studioOutputs]);
+
+  // Reset UI state only when mode changes
+  useEffect(() => {
+    setError(""); 
+    setQuizSelected({}); 
+    setQuizRevealed(false); 
+    setFlippedCard(null); 
+    setIsPresenting(false); 
+    setSlideIndex(0);
+    stopAudio();
+  }, [activeMode]);
 
   const stopAudio = () => {
     if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
@@ -398,11 +427,18 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
 
   useEffect(() => {
     if (!isGenerating && onOutputChange && (streamText || jsonData)) {
-      const existing = studioOutputs?.[activeMode];
-      const isDiff = typeof existing === "string" ? existing !== streamText : JSON.stringify(existing) !== JSON.stringify(jsonData);
-      if (isDiff) onOutputChange({ text: streamText, json: jsonData, mode: activeMode });
+      const current = jsonData ?? streamText;
+      const last = lastSyncedRef.current[activeMode];
+      
+      const currentStr = typeof current === "string" ? current : JSON.stringify(current);
+      const lastStr = typeof last === "string" ? last : JSON.stringify(last);
+
+      if (currentStr !== lastStr) {
+        lastSyncedRef.current[activeMode] = current;
+        onOutputChange({ text: streamText, json: jsonData, mode: activeMode });
+      }
     }
-  }, [streamText, jsonData, isGenerating, onOutputChange, activeMode, studioOutputs]);
+  }, [streamText, jsonData, isGenerating, onOutputChange, activeMode]);
 
   const cancelGeneration = () => { abortRef.current?.abort(); setIsGenerating(false); };
 

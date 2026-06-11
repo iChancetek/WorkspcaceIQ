@@ -24,21 +24,26 @@ Use 3-4 main branches with 2-4 sub-nodes each. Keep labels concise (3-6 words ma
 Structure: # Executive Summary, ## Key Findings, ## Detailed Analysis, ## Recommendations, ## Conclusion.
 Use markdown formatting. Be specific, cite source data where possible, and maintain a professional tone.`,
 
-  slides: `You are a world-class presentation designer. Create a bold, amazing, and comprehensive slide deck outline based on the sources.
-You MUST generate 8-12 distinct slides.
-You MUST separate every single slide with a line containing exactly three dashes: ---
+  slides: `You are a world-class presentation designer and subject matter expert. 
+Create a comprehensive, high-impact, and dynamic slide deck outline based on the provided sources.
+You MUST generate a minimum of 8-10 distinct, information-rich slides that cover the material in depth.
 
-For EACH slide, use this exact structure:
+CRITICAL INSTRUCTIONS:
+1. You MUST separate EVERY slide with a line containing exactly three dashes: ---
+2. EACH slide must follow this EXACT structure:
+
 ---
-## Slide N: [Main Title]
-### [Subtitle/Hook]
+## Slide N: [Compelling & Bold Main Title]
+### [Sub-headline or key hook that adds context]
 **Key Points:**
-- [Comprehensive Point 1]
-- [Comprehensive Point 2]
-- [Comprehensive Point 3]
-**Visual Idea:** [Describe a bold visual or chart for this slide]
-**Speaker Note:** [A natural, calm, and professional speaking guide. Write in first person.]
----`,
+- [Detailed, comprehensive insight 1]
+- [Detailed, comprehensive insight 2]
+- [Detailed, comprehensive insight 3]
+**Visual Idea:** [Describe a specific, bold visual, diagram, or chart for this slide]
+**Speaker Note:** [A detailed, natural, and professional script (2-4 sentences). Write in the first person as the presenter.]
+---
+
+Ensure the content is polished, professional, and directly derived from the source material.`,
 
   infographic: `You are a data storyteller. Extract the most compelling facts, stats, and insights from the sources.
 Return ONLY a valid JSON object. Format:

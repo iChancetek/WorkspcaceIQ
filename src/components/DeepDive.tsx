@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Loader2, Play, Pause, Download, Headphones, Square } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Source } from "./SourceUploader";
@@ -55,6 +55,15 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
     setGenerationProgress(0);
   };
 
+  // Update status based on progress
+  useEffect(() => {
+    if (!isGenerating) return;
+    if (generationProgress < 30) setGenerationStatus("Synthesizing your sources...");
+    else if (generationProgress < 60) setGenerationStatus("Chancellor & Sydney are drafting the script...");
+    else if (generationProgress < 90) setGenerationStatus("Generating high-fidelity audio...");
+    else if (generationProgress >= 100) setGenerationStatus("Deep Dive Ready!");
+  }, [generationProgress, isGenerating]);
+
   const generateDeepDive = async () => {
     if (sources.length === 0) return;
 
@@ -65,23 +74,13 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
     setIsGenerating(true);
     setAudioUrl(null);
     setGenerationProgress(5);
-    setGenerationStatus("Synthesizing your sources...");
 
     // Simulate progress while waiting for the heavy API call
     const progressInterval = setInterval(() => {
       setGenerationProgress(prev => {
-        if (prev < 30) {
-          setGenerationStatus("Synthesizing your sources...");
-          return prev + 1;
-        }
-        if (prev < 60) {
-          setGenerationStatus("Chancellor & Sydney are drafting the script...");
-          return prev + 0.5;
-        }
-        if (prev < 90) {
-          setGenerationStatus("Generating high-fidelity audio...");
-          return prev + 0.2;
-        }
+        if (prev < 30) return prev + 1;
+        if (prev < 60) return prev + 0.5;
+        if (prev < 90) return prev + 0.2;
         return prev;
       });
     }, 400);
@@ -101,7 +100,6 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
 
       clearInterval(progressInterval);
       setGenerationProgress(100);
-      setGenerationStatus("Deep Dive Ready!");
 
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -118,10 +116,9 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
       console.error("Deep Dive error:", err);
       setGenerationStatus("Generation failed. Please try again.");
     } finally {
-      setTimeout(() => {
-        setIsGenerating(false);
-        setGenerationProgress(0);
-      }, 1000);
+      setIsGenerating(false);
+      // Don't reset progress immediately so user sees 100% for a bit
+      setTimeout(() => setGenerationProgress(0), 2000);
     }
   };
 
