@@ -23,9 +23,30 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
+    // Knowledge Graph — Entity Nodes
+    match /users/{userId}/kg_nodes/{nodeId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Knowledge Graph — Relationship Edges
+    match /users/{userId}/kg_edges/{edgeId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Knowledge Processing Jobs
+    match /users/{userId}/processing/{jobId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Unified Knowledge Sources Registry
+    match /users/{userId}/knowledge_sources/{sourceId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
     // Default deny
     match /{document=**} {
       allow read, write: if false;
     }
   }
 }
+

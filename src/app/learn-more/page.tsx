@@ -3,11 +3,13 @@ import { ArrowLeft, ArrowRight, Mic, BookOpen, Headphones, Globe, Shield, Sparkl
 import { IChancellor } from "@/components/IChancellor";
 import { BrandIdentifier } from "@/components/BrandIdentifier";
 
-const heroFeatures = [
-  { icon: Mic, label: "Flow Dictation", color: "text-blue-400", bg: "from-blue-500/20 to-blue-600/5" },
-  { icon: Globe, label: "Live Translate", color: "text-blue-500", bg: "from-blue-500/20 to-blue-600/5" },
-  { icon: BookOpen, label: "Research Mode", color: "text-violet-400", bg: "from-violet-500/20 to-violet-600/5" },
-  { icon: Headphones, label: "Deep Dive Audio", color: "text-emerald-400", bg: "from-emerald-500/15 to-emerald-600/5" },
+const coreCapabilities = [
+  { icon: Mic, title: "🗣️ Dictate Ideas", desc: "Capture thoughts naturally with AI voice input.", color: "text-blue-400", bg: "from-blue-500/20 to-blue-600/5" },
+  { icon: BookOpen, title: "📚 Upload Any Source", desc: "PDFs, websites, videos, audio, documents, images, code, and more.", color: "text-purple-400", bg: "from-purple-500/20 to-purple-600/5" },
+  { icon: Brain, title: "🧠 GraphRAG Intelligence", desc: "Connect every source into a living knowledge graph.", color: "text-cyan-400", bg: "from-cyan-500/20 to-cyan-600/5" },
+  { icon: MessageCircle, title: "💬 Ask Anything", desc: "Get cited, context-aware answers across your entire workspace.", color: "text-pink-400", bg: "from-pink-500/20 to-pink-600/5" },
+  { icon: Table2, title: "📊 Create Instantly", desc: "Reports, presentations, spreadsheets, documents, diagrams, and timelines.", color: "text-amber-400", bg: "from-amber-500/15 to-amber-600/5" },
+  { icon: Headphones, title: "🎙️ AI Podcasts", desc: "Turn your knowledge into personalized podcasts you can listen to anywhere.", color: "text-emerald-400", bg: "from-emerald-500/15 to-emerald-600/5" },
 ];
 
 const flowFeatures = [
@@ -159,11 +161,14 @@ export default function LearnMorePage() {
         </div>
 
         {/* Feature overview cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-          {heroFeatures.map(({ icon: Icon, label, color, bg }) => (
-            <div key={label} className={`p-5 rounded-2xl bg-gradient-to-b ${bg} border border-white/8 flex flex-col items-center gap-3`}>
-              <Icon className={`w-6 h-6 ${color}`} />
-              <span className="text-xs font-semibold text-white/90">{label}</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto mt-12 text-left">
+          {coreCapabilities.map(({ icon: Icon, title, desc, color, bg }) => (
+            <div key={title} className={`p-6 rounded-2xl bg-gradient-to-b ${bg} border border-white/8 flex flex-col gap-3 shadow-lg hover:border-white/20 hover:scale-[1.01] transition-all duration-200`}>
+              <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/8 flex items-center justify-center">
+                <Icon className={`w-5 h-5 ${color}`} />
+              </div>
+              <h3 className="text-sm font-bold text-white tracking-tight">{title}</h3>
+              <p className="text-xs text-white/70 leading-relaxed font-light">{desc}</p>
             </div>
           ))}
         </div>
@@ -241,6 +246,88 @@ export default function LearnMorePage() {
         features={ichancellorFeatures}
         accent="text-pink-400"
       />
+
+      {/* ── AGENTIC AI TEAM SECTION ─────────────────────────────────────── */}
+      <section id="agents-team" className="relative z-10 max-w-6xl mx-auto px-8 py-24 border-t border-white/5">
+        <div className="text-center mb-16">
+          <span className="text-xs font-bold tracking-[0.25em] uppercase text-cyan-400 mb-4 block">Agentic AI Team</span>
+          <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">Collaborative AI Agent Workforce</h2>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto font-light">
+            Behind WorkSpaceIQ is a team of specialized AI agents working in tandem. From ingestion to synthesis, they collaborate to achieve your goals.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+          <div className="p-8 rounded-3xl bg-white/[0.02] border border-white/8">
+            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-cyan-400" />
+              Agent Roles & Specializations
+            </h3>
+            <ul className="space-y-4 text-sm text-white/70">
+              <li>
+                <strong className="text-white">1. Ingestion Agent (The Document Specialist)</strong>: 
+                Extracts raw texts, tables, and pages from files (.pdf, .docx, .md, .rtf, .pptx, .epub) in-memory without bloating database storage.
+              </li>
+              <li>
+                <strong className="text-white">2. Whisper STT Agent (The Audio Transcriber)</strong>: 
+                Listens to spoken words in MP3, WAV, MP4, and MOV formats and outputs rich transcripts with precise timestamps.
+              </li>
+              <li>
+                <strong className="text-white">3. Entity Extractor Agent (The Knowledge Mapper)</strong>: 
+                Driven by GPT-5.4, this agent scans text chunks to extract concept nodes, relationship edges, and merges them to build the Knowledge Graph.
+              </li>
+              <li>
+                <strong className="text-white">4. Sydney & Chancellor Agents (The Audio Podcasters)</strong>: 
+                Collaboratively write scripts and host your Deep Dive audio podcasts, offering complementary strategic and investigative perspectives.
+              </li>
+            </ul>
+          </div>
+
+          <div className="p-8 rounded-3xl bg-white/[0.02] border border-white/8">
+            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-violet-400" />
+              How They Work Together
+            </h3>
+            <p className="text-sm leading-relaxed text-white/70 mb-4">
+              When a research target is uploaded, the **Ingestion Agent** translates document structures while the **Whisper Agent** transcribes media resources. They feed their content to the **Entity Extractor Agent**, which indexes raw vectors into Pinecone and charts relationship structures in Firestore.
+            </p>
+            <p className="text-sm leading-relaxed text-white/70">
+              When you ask a question, the **Orchestration Agent** manages hybrid local/global retrieval, querying Pinecone and traversing Firestore in parallel. The result is passed to **GPT-5.4** to output grounded, citation-backed intelligence, which can finally be compiled into professional reports or spoken aloud by the podcast team.
+            </p>
+          </div>
+        </div>
+
+        {/* ── AGENTIC FRAMEWORK & TOOLS DETAIL ── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+          <div className="p-8 rounded-3xl bg-white/[0.02] border border-white/8">
+            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-blue-400" />
+              The LangGraph Framework
+            </h3>
+            <p className="text-sm leading-relaxed text-white/70 mb-4">
+              WorkSpaceIQ leverages the **LangGraph** framework for stateful agent orchestration. The agents maintain a unified memory state, executing a continuous loop of thinking, deciding, acting, and observing.
+            </p>
+            <p className="text-sm leading-relaxed text-white/70">
+              This architecture decouples the agent's reasoning from direct file system processes, ensuring the system is fully prepared for the **Model Context Protocol (MCP)**, allowing secure and dynamic scaling to external developer data resources.
+            </p>
+          </div>
+
+          <div className="p-8 rounded-3xl bg-white/[0.02] border border-white/8">
+            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+              Agentic Toolset
+            </h3>
+            <ul className="space-y-2 text-xs text-white/70">
+              <li>• <strong className="text-white">Multi-Format Ingestion Tool</strong>: Parses PDF, DOCX, TXT, MD, RTF, PPTX, EPUB.</li>
+              <li>• <strong className="text-white">Whisper STT Tool</strong>: Audio/Video transcription tool with timestamp alignment.</li>
+              <li>• <strong className="text-white">URL Extractor Tool</strong>: Scrapes transcripts from web links, YouTube, Vimeo, and Loom.</li>
+              <li>• <strong className="text-white">Pinecone Vector Search Tool</strong>: Conducts user-isolated semantic search checks.</li>
+              <li>• <strong className="text-white">Firestore Graph Traversal Tool</strong>: Recursively maps entity neighbors and weights.</li>
+              <li>• <strong className="text-white">Tavily Web Search</strong>: Fetches live external web information when needed.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
 
       {/* Final CTA */}
       <section className="relative z-10 max-w-6xl mx-auto px-8 pb-24">

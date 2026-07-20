@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { Source } from "./SourceUploader";
 import { motion, AnimatePresence } from "framer-motion";
 import { VoiceSelector } from "./VoiceSelector";
+import { useAuth } from "@/context/AuthContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -90,6 +91,8 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
   const [activeVoice, setActiveVoice] = useState("nova");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [selectedSourceId, setSelectedSourceId] = useState<string | null>(null);
+  const [includeGraphContext, setIncludeGraphContext] = useState(true);
+  const { user } = useAuth();
 
   const bottomRef      = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -245,6 +248,7 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
           question: text || undefined,
           messages: historyForAPI,
           imageBase64,
+          userId: includeGraphContext ? user?.uid : undefined,
         }),
       });
       if (!res.body) throw new Error("No stream");
@@ -264,7 +268,7 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
     } finally {
       setIsStreaming(false);
     }
-  }, [input, isStreaming, messages, pendingImage, sources, selectedSourceId, tone, language, autoSpeak, speakText]);
+  }, [input, isStreaming, messages, pendingImage, sources, selectedSourceId, tone, language, autoSpeak, speakText, includeGraphContext, user]);
 
   const runMode = (modeId: string) => {
     if (isStreaming || sources.length === 0) return;
@@ -300,6 +304,27 @@ export function ResearchChat({ sources, tone, language }: ResearchChatProps) {
           >
             All Resources ({sources.length})
           </motion.button>
+          
+          {/* GraphRAG Toggle */}
+          {user && (
+            <>
+              <div className="h-4 w-px bg-foreground/10 dark:bg-white/10 mx-1 hidden lg:block" />
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setIncludeGraphContext(!includeGraphContext)}
+                className={cn(
+                  "px-3 py-1.5 rounded-full text-xs font-bold border transition-all flex items-center gap-1.5 shadow-sm dark:shadow-none",
+                  includeGraphContext
+                    ? "bg-cyan-500/10 dark:bg-cyan-500/20 border-cyan-500/20 dark:border-cyan-500/40 text-cyan-700 dark:text-cyan-300"
+                    : "bg-foreground/5 dark:bg-transparent border-foreground/10 dark:border-white/10 text-foreground/40 dark:text-white/35 hover:text-foreground dark:hover:text-white/55 hover:border-foreground/20 dark:hover:border-white/20"
+                )}
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                GraphRAG Context: {includeGraphContext ? "ON" : "OFF"}
+              </motion.button>
+            </>
+          )}
           {sources.map(s => (
             <motion.button
               key={s.id}

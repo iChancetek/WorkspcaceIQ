@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Mic, BookOpen, Headphones, LogOut, Library,
   Music, Globe, ArrowRight, Download, FolderOpen,
-  Pencil, Trash2, Check, X, Loader2, LayoutGrid
+  Pencil, Trash2, Check, X, Loader2, LayoutGrid, Brain, Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { StreamingAudioRecorder } from "@/components/StreamingAudioRecorder";
@@ -23,6 +23,9 @@ import { WorkspaceHeader } from "@/components/WorkspaceHeader";
 import { ProjectSidebar } from "@/components/ProjectSidebar";
 import { WorkspacesGrid } from "@/components/WorkspacesGrid";
 import { WorkspaceIcon } from "@/components/WorkspaceIcon";
+import { KnowledgeHub } from "@/components/KnowledgeHub";
+import { GraphVisualization } from "@/components/GraphVisualization";
+import { KGNode, KGEdge } from "@/lib/rag/knowledge-graph";
 import { generateProjectMarkdown, downloadFile } from "@/lib/export";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -86,6 +89,7 @@ const FEATURE_CARDS = [
 
 const TABS = [
   { id: "workspaces",label: "My WorkSpaces", icon: LayoutGrid, color: "text-violet-400", glow: "shadow-violet-500/20" },
+  { id: "knowledge", label: "Knowledge Hub", icon: Brain, color: "text-cyan-400", glow: "shadow-cyan-500/20" },
   { id: "flow",     label: "Flow",      icon: Mic,       color: "text-blue-400",    glow: "shadow-blue-500/20" },
   { id: "journal",  label: "Journal",   icon: BookOpen,  color: "text-amber-400",   glow: "shadow-amber-500/20" },
   { id: "memo",     label: "Memo",      icon: StickyNote,color: "text-sky-400",     glow: "shadow-sky-500/20" },
@@ -109,6 +113,84 @@ export default function Dashboard() {
   const [activeLanguage, setActiveLanguage] = useState("English");
   const [allStudioOutputs, setAllStudioOutputs] = useState<Record<string, any>>({});
   const [deepDiveTranscript, setDeepDiveTranscript] = useState<string | null>(null);
+  
+  // GraphRAG sync state
+  const [graphNodes, setGraphNodes] = useState<KGNode[]>([]);
+  const [graphEdges, setGraphEdges] = useState<KGEdge[]>([]);
+  const [isBuildingGraph, setIsBuildingGraph] = useState(false);
+
+  const handleBuildGraph = async () => {
+    if (!user || sources.length === 0) return;
+    setIsBuildingGraph(true);
+    try {
+      for (const s of sources) {
+        await fetch("/api/knowledge/ingest", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: s.id,
+            userId: user.uid,
+            title: s.title,
+            type: s.type,
+            text: s.text,
+          }),
+        });
+      }
+      // Reload graph status
+      const res = await fetch("/api/knowledge/status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.uid }),
+      });
+      const data = await res.json();
+      if (data.graph?.topEntities) {
+        const nodes = data.graph.topEntities.map((e: any) => ({
+          id: `${e.type}__${e.name.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`,
+          name: e.name,
+          type: e.type,
+          description: "",
+          sourceIds: [],
+          referenceCount: e.refs,
+          properties: {},
+          createdAt: null,
+          updatedAt: null,
+        }));
+        setGraphNodes(nodes);
+      }
+    } catch (e) {
+      console.error("Failed to build graph:", e);
+    } finally {
+      setIsBuildingGraph(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!user || activeTab !== "research") return;
+
+    fetch("/api/knowledge/status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: user.uid }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.graph?.topEntities) {
+          const nodes = data.graph.topEntities.map((e: any) => ({
+            id: `${e.type}__${e.name.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`,
+            name: e.name,
+            type: e.type,
+            description: "",
+            sourceIds: [],
+            referenceCount: e.refs,
+            properties: {},
+            createdAt: null,
+            updatedAt: null,
+          }));
+          setGraphNodes(nodes);
+        }
+      })
+      .catch(console.warn);
+  }, [user, activeTab, sources]);
 
   // Project / workspace state
   const [projects, setProjects] = useState<ResearchProject[]>([]);
@@ -608,8 +690,55 @@ export default function Dashboard() {
                   <SourceUploader
                     sources={sources}
                     onSourcesChange={handleSourcesChange}
-                    maxSources={10}
+                    maxSources={25}
                   />
+
+                  {/* Workspace Relationship Graph */}
+                  {sources.length > 0 && (
+                    <div className="rounded-3xl border border-foreground/10 dark:border-white/8 bg-foreground/5 dark:bg-white/[0.02] overflow-hidden">
+                      <div className="flex items-center gap-3 px-5 py-4 border-b border-foreground/10 dark:border-white/8 bg-foreground/5 dark:bg-white/[0.02]">
+                        <div className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/15">
+                          <Brain className="w-4 h-4 text-cyan-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-foreground dark:text-white">Workspace Relationship Graph</p>
+                          <p className="text-[10px] text-foreground/40 dark:text-white/40 font-medium">Interactive GraphRAG topology of extracted concepts and sources</p>
+                        </div>
+                      </div>
+                      
+                      <div className="p-5 bg-background/50 backdrop-blur-md">
+                        {isBuildingGraph ? (
+                          <div className="py-12 flex flex-col items-center justify-center gap-3">
+                            <Loader2 className="w-6 h-6 text-cyan-400 animate-spin" />
+                            <p className="text-xs text-foreground/50 dark:text-white/50 font-bold uppercase tracking-wider animate-pulse">
+                              Extracting entities and plotting connections...
+                            </p>
+                          </div>
+                        ) : graphNodes.length > 0 ? (
+                          <GraphVisualization nodes={graphNodes} edges={graphEdges} />
+                        ) : (
+                          <div className="py-8 text-center space-y-4">
+                            <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mx-auto">
+                              <Brain className="w-5 h-5 text-cyan-500 animate-pulse" />
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm font-bold text-foreground dark:text-white">No Relationship Graph Generated</p>
+                              <p className="text-[11px] text-foreground/40 dark:text-white/40 max-w-[320px] mx-auto leading-relaxed">
+                                Build an interactive node-link visualization mapping the connections and concepts across your sources.
+                              </p>
+                            </div>
+                            <button
+                              onClick={handleBuildGraph}
+                              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-violet-500 hover:opacity-90 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg shadow-cyan-500/20 transition-all hover:scale-[1.02]"
+                            >
+                              <Sparkles className="w-3.5 h-3.5" />
+                              Build Relationship Graph
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   {sources.some((s) => s.type === "spreadsheet") && (
                     <DataDashboard sources={sources} tone={activeTone} />
@@ -698,6 +827,13 @@ export default function Dashboard() {
                 onRestoreProject={handleRestoreProject}
                 onOpenResearchProject={handleSelectProject}
               />
+            </section>
+          )}
+
+          {/* ── KNOWLEDGE HUB TAB ────────────────────────────────────────────── */}
+          {activeTab === "knowledge" && (
+            <section className="space-y-8">
+              <KnowledgeHub />
             </section>
           )}
 

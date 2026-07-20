@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { openai } from "@/agents/core/openai-client";
 import { queryKnowledgeBase } from "@/lib/rag/pinecone";
+import { hybridRetrieve } from "@/lib/rag/hybrid-retriever";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -29,7 +30,7 @@ RULES:
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, query } = await req.json();
+    const { messages, query, userId } = await req.json();
 
     if (!query && (!messages || messages.length === 0)) {
       return NextResponse.json({ error: "Query or messages required" }, { status: 400 });
@@ -37,25 +38,41 @@ export async function POST(req: NextRequest) {
 
     const latestQuery = query ?? messages[messages.length - 1]?.content ?? "";
 
-    // Step 1: Retrieve context with a HARD TIMEOUT
-    let contextChunks: string[] = [];
+    // Step 1: Retrieve context — use hybrid retriever if userId is available
+    let context = "";
     try {
       console.log("[iChancellor] Fetching context for:", latestQuery.slice(0, 50) + "...");
-      
-      const ragPromise = queryKnowledgeBase(latestQuery, 5);
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("RAG Timeout")), 5000)
-      );
 
-      contextChunks = await Promise.race([ragPromise, timeoutPromise]) as string[];
-      console.log(`[iChancellor] RAG search returned ${contextChunks.length} chunks.`);
+      if (userId) {
+        // Enhanced: Use hybrid retrieval (vector + knowledge graph)
+        const hybridPromise = hybridRetrieve(latestQuery, userId, { topK: 5, includeGraph: true });
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Hybrid RAG Timeout")), 8000)
+        );
+        const retrieval = await Promise.race([hybridPromise, timeoutPromise]) as Awaited<ReturnType<typeof hybridRetrieve>>;
+        console.log(`[iChancellor] Hybrid retrieval: ${retrieval.chunks.length} chunks via [${retrieval.strategies.join(", ")}]`);
+        context = retrieval.formattedContext;
+      }
+
+      // Fallback: Legacy RAG (also runs if hybrid returned nothing)
+      if (!context || context.length < 20) {
+        const ragPromise = queryKnowledgeBase(latestQuery, 5);
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("RAG Timeout")), 5000)
+        );
+        const contextChunks = await Promise.race([ragPromise, timeoutPromise]) as string[];
+        console.log(`[iChancellor] Legacy RAG returned ${contextChunks.length} chunks.`);
+        if (contextChunks.length > 0) {
+          context = contextChunks.join("\n\n---\n\n");
+        }
+      }
     } catch (err: any) {
       console.warn("[iChancellor] RAG failed or timed out. Falling back to base knowledge:", err.message);
     }
 
-    const context = contextChunks.length > 0
-      ? contextChunks.join("\n\n---\n\n")
-      : "No specific context found. Answer from general knowledge about WorkSpaceIQ platform.";
+    if (!context) {
+      context = "No specific context found. Answer from general knowledge about WorkSpaceIQ platform.";
+    }
 
     const systemPrompt = ICHANCELLOR_SYSTEM.replace("{CONTEXT}", context);
 

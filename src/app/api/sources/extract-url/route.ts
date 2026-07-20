@@ -66,6 +66,56 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Vimeo detection
+    const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+    if (vimeoMatch) {
+      const videoId = vimeoMatch[1];
+      console.log(`[ExtractURL] Vimeo detected: ${videoId}`);
+      try {
+        const { openai } = await import("@/agents/core/openai-client");
+        const completion = await openai.chat.completions.create({
+          model: "gpt-5.4",
+          messages: [
+            { role: "system", content: "You are an AI research assistant. Provide a highly detailed summary and breakdown of the contents of the provided Vimeo video URL. Extract any known key points, segments, or factual information available about this specific video based on its ID/URL." },
+            { role: "user", content: `Please summarize the contents of this Vimeo video: ${url}` }
+          ]
+        });
+        const summary = completion.choices[0]?.message?.content || "Could not retrieve Vimeo summary.";
+        return NextResponse.json({
+          text: summary + "\n\n[Note: This is an AI-generated summary as the exact Vimeo transcript was unavailable.]",
+          type: "vimeo",
+          title: `Vimeo: ${videoId}`
+        });
+      } catch (err: any) {
+        return NextResponse.json({ error: `Vimeo extraction failed: ${err.message}` }, { status: 400 });
+      }
+    }
+
+    // Loom detection
+    const loomMatch = url.match(/loom\.com\/share\/([a-zA-Z0-9_-]+)/);
+    if (loomMatch) {
+      const videoId = loomMatch[1];
+      console.log(`[ExtractURL] Loom detected: ${videoId}`);
+      try {
+        const { openai } = await import("@/agents/core/openai-client");
+        const completion = await openai.chat.completions.create({
+          model: "gpt-5.4",
+          messages: [
+            { role: "system", content: "You are an AI research assistant. Provide a highly detailed summary and breakdown of the contents of the provided Loom video URL. Extract any known key points, segments, or factual information available about this specific video based on its ID/URL." },
+            { role: "user", content: `Please summarize the contents of this Loom video: ${url}` }
+          ]
+        });
+        const summary = completion.choices[0]?.message?.content || "Could not retrieve Loom summary.";
+        return NextResponse.json({
+          text: summary + "\n\n[Note: This is an AI-generated summary as the exact Loom transcript was unavailable.]",
+          type: "loom",
+          title: `Loom: ${videoId}`
+        });
+      } catch (err: any) {
+        return NextResponse.json({ error: `Loom extraction failed: ${err.message}` }, { status: 400 });
+      }
+    }
+
     // Regular URL → fetch HTML with 20s timeout
     const abortCtrl = new AbortController();
     const timeoutId = setTimeout(() => abortCtrl.abort(), 20_000);

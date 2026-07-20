@@ -110,3 +110,83 @@ export async function ingestDocument(
 
   return vectors.length;
 }
+
+// ─── Enhanced: User-Scoped Hybrid Query ─────────────────────────────────────
+
+export interface HybridMatch {
+  text: string;
+  score: number;
+  metadata: Record<string, any>;
+}
+
+/**
+ * User-scoped vector search with optional metadata filters.
+ * Returns enriched matches with full metadata for citation building.
+ */
+export async function queryHybrid(
+  queryText: string,
+  userId: string,
+  options: {
+    topK?: number;
+    scoreThreshold?: number;
+    sourceType?: string;
+    sourceId?: string;
+    projectId?: string;
+  } = {}
+): Promise<HybridMatch[]> {
+  const { topK = 10, scoreThreshold = 0.25, sourceType, sourceId, projectId } = options;
+
+  const embedding = await embedText(queryText);
+
+  // Build metadata filter for user scoping
+  const filterConditions: Record<string, any> = {
+    userId: { $eq: userId },
+  };
+
+  if (sourceType) {
+    filterConditions.sourceType = { $eq: sourceType };
+  }
+  if (sourceId) {
+    filterConditions.sourceId = { $eq: sourceId };
+  }
+  if (projectId) {
+    filterConditions.projectId = { $eq: projectId };
+  }
+
+  const results = await getPineconeIndex().query({
+    vector: embedding,
+    topK,
+    includeMetadata: true,
+    filter: filterConditions,
+  });
+
+  return results.matches
+    .filter((m: any) => (m.score ?? 0) > scoreThreshold)
+    .map((m: any) => ({
+      text: (m.metadata?.text as string) ?? "",
+      score: m.score ?? 0,
+      metadata: (m.metadata as Record<string, any>) ?? {},
+    }));
+}
+
+/**
+ * Delete all vectors associated with a specific source.
+ * Used when a source is removed from the workspace.
+ */
+export async function deleteBySource(
+  userId: string,
+  sourceId: string
+): Promise<void> {
+  try {
+    // Pinecone SDK v7 supports deleteMany with filter
+    await (getPineconeIndex() as any).deleteMany({
+      filter: {
+        userId: { $eq: userId },
+        sourceId: { $eq: sourceId },
+      },
+    });
+    console.log(`[RAG] Deleted vectors for source ${sourceId}`);
+  } catch (err: any) {
+    console.warn("[RAG] deleteMany failed, source vectors may persist:", err.message);
+  }
+}

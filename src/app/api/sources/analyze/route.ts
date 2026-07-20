@@ -1,12 +1,13 @@
 import { NextRequest } from "next/server";
 import { openai } from "@/agents/core/openai-client";
+import { hybridRetrieve } from "@/lib/rag/hybrid-retriever";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
-    const { sources, mode, tone, language, question, messages: history, imageBase64 } = await req.json();
+    const { sources, mode, tone, language, question, messages: history, imageBase64, userId } = await req.json();
 
     // Combine all source texts with attribution markers
     const sourcesContext = (sources as { id: string; title: string; text: string }[])
@@ -58,6 +59,34 @@ CITATION RULES:
 SOURCES:
 ${sourcesContext}`;
 
+    // Enhanced: Optionally enrich with cross-source knowledge graph context
+    let graphContextBlock = "";
+    if (userId && (question || activeMode === "ask")) {
+      try {
+        const retrieval = await hybridRetrieve(
+          question || `Analyze sources in ${activeMode} mode`,
+          userId,
+          { topK: 5, includeGraph: true }
+        );
+        if (retrieval.graphContext.nodes.length > 0) {
+          graphContextBlock = "\n\nCROSS-SOURCE KNOWLEDGE GRAPH CONTEXT:\n";
+          for (const node of retrieval.graphContext.nodes.slice(0, 10)) {
+            graphContextBlock += `- ${node.name} (${node.type}): ${node.description}\n`;
+          }
+          if (retrieval.graphContext.edges.length > 0) {
+            graphContextBlock += "\nRelationships:\n";
+            for (const edge of retrieval.graphContext.edges.slice(0, 10)) {
+              graphContextBlock += `- ${edge.fromName} → [${edge.type}] → ${edge.toName}\n`;
+            }
+          }
+        }
+      } catch (err: any) {
+        console.warn("[Sources Analyze] Graph context enrichment failed:", err.message);
+      }
+    }
+
+    const finalSystemPrompt = systemPrompt + graphContextBlock;
+
     // Build conversation messages — support vision payloads
     const conversationMessages: any[] = [];
 
@@ -98,7 +127,7 @@ ${sourcesContext}`;
       model: "gpt-5.4",
       max_completion_tokens: 4000,
       messages: [
-        { role: "system", content: systemPrompt },
+        { role: "system", content: finalSystemPrompt },
         ...conversationMessages,
       ],
       stream: true,

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Mic, BookOpen, Headphones, ArrowRight, Globe, Sparkles, Shield } from "lucide-react";
+import { Mic, Brain, Headphones, ArrowRight, Globe, Sparkles, Shield } from "lucide-react";
 import { IChancellor } from '@/components/IChancellor';
 import { BrandLogo } from '@/components/BrandLogo';
 import { BrandIdentifier } from '@/components/BrandIdentifier';
@@ -10,24 +10,48 @@ import { useAuth } from '@/context/AuthContext';
 const features = [
   {
     icon: Mic,
-    title: 'Flow Dictation',
-    description: 'Speak naturally. GPT-5.4 turns rambled thoughts into polished, structured writing in real time.',
+    title: '🗣️ Dictate Ideas',
+    description: 'Capture thoughts naturally with AI voice input.',
     color: 'from-blue-500/20 to-blue-600/5',
     glow: 'shadow-blue-500/20',
     iconColor: 'text-blue-400',
   },
   {
-    icon: BookOpen,
-    title: 'Research Mode',
-    description: 'Upload PDFs, docs, websites, and YouTube videos. Ask anything — with citations grounded in your sources.',
+    icon: Globe,
+    title: '📚 Upload Any Source',
+    description: 'PDFs, websites, videos, audio, documents, images, code, and more.',
     color: 'from-purple-500/20 to-purple-600/5',
     glow: 'shadow-purple-500/20',
     iconColor: 'text-purple-400',
   },
   {
+    icon: Brain,
+    title: '🧠 GraphRAG Intelligence',
+    description: 'Connect every source into a living knowledge graph.',
+    color: 'from-cyan-500/20 to-cyan-600/5',
+    glow: 'shadow-cyan-500/20',
+    iconColor: 'text-cyan-400',
+  },
+  {
+    icon: Sparkles,
+    title: '💬 Ask Anything',
+    description: 'Get cited, context-aware answers across your entire workspace.',
+    color: 'from-pink-500/20 to-pink-600/5',
+    glow: 'shadow-pink-500/20',
+    iconColor: 'text-pink-400',
+  },
+  {
+    icon: Shield,
+    title: '📊 Create Instantly',
+    description: 'Reports, presentations, spreadsheets, documents, diagrams, and timelines.',
+    color: 'from-amber-500/20 to-amber-600/5',
+    glow: 'shadow-amber-500/20',
+    iconColor: 'text-amber-400',
+  },
+  {
     icon: Headphones,
-    title: 'Deep Dive Audio',
-    description: 'One click turns your research into an engaging AI podcast — two hosts, your content, zero effort.',
+    title: '🎙️ AI Podcasts',
+    description: 'Turn your knowledge into personalized podcasts you can listen to anywhere.',
     color: 'from-emerald-500/20 to-emerald-600/5',
     glow: 'shadow-emerald-500/20',
     iconColor: 'text-emerald-400',
@@ -35,9 +59,9 @@ const features = [
 ];
 
 const capabilities = [
-  { label: 'Multi-Language Output', icon: Globe },
-  { label: 'Citation Grounding', icon: Sparkles },
-  { label: 'Privacy-Native', icon: Shield },
+  { label: 'LangGraph Orchestration', icon: Brain },
+  { label: 'AI Toolsets & Connectors', icon: Sparkles },
+  { label: 'Privacy-Native RAG', icon: Shield },
 ];
 
 export default function Home() {
@@ -102,8 +126,10 @@ export default function Home() {
           </span>
         </h1>
 
-        <p className="text-xl md:text-2xl text-white/50 max-w-2xl leading-relaxed mb-10 font-light">
-          Dictate, research, and create. Upload any source, ask anything, and listen to an AI podcast of your own content — all in one place.
+        <p className="text-xl md:text-2xl text-white/50 max-w-3xl leading-relaxed mb-10 font-light">
+          <strong>One Workspace. Unlimited Knowledge. Infinite Possibilities.</strong>
+          <br /><br />
+          Dictate ideas, upload any source, and let AI connect everything into a living GraphRAG knowledge graph. Ask complex questions, uncover insights, generate professional reports, presentations, spreadsheets, and documents, then listen to AI-generated podcasts built from your own knowledge—all from a single intelligent workspace.
         </p>
 
         {/* CTAs */}
@@ -139,7 +165,7 @@ export default function Home() {
 
       {/* ── Feature Cards ── */}
       <section className="relative z-10 max-w-6xl mx-auto px-8 pb-32">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map(({ icon: Icon, title, description, color, glow, iconColor }) => (
             <div
               key={title}

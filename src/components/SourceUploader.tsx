@@ -4,12 +4,13 @@ import { useState, useRef } from "react";
 import { Upload, Link2, Loader2, FileText, Globe, Video, Music, X, AlertCircle, Table2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { extractDocumentText } from "@/actions/document";
+import { useAuth } from "@/context/AuthContext";
 
 export interface Source {
   id: string;
   title: string;
   text: string;
-  type: "pdf" | "docx" | "txt" | "audio" | "youtube" | "website" | "spreadsheet";
+  type: "pdf" | "docx" | "txt" | "audio" | "youtube" | "website" | "spreadsheet" | "video";
 }
 
 interface SourceUploaderProps {
@@ -18,13 +19,49 @@ interface SourceUploaderProps {
   maxSources?: number;
 }
 
-export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: SourceUploaderProps) {
+export function SourceUploader({ sources, onSourcesChange, maxSources = 25 }: SourceUploaderProps) {
+  const { user } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
   const [urlInput, setUrlInput] = useState("");
   const [isExtractingUrl, setIsExtractingUrl] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const triggerIngest = async (id: string, title: string, type: string, text: string) => {
+    if (!user) return;
+    try {
+      fetch("/api/knowledge/ingest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id,
+          userId: user.uid,
+          title,
+          type,
+          text,
+        }),
+      }).catch(console.warn);
+    } catch (e) {
+      console.warn("Background ingestion trigger failed", e);
+    }
+  };
+
+  const triggerDelete = async (id: string) => {
+    if (!user) return;
+    try {
+      fetch("/api/knowledge/ingest", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.uid,
+          sourceId: id,
+        }),
+      }).catch(console.warn);
+    } catch (e) {
+      console.warn("Background delete trigger failed", e);
+    }
+  };
 
   const handleFiles = async (files: FileList) => {
     if (sources.length >= maxSources) return;
@@ -41,18 +78,22 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
         const typeMap: Record<string, Source["type"]> = {
           pdf: "pdf", docx: "docx", txt: "txt",
           mp3: "audio", wav: "audio", webm: "audio", m4a: "audio",
+          mp4: "video", mov: "video",
           xlsx: "spreadsheet", xls: "spreadsheet", csv: "spreadsheet",
         };
 
+        const generatedId = crypto.randomUUID();
+        const type = typeMap[ext] || "txt";
         onSourcesChange([
           ...sources,
           {
-            id: crypto.randomUUID(),
+            id: generatedId,
             title: file.name,
             text,
-            type: typeMap[ext] || "txt",
+            type,
           },
         ]);
+        triggerIngest(generatedId, file.name, type, text);
       } catch (err) {
         console.error("File processing error:", err);
       }
@@ -74,15 +115,18 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
         const csvRes = await fetch(urlInput);
         if (!csvRes.ok) throw new Error("Could not fetch the spreadsheet. Make sure it is published to the web.");
         const csv = await csvRes.text();
+        const generatedId = crypto.randomUUID();
+        const title = urlInput.includes("docs.google.com") ? "Google Sheet" : urlInput.split("/").pop() || "Spreadsheet";
         onSourcesChange([
           ...sources,
           {
-            id: crypto.randomUUID(),
-            title: urlInput.includes("docs.google.com") ? "Google Sheet" : urlInput.split("/").pop() || "Spreadsheet",
+            id: generatedId,
+            title,
             text: csv,
             type: "spreadsheet",
           },
         ]);
+        triggerIngest(generatedId, title, "spreadsheet", csv);
         setUrlInput("");
       } else {
       const res = await fetch("/api/sources/extract-url", {
@@ -92,15 +136,19 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
       });
       const data = await res.json();
       if (data.text) {
+        const generatedId = crypto.randomUUID();
+        const title = data.title || urlInput;
+        const type = data.type === "youtube" ? "youtube" : "website";
         onSourcesChange([
           ...sources,
           {
-            id: crypto.randomUUID(),
-            title: data.title || urlInput,
+            id: generatedId,
+            title,
             text: data.text,
-            type: data.type === "youtube" ? "youtube" : "website",
+            type,
           },
         ]);
+        triggerIngest(generatedId, title, type, data.text);
         setUrlInput("");
       } else if (data.error) {
         setError(data.error);
@@ -115,6 +163,7 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
 
   const removeSource = (id: string) => {
     onSourcesChange(sources.filter((s) => s.id !== id));
+    triggerDelete(id);
   };
 
   const typeIcons: Record<string, React.ReactNode> = {
@@ -122,6 +171,7 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
     docx: <FileText className="w-4 h-4 text-blue-500" />,
     txt: <FileText className="w-4 h-4 text-foreground/50" />,
     audio: <Music className="w-4 h-4 text-purple-500" />,
+    video: <Video className="w-4 h-4 text-purple-500" />,
     youtube: <Video className="w-4 h-4 text-red-500" />,
     website: <Globe className="w-4 h-4 text-green-500" />,
     spreadsheet: <Table2 className="w-4 h-4 text-emerald-500" />,
@@ -147,7 +197,7 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
           ref={fileInputRef}
           type="file"
           multiple
-          accept=".pdf,.docx,.txt,.mp3,.wav,.webm,.m4a,.xlsx,.xls,.csv"
+          accept=".pdf,.docx,.txt,.mp3,.wav,.webm,.m4a,.mp4,.mov,.xlsx,.xls,.csv"
           className="hidden"
           onChange={(e) => e.target.files && handleFiles(e.target.files)}
         />
@@ -162,7 +212,7 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 10 }: So
               {isUploading ? "Processing..." : "Drop files here or click to upload"}
             </p>
             <p className="text-[10px] uppercase tracking-widest text-foreground/70 dark:text-white/80 mt-1">
-              PDF · DOCX · TXT · MP3 · WAV · XLSX · CSV
+              PDF · DOCX · TXT · MP3 · WAV · MP4 · MOV · XLSX · CSV
             </p>
           </div>
         </div>
