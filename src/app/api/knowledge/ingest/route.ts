@@ -18,7 +18,7 @@ export const maxDuration = 300; // 5 minutes for large documents
  */
 export async function POST(req: NextRequest) {
   try {
-    const { id, userId, title, type, text, sourceUrl, projectId } = await req.json();
+    const { id, userId, title, type, text, sourceUrl, projectId, forceRebuild } = await req.json();
 
     if (!userId) {
       return NextResponse.json({ error: "userId is required" }, { status: 400 });
@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
       text,
       sourceUrl,
       originProjectId: projectId,
+      forceRebuild,
     });
 
     if (isDuplicate) {

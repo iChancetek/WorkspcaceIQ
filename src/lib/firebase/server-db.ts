@@ -63,17 +63,26 @@ export async function registerKnowledgeSource(
     text: string;
     sourceUrl?: string;
     originProjectId?: string;
+    forceRebuild?: boolean;
   }
 ): Promise<{ sourceId: string; isDuplicate: boolean }> {
   const contentHash = hashContent(data.text);
   const sourcesRef = adminDb.collection("users").doc(uid).collection("knowledge_sources");
+  const sourceId = data.id || sourcesRef.doc().id;
 
-  const existingSnap = await sourcesRef.where("contentHash", "==", contentHash).limit(1).get();
-  if (!existingSnap.empty) {
-    return { sourceId: existingSnap.docs[0].id, isDuplicate: true };
+  if (data.forceRebuild) {
+    try {
+      await deleteNodesAndEdgesBySource(uid, sourceId);
+    } catch (err: any) {
+      console.warn(`[registerKnowledgeSource] Failed to clean old graph for ${sourceId}:`, err.message);
+    }
+  } else {
+    const existingSnap = await sourcesRef.where("contentHash", "==", contentHash).limit(1).get();
+    if (!existingSnap.empty) {
+      return { sourceId: existingSnap.docs[0].id, isDuplicate: true };
+    }
   }
 
-  const sourceId = data.id || sourcesRef.doc().id;
   await sourcesRef.doc(sourceId).set({
     id: sourceId,
     uid,

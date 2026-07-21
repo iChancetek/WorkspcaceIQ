@@ -133,6 +133,7 @@ export default function Dashboard() {
             title: s.title,
             type: s.type,
             text: s.text,
+            forceRebuild: true,
           }),
         });
       }
