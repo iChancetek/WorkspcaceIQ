@@ -5,7 +5,7 @@ import {
   Headphones, CreditCard, HelpCircle, GitBranch, FileText,
   Layout, Table2, BarChart3, Video, Loader2, Play,
   Download, RefreshCw, ChevronRight, ChevronLeft, Sparkles, X, Square,
-  Save, Check
+  Save, Check, Copy
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Source } from "./SourceUploader";
@@ -439,6 +439,7 @@ export function Studio({ userId, sources, tone, language, studioOutputs, onNavig
   const [selectedReportType, setSelectedReportType] = useState<"standard" | "deep-dive">("standard");
   const [selectedFont, setSelectedFont] = useState<"georgia" | "times" | "inter" | "helvetica">("georgia");
   const [showChecklist, setShowChecklist] = useState(true);
+  const [copied, setCopied] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -631,6 +632,37 @@ export function Studio({ userId, sources, tone, language, studioOutputs, onNavig
     }
   };
 
+  const copyToClipboard = async () => {
+    const parsed = parseReportStream(streamText);
+    const reportHtml = parsed.reportHtml || streamText;
+    const cleanPlainText = reportHtml
+      .replace(/<[^>]+>/g, "")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">");
+
+    try {
+      const clipboardItem = new ClipboardItem({
+        "text/plain": new Blob([cleanPlainText], { type: "text/plain" }),
+        "text/html": new Blob([reportHtml], { type: "text/html" }),
+      });
+      await navigator.clipboard.write([clipboardItem]);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.warn("HTML clipboard copy failed, falling back to text copy:", err);
+      try {
+        await navigator.clipboard.writeText(cleanPlainText);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (fallbackErr) {
+        console.error("Text clipboard copy failed too:", fallbackErr);
+        setError("Failed to copy to clipboard.");
+      }
+    }
+  };
+
   const currentMode = MODES.find(m => m.id === activeMode)!;
   const hasOutput = streamText || jsonData;
   const flashcards = jsonData ? (Array.isArray(jsonData) ? jsonData : jsonData.flashcards || []) : [];
@@ -665,6 +697,12 @@ export function Studio({ userId, sources, tone, language, studioOutputs, onNavig
             {isGenerating && <button onClick={cancelGeneration} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-400 text-xs font-bold border border-red-500/30 transition-colors"><Square className="w-3 h-3 fill-current" /> Stop</button>}
             {hasOutput && !isGenerating && (
               <>
+                {activeMode === "report" && (
+                  <button onClick={copyToClipboard} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 text-xs font-bold border border-emerald-500/30 transition-colors group">
+                    {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copied ? "Copied!" : "Copy for Substack"}
+                  </button>
+                )}
                 <button onClick={onManualSave} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-violet-500/20 hover:bg-violet-500/30 text-violet-400 text-xs font-bold border border-violet-500/30 transition-colors group"><Save className="w-3.5 h-3.5" /> Save</button>
                 <button onClick={() => generate()} className="p-2 rounded-xl bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 text-foreground/40 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-colors"><RefreshCw className="w-4 h-4" /></button>
               </>
