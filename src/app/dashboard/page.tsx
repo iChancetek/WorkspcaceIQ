@@ -41,6 +41,7 @@ import {
   softDeleteProject,
   ResearchProject,
 } from "@/lib/firebase/projects";
+import { saveItem } from "@/lib/firebase/items";
 
 // ─── Static Data ──────────────────────────────────────────────────────────────
 
@@ -372,6 +373,26 @@ export default function Dashboard() {
       if (project.metadata.language) setActiveLanguage(project.metadata.language);
       if (project.metadata.deepDiveTranscript) setDeepDiveTranscript(project.metadata.deepDiveTranscript);
       setActiveTab("research");
+    }
+  };
+
+  const handleDeepDiveGenerated = async (transcriptText: string) => {
+    setDeepDiveTranscript(transcriptText);
+    if (user) {
+      try {
+        await saveItem(user.uid, "deepdive", {
+          title: `Deep Dive Podcast: ${activeProject?.name || "Workspace Overview"}`,
+          content: transcriptText,
+          metadata: {
+            language: activeLanguage,
+            sourcesCount: sources.length,
+            projectId: activeProjectId,
+          },
+        });
+        console.log("[Library] Deep Dive podcast auto-saved to library.");
+      } catch (err) {
+        console.warn("[Library] Failed to auto-save podcast to library:", err);
+      }
     }
   };
 
@@ -871,7 +892,7 @@ export default function Dashboard() {
               <DeepDive
                 sources={sources}
                 language={activeLanguage}
-                onTranscriptGenerated={setDeepDiveTranscript}
+                onTranscriptGenerated={handleDeepDiveGenerated}
               />
             </section>
 

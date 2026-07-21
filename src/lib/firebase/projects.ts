@@ -11,6 +11,7 @@ import {
   onSnapshot,
   serverTimestamp,
   Timestamp,
+  getDocs,
 } from "firebase/firestore";
 import { db } from "./config";
 
@@ -113,6 +114,21 @@ export async function recoverProject(uid: string, id: string): Promise<void> {
 
 export async function hardDeleteProject(uid: string, id: string): Promise<void> {
   await deleteDoc(projectDocRef(uid, id));
+}
+
+// ─── Purge expired workspaces (>30 days) ──────────────────────────────────
+
+export async function purgeExpiredProjects(uid: string): Promise<void> {
+  const cutoff = Timestamp.fromDate(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000));
+  const q = query(projectsCol(uid));
+  const snap = await getDocs(q);
+
+  const toDelete = snap.docs.filter((d) => {
+    const data = d.data();
+    return data.isDeleted === true && data.deletedAt && data.deletedAt.toMillis() <= cutoff.toMillis();
+  });
+
+  await Promise.all(toDelete.map((d) => deleteDoc(d.ref)));
 }
 
 // ─── Subscriptions ──────────────────────────────────────────────────────────

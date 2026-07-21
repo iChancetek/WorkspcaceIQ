@@ -21,6 +21,7 @@ import {
   recoverProject,
   hardDeleteProject,
   updateProject,
+  purgeExpiredProjects,
 } from "@/lib/firebase/projects";
 import { Timestamp } from "firebase/firestore";
 import { generateProjectMarkdown, downloadFile } from "@/lib/export";
@@ -389,7 +390,10 @@ export function Library({
   }, [user]);
 
   useEffect(() => {
-    if (user) purgeExpiredItems(user.uid).catch(console.warn);
+    if (user) {
+      purgeExpiredItems(user.uid).catch(console.warn);
+      purgeExpiredProjects(user.uid).catch(console.warn);
+    }
   }, [user]);
 
   const handleDelete = useCallback(async (id: string) => {
