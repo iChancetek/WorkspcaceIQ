@@ -31,4 +31,6 @@ secrets:
     secret: PINECONE_API_KEY
   - variable: PINECONE_INDEX_HOST
     secret: PINECONE_INDEX_HOST
+  - variable: FIREBASE_SERVICE_ACCOUNT_KEY
+    secret: FIREBASE_SERVICE_ACCOUNT_KEY
 
