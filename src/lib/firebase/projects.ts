@@ -122,12 +122,18 @@ export function subscribeToProjects(
   callback: (projects: ResearchProject[]) => void
 ) {
   const q = query(projectsCol(uid), orderBy("updatedAt", "desc"));
-  return onSnapshot(q, (snap) => {
-    const projects = snap.docs
-      .map((d) => ({ id: d.id, ...d.data() } as ResearchProject))
-      .filter((p) => !p.isDeleted);
-    callback(projects);
-  });
+  return onSnapshot(
+    q,
+    (snap) => {
+      const projects = snap.docs
+        .map((d) => ({ id: d.id, ...d.data() } as ResearchProject))
+        .filter((p) => !p.isDeleted);
+      callback(projects);
+    },
+    (err) => {
+      console.warn("[Projects] Subscription error:", err.message);
+    }
+  );
 }
 
 export function subscribeToDeletedProjects(
@@ -135,10 +141,16 @@ export function subscribeToDeletedProjects(
   callback: (projects: ResearchProject[]) => void
 ) {
   const q = query(projectsCol(uid), orderBy("updatedAt", "desc"));
-  return onSnapshot(q, (snap) => {
-    const projects = snap.docs
-      .map((d) => ({ id: d.id, ...d.data() } as ResearchProject))
-      .filter((p) => p.isDeleted);
-    callback(projects);
-  });
+  return onSnapshot(
+    q,
+    (snap) => {
+      const projects = snap.docs
+        .map((d) => ({ id: d.id, ...d.data() } as ResearchProject))
+        .filter((p) => p.isDeleted);
+      callback(projects);
+    },
+    (err) => {
+      console.warn("[DeletedProjects] Subscription error:", err.message);
+    }
+  );
 }

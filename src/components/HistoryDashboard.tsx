@@ -3,20 +3,27 @@
 import { useEffect, useState } from "react";
 import { FileAudio, FileText, Globe, Loader2 } from "lucide-react";
 import { subscribeToSessions, SessionDoc } from "@/lib/firebase/firestore";
+import { useAuth } from "@/context/AuthContext";
 
 export function HistoryDashboard() {
+  const { user } = useAuth();
   const [historyItems, setHistoryItems] = useState<(SessionDoc & { time: string })[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Subscribing to real-time updates from Firebase Firestore
+    if (!user) {
+      setIsLoading(false);
+      return;
+    }
+    
+    // Subscribing to real-time updates from Firebase Firestore only if authenticated
     const unsubscribe = subscribeToSessions((sessions) => {
       setHistoryItems(sessions);
       setIsLoading(false);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [user]);
 
   if (isLoading) {
     return (

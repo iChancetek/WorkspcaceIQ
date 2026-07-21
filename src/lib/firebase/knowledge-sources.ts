@@ -171,12 +171,18 @@ export function subscribeToKnowledgeSources(
 ) {
   const q = query(sourcesCol(uid), orderBy("createdAt", "desc"), limit(100));
 
-  return onSnapshot(q, (snap) => {
-    const sources = snap.docs.map(
-      (d) => ({ id: d.id, ...d.data() } as KnowledgeSource)
-    );
-    callback(sources);
-  });
+  return onSnapshot(
+    q,
+    (snap) => {
+      const sources = snap.docs.map(
+        (d) => ({ id: d.id, ...d.data() } as KnowledgeSource)
+      );
+      callback(sources);
+    },
+    (err) => {
+      console.warn("[KnowledgeSources] Subscription error:", err.message);
+    }
+  );
 }
 
 // ─── Get Processing Sources ─────────────────────────────────────────────────
@@ -191,12 +197,18 @@ export function subscribeToProcessingSources(
     limit(20)
   );
 
-  return onSnapshot(q, (snap) => {
-    const sources = snap.docs.map(
-      (d) => ({ id: d.id, ...d.data() } as KnowledgeSource)
-    );
-    callback(sources);
-  });
+  return onSnapshot(
+    q,
+    (snap) => {
+      const sources = snap.docs.map(
+        (d) => ({ id: d.id, ...d.data() } as KnowledgeSource)
+      );
+      callback(sources);
+    },
+    (err) => {
+      console.warn("[ProcessingSources] Subscription error:", err.message);
+    }
+  );
 }
 
 // ─── Get Source Stats ───────────────────────────────────────────────────────
