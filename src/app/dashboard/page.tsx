@@ -445,9 +445,7 @@ export default function Dashboard() {
 
   // ── Derived ────────────────────────────────────────────────────────────────
 
-  const initials = user?.displayName
-    ? user.displayName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
-    : user?.email?.[0]?.toUpperCase() ?? "C";
+  const displayName = user?.displayName || user?.email?.split("@")[0] || "User";
 
   const showSharedControls = activeTab === "research" || activeTab === "deepdive";
   const activeProject = projects.find((p) => p.id === activeProjectId) ?? null;
@@ -512,10 +510,14 @@ export default function Dashboard() {
               </span>
               <ThemeToggle />
               {user?.photoURL ? (
-                <img src={user.photoURL} alt={initials} className="w-8 h-8 rounded-full object-cover shadow-lg ring-2 ring-foreground/10" />
+                <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-foreground/5 dark:bg-white/5 border border-foreground/10 dark:border-white/10 shadow-sm">
+                  <img src={user.photoURL} alt={displayName} className="w-5 h-5 rounded-full object-cover ring-1 ring-foreground/10" />
+                  <span className="text-xs font-bold text-foreground dark:text-white">{displayName}</span>
+                </div>
               ) : (
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 via-violet-400 to-emerald-400 flex items-center justify-center text-xs font-bold shadow-lg">
-                  {initials}
+                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-foreground/5 dark:bg-white/5 border border-foreground/10 dark:border-white/10 text-xs font-bold text-foreground dark:text-white shadow-sm">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>{displayName}</span>
                 </div>
               )}
               <button
@@ -542,19 +544,19 @@ export default function Dashboard() {
                 className={cn(
                   "relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200",
                   activeTab === tab.id
-                    ? "text-white shadow-lg"
-                    : "text-black dark:text-white/60 hover:text-blue-600 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-white/5"
+                    ? "text-white dark:text-white shadow-lg"
+                    : "text-foreground dark:text-white hover:text-blue-600 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-white/10"
                 )}
               >
                 {activeTab === tab.id && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute inset-0 bg-blue-600 dark:bg-white/10 border border-blue-500/30 dark:border-white/15 rounded-xl -z-10 shadow-md shadow-blue-500/20 dark:shadow-[0_0_20px_rgba(255,255,255,0.03)]"
+                    className="absolute inset-0 bg-blue-600 dark:bg-white/15 border border-blue-500/30 dark:border-white/20 rounded-xl -z-10 shadow-md shadow-blue-500/20 dark:shadow-[0_0_20px_rgba(255,255,255,0.05)]"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
-                <tab.icon className={cn("w-4 h-4", activeTab === tab.id ? tab.color : "")} />
-                {tab.label}
+                <tab.icon className={cn("w-4 h-4", activeTab === tab.id ? tab.color : "text-foreground/70 dark:text-white")} />
+                <span className="dark:text-white font-bold">{tab.label}</span>
               </motion.button>
             ))}
           </nav>

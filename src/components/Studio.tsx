@@ -437,7 +437,7 @@ export function Studio({ userId, sources, tone, language, studioOutputs, onNavig
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [autoAdvance, setAutoAdvance] = useState(false);
   const [selectedReportType, setSelectedReportType] = useState<"standard" | "deep-dive">("standard");
-  const [selectedFont, setSelectedFont] = useState<"georgia" | "times" | "inter" | "helvetica">("georgia");
+  const [selectedFont, setSelectedFont] = useState<"georgia" | "times" | "inter" | "helvetica" | "sourcesans" | "ibmplex" | "charter">("georgia");
   const [showChecklist, setShowChecklist] = useState(true);
   const [copied, setCopied] = useState(false);
   const [reportAudioUrl, setReportAudioUrl] = useState<string | null>(null);
@@ -688,21 +688,30 @@ export function Studio({ userId, sources, tone, language, studioOutputs, onNavig
     if (activeMode === "report") {
       const parsed = parseReportStream(text);
       const cleanHtml = parsed.reportHtml || text;
+      const fontStack = 
+        selectedFont === "georgia" ? "Georgia, serif" :
+        selectedFont === "times" ? "'Times New Roman', Times, serif" :
+        selectedFont === "inter" ? "'Inter Variable', sans-serif" :
+        selectedFont === "helvetica" ? "'Helvetica Neue', Helvetica, sans-serif" :
+        selectedFont === "sourcesans" ? "'Source Sans Pro', sans-serif" :
+        selectedFont === "ibmplex" ? "'IBM Plex Sans', sans-serif" :
+        "Charter, Georgia, serif";
+
       const blob = new Blob([`<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
-  <title>WorkSpaceIQ Report</title>
+  <title>WorkSpaceIQ Elite Executive Report</title>
   <style>
-    body { font-family: Georgia, serif; line-height: 1.8; color: #111827; max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    h1 { font-size: 2.25rem; font-weight: 800; line-height: 1.15; margin-bottom: 0.5rem; color: #000000; }
-    .subtitle { font-family: sans-serif; font-size: 1.1rem; color: #4b5563; margin-bottom: 2rem; }
-    h2 { font-size: 1.5rem; font-weight: 700; margin-top: 2.5rem; margin-bottom: 1rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; color: #000000; }
-    h3 { font-family: sans-serif; font-size: 1.15rem; font-weight: 600; margin-top: 1.75rem; margin-bottom: 0.75rem; color: #1f2937; }
-    p { margin-bottom: 1.25rem; text-align: justify; }
-    blockquote.pull-quote { font-size: 1.35rem; font-style: italic; color: #1e3a8a; border-left: 4px solid #3b82f6; padding-left: 1.5rem; margin: 2rem 0; }
-    .callout { background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #64748b; padding: 1.25rem; border-radius: 0.75rem; margin: 1.75rem 0; font-size: 0.95rem; color: #334155; }
-    .insight-box { background-color: #f0fdf4; border: 1px solid #bbf7d0; border-left: 4px solid #22c55e; padding: 1.25rem; border-radius: 0.75rem; margin: 1.75rem 0; font-size: 0.95rem; color: #166534; }
+    body { font-family: ${fontStack}; line-height: 1.8; color: #000000; max-width: 860px; margin: 40px auto; padding: 0 24px; background-color: #ffffff; }
+    h1 { font-size: 2.5rem; font-weight: 800; line-height: 1.15; margin-bottom: 0.5rem; color: #000000; letter-spacing: -0.025em; }
+    .subtitle { font-size: 1.15rem; color: #374151; margin-bottom: 2.25rem; font-weight: 600; line-height: 1.5; border-bottom: 2px solid #000000; padding-bottom: 1rem; }
+    h2 { font-size: 1.5rem; font-weight: 700; margin-top: 2.5rem; margin-bottom: 1rem; border-bottom: 2px solid #000000; padding-bottom: 0.5rem; color: #000000; letter-spacing: -0.02em; }
+    h3 { font-size: 1.2rem; font-weight: 700; margin-top: 1.75rem; margin-bottom: 0.75rem; color: #1f2937; }
+    p { margin-bottom: 1.25rem; text-align: justify; color: #000000; }
+    blockquote.pull-quote { font-family: ${fontStack}; font-size: 1.35rem; font-style: italic; color: #1d4ed8; border-left: 4px solid #2563eb; padding-left: 1.5rem; margin: 2rem 0; line-height: 1.6; }
+    .callout { background-color: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #2563eb; padding: 1.25rem; border-radius: 0.75rem; margin: 1.75rem 0; font-size: 0.95rem; color: #000000; line-height: 1.6; }
+    .insight-box { background-color: #f0fdf4; border: 1px solid #bbf7d0; border-left: 4px solid #22c55e; padding: 1.25rem; border-radius: 0.75rem; margin: 1.75rem 0; font-size: 0.95rem; color: #166534; line-height: 1.6; }
     table.report-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.9rem; }
     table.report-table th { background-color: #f1f5f9; border-bottom: 2px solid #cbd5e1; padding: 0.75rem 1rem; font-weight: 700; text-align: left; color: #1e293b; }
     table.report-table td { border-bottom: 1px solid #e2e8f0; padding: 0.75rem 1rem; color: #334155; }
@@ -876,7 +885,7 @@ export function Studio({ userId, sources, tone, language, studioOutputs, onNavig
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-black/10 dark:border-white/10 pb-4 mb-4">
                     <div className="flex items-center flex-wrap gap-2">
                       <span className="text-[10px] font-black uppercase tracking-wider text-foreground/50 dark:text-white/50">Typography:</span>
-                      {(["georgia", "times", "inter", "helvetica"] as const).map(font => (
+                      {(["georgia", "times", "inter", "helvetica", "sourcesans", "ibmplex", "charter"] as const).map(font => (
                         <button
                           key={font}
                           onClick={() => setSelectedFont(font)}
@@ -887,7 +896,7 @@ export function Studio({ userId, sources, tone, language, studioOutputs, onNavig
                               : "bg-foreground/5 dark:bg-white/5 border-foreground/10 dark:border-white/10 text-foreground/60 dark:text-white/60 hover:bg-foreground/10 dark:hover:bg-white/10"
                           )}
                         >
-                          {font === "times" ? "Times New Roman" : font}
+                          {font === "times" ? "Times New Roman" : font === "sourcesans" ? "Source Sans" : font === "ibmplex" ? "IBM Plex" : font}
                         </button>
                       ))}
                     </div>

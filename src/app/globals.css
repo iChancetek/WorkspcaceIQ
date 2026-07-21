@@ -154,6 +154,18 @@
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+.editorial-report.font-sourcesans {
+  font-family: "Source Sans Pro", "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.editorial-report.font-ibmplex {
+  font-family: "IBM Plex Sans", "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.editorial-report.font-charter {
+  font-family: Charter, "Bitstream Charter", "Georgia", serif;
+}
+
 /* Content Elements Styling */
 .editorial-report h1 {
   font-size: 2.25rem;
