@@ -472,12 +472,11 @@ export default function Dashboard() {
     <AuthGuard>
       <main className="min-h-screen bg-background text-foreground relative overflow-x-hidden">
 
-        {/* Aurora backgrounds */}
+        {/* Aurora backgrounds & bottom radial glow matching attachment */}
         <div className="pointer-events-none fixed inset-0 z-0">
-          <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-blue-600/10 dark:bg-blue-600/20 blur-[120px]" />
-          <div className="absolute top-[-10%] right-[-15%] w-[500px] h-[500px] rounded-full bg-violet-600/10 dark:bg-violet-600/15 blur-[130px]" />
-          <div className="absolute bottom-[10%] left-[30%] w-[400px] h-[400px] rounded-full bg-teal-500/5 dark:bg-teal-500/10 blur-[100px]" />
-          <div className="absolute bottom-[-5%] right-[5%] w-[350px] h-[350px] rounded-full bg-amber-500/5 dark:bg-amber-500/8 blur-[100px]" />
+          <div className="absolute top-[-20%] left-[-10%] w-[650px] h-[650px] rounded-full bg-blue-600/10 dark:bg-indigo-600/25 blur-[140px]" />
+          <div className="absolute top-[-10%] right-[-15%] w-[550px] h-[550px] rounded-full bg-violet-600/10 dark:bg-purple-600/20 blur-[140px]" />
+          <div className="absolute bottom-[-10%] left-[15%] right-[15%] h-[320px] rounded-full bg-indigo-500/15 dark:bg-indigo-500/30 blur-[130px]" />
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto px-6 py-8 md:py-12 space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">

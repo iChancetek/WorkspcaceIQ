@@ -20,29 +20,29 @@
 }
 
 :root {
-  --background: #fdfdfb;
+  --background: #f8fafc;
   --foreground: #0f172a;
-  --primary: #1e293b;
-  --primary-foreground: #fdfdfb;
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
   --secondary: #f1f5f9;
   --secondary-foreground: #0f172a;
-  --accent: #3b82f6; 
+  --accent: #4f46e5; 
   --accent-foreground: #ffffff;
   --border: #e2e8f0;
-  --card: rgba(0, 0, 0, 0.03);
+  --card: rgba(255, 255, 255, 0.85);
 }
 
 .dark {
-  --background: #050508;
-  --foreground: #ffffff;
-  --primary: #f0f0f0;
-  --primary-foreground: #050508;
-  --secondary: #1a1a1a;
-  --secondary-foreground: #ffffff;
-  --accent: #3b82f6; 
+  --background: #18153b;
+  --foreground: #f8fafc;
+  --primary: #818cf8;
+  --primary-foreground: #18153b;
+  --secondary: #1f1b4a;
+  --secondary-foreground: #f8fafc;
+  --accent: #6366f1; 
   --accent-foreground: #ffffff;
-  --border: #ffffff15;
-  --card: rgba(255, 255, 255, 0.04);
+  --border: rgba(129, 140, 248, 0.18);
+  --card: rgba(30, 26, 75, 0.65);
 }
 
 @layer base {
@@ -76,6 +76,28 @@
   .dark-card {
     @apply bg-card border border-border rounded-2xl backdrop-blur-sm transition-all duration-200;
   }
+}
+
+/* Sleek Scrollbar matching image attachment */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.15);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 23, 42, 0.3);
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(129, 140, 248, 0.22);
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(129, 140, 248, 0.45);
 }
 
 /* ─── Editorial Report Custom Typography & Layout ─── */

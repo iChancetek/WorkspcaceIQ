@@ -20,11 +20,11 @@ export function ThemeToggle() {
     <button
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       className={cn(
-        "relative p-2 rounded-xl transition-all duration-300",
-        "bg-white/5 border border-white/10 hover:bg-white/10",
-        "dark:bg-white/5 dark:border-white/10 dark:hover:bg-white/10"
+        "relative flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-300 shadow-sm",
+        "bg-white/80 border border-slate-200 hover:bg-slate-100/80 text-slate-700",
+        "dark:bg-[#1E1A4A]/80 dark:border-indigo-400/20 dark:hover:bg-[#25205C] dark:text-indigo-200"
       )}
-      title="Toggle Theme"
+      title={theme === "dark" ? "Switch to Alpine Light Mode" : "Switch to Royal Indigo Dark Mode"}
     >
       <AnimatePresence mode="wait" initial={false}>
         {theme === "dark" ? (
@@ -34,8 +34,10 @@ export function ThemeToggle() {
             animate={{ opacity: 1, rotate: 0, scale: 1 }}
             exit={{ opacity: 0, rotate: 90, scale: 0.5 }}
             transition={{ duration: 0.2 }}
+            className="flex items-center gap-1.5"
           >
-            <Moon className="w-4 h-4 text-violet-400" />
+            <Moon className="w-3.5 h-3.5 text-indigo-400" />
+            <span className="text-[11px] font-semibold tracking-tight">Dark Indigo</span>
           </motion.div>
         ) : (
           <motion.div
@@ -44,8 +46,10 @@ export function ThemeToggle() {
             animate={{ opacity: 1, rotate: 0, scale: 1 }}
             exit={{ opacity: 0, rotate: -90, scale: 0.5 }}
             transition={{ duration: 0.2 }}
+            className="flex items-center gap-1.5"
           >
-            <Sun className="w-4 h-4 text-amber-400" />
+            <Sun className="w-3.5 h-3.5 text-amber-500" />
+            <span className="text-[11px] font-semibold tracking-tight">Light Mode</span>
           </motion.div>
         )}
       </AnimatePresence>
