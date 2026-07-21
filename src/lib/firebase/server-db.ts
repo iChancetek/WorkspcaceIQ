@@ -1,10 +1,41 @@
-import { initializeApp, getApps } from "firebase-admin/app";
+import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
+import fs from "fs";
+import path from "path";
 
 if (!getApps().length) {
-  initializeApp({
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "chancescribe",
-  });
+  const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+  const saPath = path.join(process.cwd(), "firebase-service-account.json");
+
+  if (serviceAccountKey) {
+    try {
+      const parsed = JSON.parse(serviceAccountKey);
+      initializeApp({ credential: cert(parsed) });
+      console.log("[server-db] Initialized with inline service account key");
+    } catch (e) {
+      console.warn("[server-db] Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY, falling back to projectId");
+      initializeApp({
+        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "chancescribe",
+      });
+    }
+  } else if (fs.existsSync(saPath)) {
+    try {
+      const parsed = JSON.parse(fs.readFileSync(saPath, "utf8"));
+      initializeApp({ credential: cert(parsed) });
+      console.log("[server-db] Initialized with local service account JSON file");
+    } catch (e) {
+      console.warn("[server-db] Failed to read firebase-service-account.json, falling back to projectId");
+      initializeApp({
+        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "chancescribe",
+      });
+    }
+  } else {
+    // Falls back to GOOGLE_APPLICATION_CREDENTIALS or ADC
+    initializeApp({
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "chancescribe",
+    });
+    console.log("[server-db] Initialized with projectId (using ADC or GOOGLE_APPLICATION_CREDENTIALS)");
+  }
 }
 
 export const adminDb = getFirestore();
