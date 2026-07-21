@@ -141,6 +141,20 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
     }
   };
 
+  const prevLanguageRef = useRef(language);
+
+  useEffect(() => {
+    if (prevLanguageRef.current !== language) {
+      prevLanguageRef.current = language;
+      const targetLang = POPULAR_LANGUAGES.find(l => l.id.toLowerCase() === language?.toLowerCase())?.id || "English";
+      setSelectedLanguage(targetLang);
+
+      if (audioUrl && !isGenerating) {
+        generateDeepDive();
+      }
+    }
+  }, [language, audioUrl, isGenerating]);
+
   const togglePlayback = () => {
     if (!audioUrl) return;
 

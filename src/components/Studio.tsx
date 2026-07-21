@@ -661,6 +661,21 @@ export function Studio({ userId, sources, tone, language, studioOutputs, onNavig
     } finally { setIsGenerating(false); }
   };
 
+  const prevLanguageRef = useRef(language);
+
+  useEffect(() => {
+    if (prevLanguageRef.current !== language) {
+      prevLanguageRef.current = language;
+      stopReportAudio();
+      setReportAudioUrl(null);
+      setReportAudioBlob(null);
+
+      if (sources.length > 0 && (streamText || jsonData) && !isGenerating) {
+        generate();
+      }
+    }
+  }, [language, sources, streamText, jsonData, isGenerating]);
+
   const downloadText = (text: string, filename: string) => {
     const blob = new Blob([text], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
