@@ -16,16 +16,16 @@ interface ToneSelectorProps {
 
 export function ToneSelector({ activeTone, onToneChange }: ToneSelectorProps) {
   return (
-    <div className="flex flex-nowrap items-center gap-2 p-1 bg-white/10 rounded-full border border-white/10 overflow-x-auto scrollbar-hide max-w-full">
+    <div className="flex flex-nowrap items-center gap-2 p-1 bg-slate-100 dark:bg-white/10 rounded-full border border-slate-200 dark:border-white/10 overflow-x-auto scrollbar-hide max-w-full">
       {TONES.map((tone) => (
         <button
           key={tone.id}
           onClick={() => onToneChange(tone.id)}
           className={cn(
-            "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all",
+            "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all",
             activeTone === tone.id
-              ? "bg-white text-black shadow-sm"
-              : "text-white/80 hover:text-white hover:bg-white/5"
+              ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
+              : "text-black dark:text-white/80 hover:text-blue-600 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-white/5"
           )}
         >
           <span>{tone.icon}</span>

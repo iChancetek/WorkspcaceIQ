@@ -21,14 +21,14 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #0f172a;
+  --foreground: #000000;
   --primary: #2563eb;
   --primary-foreground: #ffffff;
-  --secondary: #f8fafc;
-  --secondary-foreground: #0f172a;
-  --accent: #4f46e5; 
+  --secondary: #eff6ff;
+  --secondary-foreground: #000000;
+  --accent: #2563eb; 
   --accent-foreground: #ffffff;
-  --border: #e2e8f0;
+  --border: #dbeafe;
   --card: #ffffff;
 }
 
@@ -103,7 +103,7 @@
 /* ─── Editorial Report Custom Typography & Layout ─── */
 .editorial-report {
   line-height: 1.8;
-  color: #1e293b; /* High-contrast slate text in Light Mode */
+  color: #000000; /* Solid glossy black text in Light Mode - NO GRAY */
 }
 
 .dark .editorial-report {
@@ -167,10 +167,10 @@
 
 .editorial-report .subtitle {
   font-size: 1.1rem;
-  color: #4b5563; /* Slate 600 */
+  color: #000000;
   margin-bottom: 2rem;
   line-height: 1.5;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .editorial-report h2 {
@@ -179,44 +179,45 @@
   margin-top: 2.5rem;
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 2px solid #000000;
   color: #000000;
   letter-spacing: -0.02em;
 }
 
 .editorial-report h3 {
   font-size: 1.15rem;
-  font-weight: 600;
+  font-weight: 700;
   margin-top: 1.75rem;
   margin-bottom: 0.75rem;
-  color: #1f2937;
+  color: #000000;
 }
 
 .editorial-report p {
   margin-bottom: 1.25rem;
   text-align: justify;
+  color: #000000;
 }
 
 .editorial-report blockquote.pull-quote {
   font-family: "Georgia", serif;
   font-size: 1.35rem;
   font-style: italic;
-  color: #1e3a8a; /* Deep blue */
-  border-left: 4px solid #3b82f6; /* Blue accent */
+  color: #1d4ed8; /* Vibrant Royal Blue */
+  border-left: 4px solid #2563eb; /* Royal Blue accent */
   padding-left: 1.5rem;
   margin: 2rem 0;
   line-height: 1.6;
 }
 
 .editorial-report .callout {
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-left: 4px solid #64748b;
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-left: 4px solid #2563eb;
   padding: 1.25rem;
   border-radius: 0.75rem;
   margin: 1.75rem 0;
   font-size: 0.95rem;
-  color: #334155;
+  color: #000000;
   line-height: 1.6;
 }
 

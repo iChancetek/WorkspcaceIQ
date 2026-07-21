@@ -540,16 +540,16 @@ export default function Dashboard() {
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
-                  "relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200",
+                  "relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200",
                   activeTab === tab.id
-                    ? "text-foreground dark:text-white shadow-lg"
-                    : "text-foreground/40 dark:text-white/60 hover:text-foreground dark:hover:text-white hover:bg-foreground/5 dark:hover:bg-white/5"
+                    ? "text-white shadow-lg"
+                    : "text-black dark:text-white/60 hover:text-blue-600 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-white/5"
                 )}
               >
                 {activeTab === tab.id && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute inset-0 bg-background dark:bg-white/10 border border-foreground/5 dark:border-white/15 rounded-xl -z-10 shadow-sm dark:shadow-[0_0_20px_rgba(255,255,255,0.03)]"
+                    className="absolute inset-0 bg-blue-600 dark:bg-white/10 border border-blue-500/30 dark:border-white/15 rounded-xl -z-10 shadow-md shadow-blue-500/20 dark:shadow-[0_0_20px_rgba(255,255,255,0.03)]"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
