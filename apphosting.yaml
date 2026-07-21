@@ -3,8 +3,8 @@ apiVersion: "v1"
 runConfig:
   minInstances: 0
   maxInstances: 10
-  memoryMiB: 512
-  cpu: 1
+  memoryMiB: 1024
+  cpu: 2
 env:
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
     value: "AIzaSyDO2NZuvolZfnk-zS-z3s3TKs5miLYfz04"
