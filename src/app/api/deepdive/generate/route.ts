@@ -6,11 +6,22 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
-    const { sources, language } = await req.json();
+    const { sources, language, customText } = await req.json();
 
-    const sourcesContext = (sources as { title: string; text: string }[])
-      .map((s, i) => `[Source ${i + 1}: ${s.title}]\n${s.text.substring(0, 10000)}`)
-      .join("\n\n---\n\n");
+    let sourcesContext = "";
+    if (customText && typeof customText === "string" && customText.trim()) {
+      sourcesContext = `[Custom Topic / User Input]:\n${customText.trim()}`;
+    }
+    if (sources && Array.isArray(sources) && sources.length > 0) {
+      const docsContext = (sources as { title: string; text: string }[])
+        .map((s, i) => `[Source ${i + 1}: ${s.title}]\n${s.text.substring(0, 10000)}`)
+        .join("\n\n---\n\n");
+      sourcesContext = sourcesContext ? `${sourcesContext}\n\n---\n\n${docsContext}` : docsContext;
+    }
+
+    if (!sourcesContext.trim()) {
+      return new Response(JSON.stringify({ error: "No sources or custom text provided" }), { status: 400 });
+    }
 
     // Step 1: Generate the podcast script
     const scriptCompletion = await openai.chat.completions.create({
@@ -23,15 +34,22 @@ export async function POST(req: NextRequest) {
 - **Host A (Chancellor)**: The wise strategist. Calm, deep-voiced, and visionary. He connects big ideas and looks at the strategic implications.
 - **Host B (Sydney)**: The dynamic investigator. Curious, articulate, and energetic. She breaks down the details, asks pointed questions, and keeps the energy high.
 
+MANDATORY INTRODUCTION RULE:
+The podcast MUST ALWAYS begin with Chancellor and Sydney explicitly introducing themselves by name in their opening lines before diving into the main discussion. 
+For example:
+CHANCELLOR: "Welcome to WorkSpaceIQ Deep Dive. I'm Chancellor..."
+SYDNEY: "And I'm Sydney! Today we're exploring..."
+Both Chancellor and Sydney MUST state their names in the very first exchange of every podcast script without exception.
+
 Rules:
 - Output in ${language || "English"}.
 - Format as a dialogue: "CHANCELLOR: ..." and "SYDNEY: ..."
 - Keep it natural, engaging, with "hmm", "right", "exactly" interjections.
-- Cover the key themes, surprising findings, and practical takeaways from the sources.
+- Cover the key themes, surprising findings, and practical takeaways from the provided input.
 - Keep total length to about 3-4 minutes of spoken content (~600-800 words).
 - End with a memorable takeaway.
 
-SOURCES:
+INPUT SOURCE CONTENT:
 ${sourcesContext}`
         },
         { role: "user", content: "Generate the Deep Dive discussion script." }

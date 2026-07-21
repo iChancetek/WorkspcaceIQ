@@ -47,6 +47,8 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioEl, setAudioEl] = useState<HTMLAudioElement | null>(null);
+  const [inputMode, setInputMode] = useState<"sources" | "custom">("sources");
+  const [customText, setCustomText] = useState("");
   const abortRef = useRef<AbortController | null>(null);
 
   const cancelGeneration = () => {
@@ -58,14 +60,15 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
   // Update status based on progress
   useEffect(() => {
     if (!isGenerating) return;
-    if (generationProgress < 30) setGenerationStatus("Synthesizing your sources...");
+    if (generationProgress < 30) setGenerationStatus("Synthesizing your content...");
     else if (generationProgress < 60) setGenerationStatus("Chancellor & Sydney are drafting the script...");
     else if (generationProgress < 90) setGenerationStatus("Generating high-fidelity audio...");
     else if (generationProgress >= 100) setGenerationStatus("Deep Dive Ready!");
   }, [generationProgress, isGenerating]);
 
   const generateDeepDive = async () => {
-    if (sources.length === 0) return;
+    if (inputMode === "sources" && sources.length === 0) return;
+    if (inputMode === "custom" && !customText.trim()) return;
 
     abortRef.current?.abort();
     const controller = new AbortController();
@@ -91,7 +94,8 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,
         body: JSON.stringify({
-          sources: sources.map((s) => ({ title: s.title, text: s.text })),
+          sources: inputMode === "sources" ? sources.map((s) => ({ title: s.title, text: s.text })) : [],
+          customText: inputMode === "custom" ? customText.trim() : undefined,
           language,
         }),
       });
@@ -175,22 +179,79 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
         <div className="space-y-2">
           <h3 className="text-3xl font-serif italic text-foreground dark:text-white">Deep Dive</h3>
           <p className="text-sm text-foreground/70 dark:text-white/70 max-w-md mx-auto">
-            Transform your uploaded sources into an engaging AI-generated podcast discussion between two hosts.
+            Transform your uploaded sources or custom topic into an engaging AI podcast discussion between Chancellor & Sydney.
           </p>
         </div>
 
-        {sources.length === 0 ? (
-          <p className="text-xs text-foreground/30 bg-secondary/50 px-4 py-2 rounded-full inline-block">
-            Upload sources in the Research tab first
-          </p>
-        ) : !audioUrl ? (
+        {!audioUrl && !isGenerating && (
+          <div className="space-y-4 max-w-lg mx-auto">
+            {/* Input Mode Selector */}
+            <div className="flex items-center justify-center gap-2 bg-foreground/5 dark:bg-white/5 p-1 rounded-2xl border border-foreground/10 dark:border-white/10">
+              <button
+                onClick={() => setInputMode("sources")}
+                className={cn(
+                  "flex-1 py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2",
+                  inputMode === "sources"
+                    ? "bg-purple-600 text-white shadow-md shadow-purple-600/30"
+                    : "text-foreground/60 dark:text-white/60 hover:text-foreground dark:hover:text-white"
+                )}
+              >
+                <span>Uploaded Sources</span>
+                {sources.length > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-white/20 text-white font-mono">
+                    {sources.length}
+                  </span>
+                )}
+              </button>
+
+              <button
+                onClick={() => setInputMode("custom")}
+                className={cn(
+                  "flex-1 py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2",
+                  inputMode === "custom"
+                    ? "bg-purple-600 text-white shadow-md shadow-purple-600/30"
+                    : "text-foreground/60 dark:text-white/60 hover:text-foreground dark:hover:text-white"
+                )}
+              >
+                <span>Custom Text / Topic</span>
+              </button>
+            </div>
+
+            {/* Custom Textarea Input */}
+            {inputMode === "custom" && (
+              <div className="space-y-1.5 text-left">
+                <label className="text-[10px] font-black uppercase tracking-wider text-foreground/50 dark:text-white/50">
+                  Enter Podcast Topic or Custom Text Prompt:
+                </label>
+                <textarea
+                  value={customText}
+                  onChange={(e) => setCustomText(e.target.value)}
+                  placeholder="Type or paste any topic, article, notes, or custom prompt here for Chancellor and Sydney to discuss..."
+                  rows={4}
+                  className="w-full p-4 rounded-2xl bg-foreground/5 dark:bg-white/5 border border-foreground/10 dark:border-white/10 text-xs text-foreground dark:text-white placeholder:text-foreground/30 dark:placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-purple-500/50 resize-none font-sans leading-relaxed"
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {!audioUrl ? (
           <div className="flex flex-col items-center gap-4 w-full max-w-sm mx-auto">
             {!isGenerating ? (
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={generateDeepDive}
-                className="w-full px-8 py-4 bg-primary text-white rounded-full font-semibold text-base transition-all shadow-lg shadow-black/10 hover:bg-primary/90 flex items-center justify-center gap-3"
+                disabled={
+                  (inputMode === "sources" && sources.length === 0) ||
+                  (inputMode === "custom" && !customText.trim())
+                }
+                className={cn(
+                  "w-full px-8 py-4 bg-primary text-white rounded-full font-semibold text-base transition-all shadow-lg shadow-black/10 hover:bg-primary/90 flex items-center justify-center gap-3",
+                  ((inputMode === "sources" && sources.length === 0) ||
+                    (inputMode === "custom" && !customText.trim())) &&
+                    "opacity-40 cursor-not-allowed"
+                )}
               >
                 <Headphones className="w-5 h-5" />
                 Generate Deep Dive
