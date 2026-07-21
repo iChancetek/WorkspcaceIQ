@@ -123,20 +123,45 @@ export default function Dashboard() {
     if (!user || sources.length === 0) return;
     setIsBuildingGraph(true);
     try {
+      // Ingest each source — track successes/failures
+      let ingestSuccesses = 0;
+      let ingestErrors: string[] = [];
+
       for (const s of sources) {
-        await fetch("/api/knowledge/ingest", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            id: s.id,
-            userId: user.uid,
-            title: s.title,
-            type: s.type,
-            text: s.text,
-            forceRebuild: true,
-          }),
-        });
+        try {
+          const res = await fetch("/api/knowledge/ingest", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: s.id,
+              userId: user.uid,
+              title: s.title,
+              type: s.type,
+              text: s.text,
+              forceRebuild: true,
+            }),
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            console.error(`[BuildGraph] Ingest failed for "${s.title}":`, data.error || res.statusText);
+            ingestErrors.push(`${s.title}: ${data.error || res.statusText}`);
+          } else if (data.isDuplicate) {
+            console.log(`[BuildGraph] "${s.title}" already indexed (duplicate)`);
+            ingestSuccesses++;
+          } else {
+            console.log(`[BuildGraph] Ingested "${s.title}": ${data.chunkCount} chunks, ${data.entityCount} entities`);
+            ingestSuccesses++;
+          }
+        } catch (srcErr: any) {
+          console.error(`[BuildGraph] Network error ingesting "${s.title}":`, srcErr.message);
+          ingestErrors.push(`${s.title}: ${srcErr.message}`);
+        }
       }
+
+      if (ingestErrors.length > 0) {
+        console.warn(`[BuildGraph] ${ingestErrors.length} source(s) failed to ingest:`, ingestErrors);
+      }
+
       // Reload full graph (nodes + edges)
       const res = await fetch("/api/knowledge/graph", {
         method: "POST",
@@ -144,7 +169,10 @@ export default function Dashboard() {
         body: JSON.stringify({ userId: user.uid }),
       });
       const data = await res.json();
-      if (data.nodes && data.nodes.length > 0) {
+
+      if (!res.ok) {
+        console.error("[BuildGraph] Graph fetch failed:", data.error || res.statusText);
+      } else if (data.nodes && data.nodes.length > 0) {
         const nodes = data.nodes.map((n: any) => ({
           id: n.id,
           name: n.name,
@@ -171,9 +199,13 @@ export default function Dashboard() {
         }));
         setGraphNodes(nodes);
         setGraphEdges(edges);
+        console.log(`[BuildGraph] ✓ Graph loaded: ${nodes.length} nodes, ${edges.length} edges`);
+      } else {
+        console.warn("[BuildGraph] Graph returned empty. Response:", JSON.stringify(data).slice(0, 500));
+        console.warn(`[BuildGraph] Ingested ${ingestSuccesses}/${sources.length} sources successfully.`);
       }
     } catch (e) {
-      console.error("Failed to build graph:", e);
+      console.error("[BuildGraph] Failed to build graph:", e);
     } finally {
       setIsBuildingGraph(false);
     }

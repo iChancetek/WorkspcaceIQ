@@ -179,8 +179,28 @@ export function subscribeToKnowledgeSources(
       );
       callback(sources);
     },
-    (err) => {
+    async (err) => {
       console.warn("[KnowledgeSources] Subscription error:", err.message);
+
+      // Fallback: try a simpler query without ordering (avoids index/permission issues)
+      try {
+        const fallbackQ = query(sourcesCol(uid), limit(100));
+        const snap = await getDocs(fallbackQ);
+        const sources = snap.docs.map(
+          (d) => ({ id: d.id, ...d.data() } as KnowledgeSource)
+        );
+        // Sort client-side
+        sources.sort((a, b) => {
+          const aTime = a.createdAt?.toMillis?.() || 0;
+          const bTime = b.createdAt?.toMillis?.() || 0;
+          return bTime - aTime;
+        });
+        callback(sources);
+        console.log("[KnowledgeSources] Fallback query succeeded with", sources.length, "sources");
+      } catch (fallbackErr: any) {
+        console.error("[KnowledgeSources] Fallback also failed:", fallbackErr.message);
+        callback([]);
+      }
     }
   );
 }
