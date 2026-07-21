@@ -5,7 +5,7 @@ import {
   Headphones, CreditCard, HelpCircle, GitBranch, FileText,
   Layout, Table2, BarChart3, Video, Loader2, Play,
   Download, RefreshCw, ChevronRight, ChevronLeft, Sparkles, X, Square,
-  Save, Check, Copy
+  Save, Check, Copy, Pause, Volume2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Source } from "./SourceUploader";
@@ -440,9 +440,86 @@ export function Studio({ userId, sources, tone, language, studioOutputs, onNavig
   const [selectedFont, setSelectedFont] = useState<"georgia" | "times" | "inter" | "helvetica">("georgia");
   const [showChecklist, setShowChecklist] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [reportAudioUrl, setReportAudioUrl] = useState<string | null>(null);
+  const [reportAudioBlob, setReportAudioBlob] = useState<Blob | null>(null);
+  const [isReportAudioLoading, setIsReportAudioLoading] = useState(false);
+  const [isReportAudioPlaying, setIsReportAudioPlaying] = useState(false);
+  const [selectedReportVoice, setSelectedReportVoice] = useState<"nova" | "onyx" | "echo" | "shimmer" | "alloy">("nova");
+  const reportAudioRef = useRef<HTMLAudioElement | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  const stopReportAudio = () => {
+    if (reportAudioRef.current) {
+      reportAudioRef.current.pause();
+      reportAudioRef.current = null;
+    }
+    setIsReportAudioPlaying(false);
+  };
+
+  useEffect(() => {
+    stopReportAudio();
+    setReportAudioUrl(null);
+    setReportAudioBlob(null);
+  }, [activeMode, selectedReportVoice]);
+
+  const handlePlayReportTTS = async (overrideText?: string) => {
+    const rawContent = overrideText || streamText;
+    if (!rawContent) return;
+
+    if (isReportAudioPlaying) {
+      stopReportAudio();
+      return;
+    }
+
+    if (reportAudioUrl && reportAudioRef.current) {
+      reportAudioRef.current.play();
+      setIsReportAudioPlaying(true);
+      return;
+    }
+
+    stopReportAudio();
+    setIsReportAudioLoading(true);
+
+    try {
+      const res = await fetch("/api/studio/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: rawContent, voice: selectedReportVoice }),
+      });
+
+      if (!res.ok) throw new Error("TTS generation failed");
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      setReportAudioBlob(blob);
+      setReportAudioUrl(url);
+
+      const audio = new Audio(url);
+      reportAudioRef.current = audio;
+      audio.onended = () => setIsReportAudioPlaying(false);
+      audio.onerror = () => setIsReportAudioPlaying(false);
+
+      await audio.play();
+      setIsReportAudioPlaying(true);
+    } catch (err: any) {
+      console.error("[Report Audio TTS Error]:", err);
+      setError("Failed to generate report audio narration.");
+    } finally {
+      setIsReportAudioLoading(false);
+    }
+  };
+
+  const downloadReportAudio = () => {
+    if (!reportAudioBlob) return;
+    const url = URL.createObjectURL(reportAudioBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "workspaceiq-report-narration.mp3";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const slides = useMemo(() => {
     if (activeMode === "slides" && streamText) return parseSlideDeck(streamText);
@@ -854,6 +931,72 @@ export function Studio({ userId, sources, tone, language, studioOutputs, onNavig
                           </div>
                         );
                       })}
+                    </div>
+                  )}
+
+                  {/* Report Audio Narration Bar */}
+                  {streamText && (
+                    <div className="bg-gradient-to-r from-violet-900/40 via-purple-900/40 to-slate-900/40 border border-purple-500/30 rounded-2xl p-4 mb-4 backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-4 shadow-xl">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-300 shrink-0">
+                          <Headphones className={cn("w-5 h-5", isReportAudioPlaying && "animate-pulse text-purple-400")} />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className="text-xs font-black uppercase tracking-wider text-white">Audio Narration</p>
+                            <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">TTS-1</span>
+                          </div>
+                          <p className="text-[11px] text-white/60">Listen to high-fidelity AI narration of this executive report.</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center flex-wrap gap-3 w-full md:w-auto justify-end">
+                        {/* Voice Selector */}
+                        <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-xl p-1">
+                          <span className="text-[9px] font-bold uppercase tracking-wider text-white/50 px-2">Voice:</span>
+                          {(["nova", "onyx", "echo", "shimmer", "alloy"] as const).map((voice) => (
+                            <button
+                              key={voice}
+                              onClick={() => setSelectedReportVoice(voice)}
+                              className={cn(
+                                "px-2.5 py-1 rounded-lg text-[10px] uppercase tracking-wider font-bold transition-all",
+                                selectedReportVoice === voice
+                                  ? "bg-purple-600 text-white shadow-md shadow-purple-600/30"
+                                  : "text-white/60 hover:text-white hover:bg-white/5"
+                              )}
+                            >
+                              {voice}
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* Play/Pause Button */}
+                        <button
+                          onClick={() => handlePlayReportTTS()}
+                          disabled={isReportAudioLoading}
+                          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition-all shadow-lg shadow-purple-600/30 active:scale-95 disabled:opacity-50"
+                        >
+                          {isReportAudioLoading ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : isReportAudioPlaying ? (
+                            <Pause className="w-4 h-4 fill-current" />
+                          ) : (
+                            <Play className="w-4 h-4 fill-current" />
+                          )}
+                          <span>{isReportAudioLoading ? "Synthesizing..." : isReportAudioPlaying ? "Pause" : "Listen"}</span>
+                        </button>
+
+                        {/* Download MP3 Button */}
+                        {reportAudioUrl && (
+                          <button
+                            onClick={downloadReportAudio}
+                            className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 transition-colors"
+                            title="Download Narration MP3"
+                          >
+                            <Download className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   )}
 
