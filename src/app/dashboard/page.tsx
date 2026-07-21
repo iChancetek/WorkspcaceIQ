@@ -136,26 +136,40 @@ export default function Dashboard() {
           }),
         });
       }
-      // Reload graph status
-      const res = await fetch("/api/knowledge/status", {
+      // Reload full graph (nodes + edges)
+      const res = await fetch("/api/knowledge/graph", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: user.uid }),
       });
       const data = await res.json();
-      if (data.graph?.topEntities) {
-        const nodes = data.graph.topEntities.map((e: any) => ({
-          id: `${e.type}__${e.name.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`,
-          name: e.name,
+      if (data.nodes && data.nodes.length > 0) {
+        const nodes = data.nodes.map((n: any) => ({
+          id: n.id,
+          name: n.name,
+          type: n.type,
+          description: n.description || "",
+          sourceIds: n.sourceIds || [],
+          referenceCount: n.referenceCount || 1,
+          properties: n.properties || {},
+          createdAt: null,
+          updatedAt: null,
+        }));
+        const edges = (data.edges || []).map((e: any) => ({
+          id: e.id,
+          fromNodeId: e.fromNodeId,
+          toNodeId: e.toNodeId,
+          fromName: e.fromName || "",
+          toName: e.toName || "",
           type: e.type,
-          description: "",
-          sourceIds: [],
-          referenceCount: e.refs,
-          properties: {},
+          evidence: e.evidence || "",
+          sourceId: e.sourceId || "",
+          weight: e.weight || 1,
           createdAt: null,
           updatedAt: null,
         }));
         setGraphNodes(nodes);
+        setGraphEdges(edges);
       }
     } catch (e) {
       console.error("Failed to build graph:", e);
@@ -167,26 +181,40 @@ export default function Dashboard() {
   useEffect(() => {
     if (!user || activeTab !== "research") return;
 
-    fetch("/api/knowledge/status", {
+    fetch("/api/knowledge/graph", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId: user.uid }),
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data.graph?.topEntities) {
-          const nodes = data.graph.topEntities.map((e: any) => ({
-            id: `${e.type}__${e.name.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`,
-            name: e.name,
+        if (data.nodes && data.nodes.length > 0) {
+          const nodes = data.nodes.map((n: any) => ({
+            id: n.id,
+            name: n.name,
+            type: n.type,
+            description: n.description || "",
+            sourceIds: n.sourceIds || [],
+            referenceCount: n.referenceCount || 1,
+            properties: n.properties || {},
+            createdAt: null,
+            updatedAt: null,
+          }));
+          const edges = (data.edges || []).map((e: any) => ({
+            id: e.id,
+            fromNodeId: e.fromNodeId,
+            toNodeId: e.toNodeId,
+            fromName: e.fromName || "",
+            toName: e.toName || "",
             type: e.type,
-            description: "",
-            sourceIds: [],
-            referenceCount: e.refs,
-            properties: {},
+            evidence: e.evidence || "",
+            sourceId: e.sourceId || "",
+            weight: e.weight || 1,
             createdAt: null,
             updatedAt: null,
           }));
           setGraphNodes(nodes);
+          setGraphEdges(edges);
         }
       })
       .catch(console.warn);

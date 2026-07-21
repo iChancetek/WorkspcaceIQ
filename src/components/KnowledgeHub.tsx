@@ -75,28 +75,41 @@ export function KnowledgeHub() {
     if (!user) return;
     setIsLoadingGraph(true);
     try {
-      const res = await fetch("/api/knowledge/status", {
+      const res = await fetch("/api/knowledge/graph", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: user.uid }),
       });
       const data = await res.json();
 
-      if (data.graph?.topEntities) {
-        // Build minimal KGNode objects from stats
-        const nodes: KGNode[] = data.graph.topEntities.map((e: any, i: number) => ({
-          id: `${e.type}__${e.name.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`,
-          name: e.name,
+      if (data.nodes && data.nodes.length > 0) {
+        const nodes: KGNode[] = data.nodes.map((n: any) => ({
+          id: n.id,
+          name: n.name,
+          type: n.type,
+          description: n.description || "",
+          sourceIds: n.sourceIds || [],
+          referenceCount: n.referenceCount || 1,
+          properties: n.properties || {},
+          createdAt: n.createdAt || null,
+          updatedAt: n.updatedAt || null,
+        }));
+        const edges: KGEdge[] = (data.edges || []).map((e: any) => ({
+          id: e.id,
+          fromNodeId: e.fromNodeId,
+          toNodeId: e.toNodeId,
+          fromName: e.fromName || "",
+          toName: e.toName || "",
           type: e.type,
-          description: "",
-          sourceIds: [],
-          referenceCount: e.refs,
-          properties: {},
-          createdAt: null,
-          updatedAt: null,
+          evidence: e.evidence || "",
+          sourceId: e.sourceId || "",
+          weight: e.weight || 1,
+          createdAt: e.createdAt || null,
+          updatedAt: e.updatedAt || null,
         }));
         setGraphNodes(nodes);
-        setStats((prev) => ({ ...prev, relationships: data.graph.edgeCount || 0 }));
+        setGraphEdges(edges);
+        setStats((prev) => ({ ...prev, relationships: edges.length }));
       }
     } catch (err) {
       console.warn("[KnowledgeHub] Failed to load graph:", err);
