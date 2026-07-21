@@ -12,6 +12,7 @@ import { Source } from "./SourceUploader";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface StudioProps {
+  userId?: string;
   sources: Source[];
   tone: string;
   language: string;
@@ -331,7 +332,74 @@ function MindMapViz({ node, depth = 0 }: { node: MindMapNode; depth?: number }) 
   );
 }
 
-export function Studio({ sources, tone, language, studioOutputs, onNavigateToDeepDive, onOutputChange, onManualSave }: StudioProps) {
+interface ParsedReport {
+  pass1: string;
+  pass2: string;
+  pass3: string;
+  pass4: string;
+  pass5: string;
+  reportHtml: string;
+  currentPass: number;
+}
+
+function parseReportStream(rawText: string): ParsedReport {
+  const result = {
+    pass1: "",
+    pass2: "",
+    pass3: "",
+    pass4: "",
+    pass5: "",
+    reportHtml: "",
+    currentPass: 0,
+  };
+
+  const p1Start = rawText.indexOf("<pass1_retrieval>");
+  const p1End = rawText.indexOf("</pass1_retrieval>");
+  const p2Start = rawText.indexOf("<pass2_grouping>");
+  const p2End = rawText.indexOf("</pass2_grouping>");
+  const p3Start = rawText.indexOf("<pass3_cross_reference>");
+  const p3End = rawText.indexOf("</pass3_cross_reference>");
+  const p4Start = rawText.indexOf("<pass4_inconsistencies>");
+  const p4End = rawText.indexOf("</pass4_inconsistencies>");
+  const p5Start = rawText.indexOf("<pass5_strategic_insights>");
+  const p5End = rawText.indexOf("</pass5_strategic_insights>");
+  const htmlStart = rawText.indexOf("<report_html>");
+  const htmlEnd = rawText.indexOf("</report_html>");
+
+  if (p1Start !== -1) {
+    result.currentPass = 1;
+    result.pass1 = p1End !== -1 ? rawText.substring(p1Start + 17, p1End) : rawText.substring(p1Start + 17);
+  }
+  if (p2Start !== -1) {
+    result.currentPass = 2;
+    result.pass2 = p2End !== -1 ? rawText.substring(p2Start + 16, p2End) : rawText.substring(p2Start + 16);
+  }
+  if (p3Start !== -1) {
+    result.currentPass = 3;
+    result.pass3 = p3End !== -1 ? rawText.substring(p3Start + 23, p3End) : rawText.substring(p3Start + 23);
+  }
+  if (p4Start !== -1) {
+    result.currentPass = 4;
+    result.pass4 = p4End !== -1 ? rawText.substring(p4Start + 23, p4End) : rawText.substring(p4Start + 23);
+  }
+  if (p5Start !== -1) {
+    result.currentPass = 5;
+    result.pass5 = p5End !== -1 ? rawText.substring(p5Start + 26, p5End) : rawText.substring(p5Start + 26);
+  }
+  if (htmlStart !== -1) {
+    result.currentPass = 6;
+    result.reportHtml = htmlEnd !== -1 ? rawText.substring(htmlStart + 13, htmlEnd) : rawText.substring(htmlStart + 13);
+  } else {
+    if (rawText.indexOf("<research_phase>") === -1) {
+      result.reportHtml = rawText;
+      result.currentPass = 6;
+    }
+  }
+
+  return result;
+}
+
+export function Studio({ userId, sources, tone, language, studioOutputs, onNavigateToDeepDive, onOutputChange, onManualSave }: StudioProps) {
   const [activeMode, setActiveMode] = useState("report");
   const [isGenerating, setIsGenerating] = useState(false);
   const [streamText, setStreamText] = useState("");
@@ -344,6 +412,9 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
   const [isPresenting, setIsPresenting] = useState(false);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [autoAdvance, setAutoAdvance] = useState(false);
+  const [selectedReportType, setSelectedReportType] = useState<"standard" | "deep-dive">("standard");
+  const [selectedFont, setSelectedFont] = useState<"georgia" | "times" | "inter" | "helvetica">("georgia");
+  const [showChecklist, setShowChecklist] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -459,7 +530,14 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
         method: "POST",
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,
-        body: JSON.stringify({ sources: sources.map(s => ({ title: s.title, text: s.text })), mode, tone, language }),
+        body: JSON.stringify({ 
+          sources: sources.map(s => ({ title: s.title, text: s.text })), 
+          mode, 
+          tone, 
+          language,
+          userId,
+          reportType: mode === "report" ? selectedReportType : undefined
+        }),
       });
       if (!res.ok) throw new Error("Generation failed");
 
@@ -487,6 +565,46 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
     const a = document.createElement("a");
     a.href = url; a.download = filename; a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const downloadReportOrText = (text: string, filename: string) => {
+    if (activeMode === "report") {
+      const parsed = parseReportStream(text);
+      const cleanHtml = parsed.reportHtml || text;
+      const blob = new Blob([`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>WorkSpaceIQ Report</title>
+  <style>
+    body { font-family: Georgia, serif; line-height: 1.8; color: #111827; max-width: 800px; margin: 40px auto; padding: 0 20px; }
+    h1 { font-size: 2.25rem; font-weight: 800; line-height: 1.15; margin-bottom: 0.5rem; color: #000000; }
+    .subtitle { font-family: sans-serif; font-size: 1.1rem; color: #4b5563; margin-bottom: 2rem; }
+    h2 { font-size: 1.5rem; font-weight: 700; margin-top: 2.5rem; margin-bottom: 1rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; color: #000000; }
+    h3 { font-family: sans-serif; font-size: 1.15rem; font-weight: 600; margin-top: 1.75rem; margin-bottom: 0.75rem; color: #1f2937; }
+    p { margin-bottom: 1.25rem; text-align: justify; }
+    blockquote.pull-quote { font-size: 1.35rem; font-style: italic; color: #1e3a8a; border-left: 4px solid #3b82f6; padding-left: 1.5rem; margin: 2rem 0; }
+    .callout { background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #64748b; padding: 1.25rem; border-radius: 0.75rem; margin: 1.75rem 0; font-size: 0.95rem; color: #334155; }
+    .insight-box { background-color: #f0fdf4; border: 1px solid #bbf7d0; border-left: 4px solid #22c55e; padding: 1.25rem; border-radius: 0.75rem; margin: 1.75rem 0; font-size: 0.95rem; color: #166534; }
+    table.report-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.9rem; }
+    table.report-table th { background-color: #f1f5f9; border-bottom: 2px solid #cbd5e1; padding: 0.75rem 1rem; font-weight: 700; text-align: left; color: #1e293b; }
+    table.report-table td { border-bottom: 1px solid #e2e8f0; padding: 0.75rem 1rem; color: #334155; }
+    ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1.5rem; }
+    li { margin-bottom: 0.5rem; }
+    sup { font-size: 0.75rem; font-weight: 600; color: #2563eb; margin-left: 0.1rem; }
+  </style>
+</head>
+<body>
+  ${cleanHtml}
+</body>
+</html>`], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = `workspaceiq-report.html`; a.click();
+      URL.revokeObjectURL(url);
+    } else {
+      downloadText(text, filename);
+    }
   };
 
   const currentMode = MODES.find(m => m.id === activeMode)!;
@@ -527,24 +645,54 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
                 <button onClick={() => generate()} className="p-2 rounded-xl bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 text-foreground/40 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-colors"><RefreshCw className="w-4 h-4" /></button>
               </>
             )}
-            {streamText && !isGenerating && <button onClick={() => downloadText(streamText, `workspaceiq-${activeMode}.md`)} className="p-2 rounded-xl bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 text-foreground/40 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-colors"><Download className="w-4 h-4" /></button>}
+            {streamText && !isGenerating && <button onClick={() => downloadReportOrText(streamText, `workspaceiq-${activeMode}.md`)} className="p-2 rounded-xl bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 text-foreground/40 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-colors"><Download className="w-4 h-4" /></button>}
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto">
           <AnimatePresence mode="wait">
             {!hasOutput && !isGenerating && (
-              <motion.div key="empty" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="h-full flex flex-col items-center justify-center gap-4 text-center py-8">
+              <motion.div key="empty" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="h-full flex flex-col items-center justify-center gap-4 text-center py-6">
                 <div className="p-4 rounded-2xl bg-foreground/5 dark:bg-white/5"><currentMode.icon className={cn("w-8 h-8", currentMode.color)} /></div>
                 <div>
                   <p className="text-base font-bold text-foreground dark:text-white mb-1">Generate {currentMode.label}</p>
                   <p className="text-xs text-foreground/50 dark:text-white/70 max-w-xs">{currentMode.desc} from your {sources.length} sources</p>
                 </div>
+                
+                {activeMode === "report" && (
+                  <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md mx-auto my-2">
+                    <button
+                      onClick={() => setSelectedReportType("standard")}
+                      className={cn(
+                        "flex-1 p-4 rounded-2xl border text-left transition-all",
+                        selectedReportType === "standard"
+                          ? "bg-blue-500/10 border-blue-500 text-blue-900 dark:text-blue-100"
+                          : "bg-foreground/5 dark:bg-white/5 border-foreground/10 dark:border-white/10 hover:bg-foreground/10 dark:hover:bg-white/10"
+                      )}
+                    >
+                      <div className="text-xs font-black uppercase tracking-wider mb-1 text-blue-600 dark:text-blue-400">Standard Report</div>
+                      <div className="text-[10px] opacity-70 leading-normal text-foreground/70 dark:text-white/70">Quick, concise, professionally structured summary of source materials.</div>
+                    </button>
+                    <button
+                      onClick={() => setSelectedReportType("deep-dive")}
+                      className={cn(
+                        "flex-1 p-4 rounded-2xl border text-left transition-all",
+                        selectedReportType === "deep-dive"
+                          ? "bg-purple-500/10 border-purple-500 text-purple-900 dark:text-purple-100"
+                          : "bg-foreground/5 dark:bg-white/5 border-foreground/10 dark:border-white/10 hover:bg-foreground/10 dark:hover:bg-white/10"
+                      )}
+                    >
+                      <div className="text-xs font-black uppercase tracking-wider mb-1 text-purple-600 dark:text-purple-400">Deep Dive Report</div>
+                      <div className="text-[10px] opacity-70 leading-normal text-foreground/70 dark:text-white/70">GraphRAG-powered, multi-pass analysis, cross-source insights, timelines, and risks.</div>
+                    </button>
+                  </div>
+                )}
+
                 <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => generate()} disabled={!sources.length || currentMode.comingSoon} className={cn("flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-sm transition-all shadow-xl bg-foreground/5 dark:bg-white/10 hover:bg-foreground/10 text-foreground dark:text-white border border-foreground/10", (!sources.length || currentMode.comingSoon) && "opacity-40 cursor-not-allowed")}><Sparkles className="w-4 h-4" /> Generate</motion.button>
               </motion.div>
             )}
 
-            {isGenerating && (
+            {isGenerating && activeMode !== "report" && (
               <motion.div key="generating" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center gap-4 py-12">
                 <Loader2 className={cn("w-8 h-8 animate-spin", currentMode.color)} />
                 <div className="text-center">
@@ -567,11 +715,103 @@ export function Studio({ sources, tone, language, studioOutputs, onNavigateToDee
               </motion.div>
             )}
 
-            {!isGenerating && activeMode === "report" && streamText && (
-              <motion.div key="report" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="prose prose-invert prose-sm dark:prose-invert max-w-none text-foreground/80 dark:text-white/80 whitespace-pre-wrap leading-relaxed text-sm">
-                {streamText}
-              </motion.div>
-            )}
+            {activeMode === "report" && (streamText || isGenerating) && (() => {
+              const parsed = parseReportStream(streamText);
+              return (
+                <motion.div key="report" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4 w-full">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-black/10 dark:border-white/10 pb-4 mb-4">
+                    <div className="flex items-center flex-wrap gap-2">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-foreground/50 dark:text-white/50">Typography:</span>
+                      {(["georgia", "times", "inter", "helvetica"] as const).map(font => (
+                        <button
+                          key={font}
+                          onClick={() => setSelectedFont(font)}
+                          className={cn(
+                            "px-3 py-1 rounded-full text-[10px] uppercase tracking-wider transition-all border font-bold",
+                            selectedFont === font
+                              ? "bg-foreground text-background border-foreground dark:bg-white dark:text-black dark:border-white"
+                              : "bg-foreground/5 dark:bg-white/5 border-foreground/10 dark:border-white/10 text-foreground/60 dark:text-white/60 hover:bg-foreground/10 dark:hover:bg-white/10"
+                          )}
+                        >
+                          {font === "times" ? "Times New Roman" : font}
+                        </button>
+                      ))}
+                    </div>
+                    
+                    {selectedReportType === "deep-dive" && (
+                      <button
+                        onClick={() => setShowChecklist(!showChecklist)}
+                        className="text-[10px] font-black uppercase tracking-wider text-violet-500 hover:text-violet-400 bg-violet-500/10 px-3 py-1.5 rounded-full border border-violet-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                      >
+                        {showChecklist ? "Hide Research Checklist" : "Show Research Checklist"}
+                      </button>
+                    )}
+                  </div>
+
+                  {selectedReportType === "deep-dive" && showChecklist && (
+                    <div className="bg-foreground/5 dark:bg-white/5 border border-foreground/10 dark:border-white/10 rounded-3xl p-5 mb-4 text-foreground/80 dark:text-white/80 text-xs space-y-3 max-w-2xl mx-auto shadow-inner">
+                      <h4 className="font-black text-[10px] uppercase tracking-widest text-violet-500 flex items-center gap-2 mb-2">
+                        <Sparkles className="w-4 h-4 text-violet-500 animate-pulse" />
+                        Multi-Pass GraphRAG Research Execution
+                      </h4>
+                      {[
+                        { pass: 1, label: "Pass 1: Retrieve comprehensive workspace documents & entity graph" },
+                        { pass: 2, label: "Pass 2: Group source text and data by topics, timelines, and entities" },
+                        { pass: 3, label: "Pass 3: Cross-reference relationships and dependencies across sources" },
+                        { pass: 4, label: "Pass 4: Resolve conflicting information and validate factual claims" },
+                        { pass: 5, label: "Pass 5: Generate strategic insights, root causes, risks, and next steps" },
+                        { pass: 6, label: "Pass 6: Write elite magazine-quality investigative report" },
+                      ].map((p) => {
+                        const isCompleted = parsed.currentPass > p.pass || (p.pass === 6 && parsed.reportHtml.length > 0 && !isGenerating);
+                        const isActive = parsed.currentPass === p.pass && isGenerating;
+                        return (
+                          <div key={p.pass} className="flex items-center justify-between">
+                            <div className="flex items-center gap-2.5">
+                              <span className={cn(
+                                "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black border transition-all",
+                                isCompleted 
+                                  ? "bg-emerald-500 border-emerald-500 text-white" 
+                                  : isActive 
+                                    ? "bg-violet-500 border-violet-500 text-white animate-pulse shadow-[0_0_8px_rgba(139,92,246,0.5)]" 
+                                    : "bg-foreground/5 dark:bg-white/5 border-foreground/10 dark:border-white/10 text-foreground/30 dark:text-white/30"
+                              )}>
+                                {isCompleted ? "✓" : p.pass}
+                              </span>
+                              <span className={cn(
+                                "font-medium transition-all",
+                                isCompleted 
+                                  ? "text-foreground/40 dark:text-white/40 line-through" 
+                                  : isActive 
+                                    ? "text-violet-600 dark:text-violet-400 font-bold" 
+                                    : "text-foreground/60 dark:text-white/60"
+                              )}>
+                                {p.label}
+                              </span>
+                            </div>
+                            {isActive && <Loader2 className="w-3.5 h-3.5 text-violet-500 animate-spin" />}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {parsed.reportHtml ? (
+                    <div className="bg-white border border-slate-200 rounded-[2.5rem] p-6 md:p-14 shadow-2xl max-w-4xl mx-auto my-4 transition-all duration-300">
+                      <div className={cn("editorial-report", `font-${selectedFont}`)} dangerouslySetInnerHTML={{ __html: parsed.reportHtml }} />
+                    </div>
+                  ) : isGenerating ? (
+                    <div className="text-center py-16 text-foreground/50 text-xs italic flex flex-col items-center justify-center gap-3">
+                      <Loader2 className="w-6 h-6 animate-spin text-violet-500 animate-bounce" />
+                      <span className="animate-pulse">Engaging WorkSpaceIQ RAG Network... Preparing research workspace...</span>
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 text-foreground/50 text-xs italic">
+                      No report generated yet.
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })()}
 
             {!isGenerating && activeMode === "flashcards" && jsonData && (
               <motion.div key="flashcards" variants={containerVariants} initial="hidden" animate="visible" exit="hidden" className="grid grid-cols-1 sm:grid-cols-2 gap-3">

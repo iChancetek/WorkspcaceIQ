@@ -77,3 +77,145 @@
     @apply bg-card border border-border rounded-2xl backdrop-blur-sm transition-all duration-200;
   }
 }
+
+/* ─── Editorial Report Custom Typography & Layout ─── */
+.editorial-report {
+  line-height: 1.8;
+  color: #111827; /* Dark slate text */
+}
+
+/* Typography Overrides */
+.editorial-report.font-georgia {
+  font-family: "Georgia", Georgia, serif;
+}
+
+.editorial-report.font-times {
+  font-family: "Times New Roman", Times, Georgia, serif;
+}
+
+.editorial-report.font-inter {
+  font-family: "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.editorial-report.font-helvetica {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/* Content Elements Styling */
+.editorial-report h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1.15;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #000000;
+  letter-spacing: -0.025em;
+}
+
+.editorial-report .subtitle {
+  font-size: 1.1rem;
+  color: #4b5563; /* Slate 600 */
+  margin-bottom: 2rem;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.editorial-report h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  color: #000000;
+  letter-spacing: -0.02em;
+}
+
+.editorial-report h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+  color: #1f2937;
+}
+
+.editorial-report p {
+  margin-bottom: 1.25rem;
+  text-align: justify;
+}
+
+.editorial-report blockquote.pull-quote {
+  font-family: "Georgia", serif;
+  font-size: 1.35rem;
+  font-style: italic;
+  color: #1e3a8a; /* Deep blue */
+  border-left: 4px solid #3b82f6; /* Blue accent */
+  padding-left: 1.5rem;
+  margin: 2rem 0;
+  line-height: 1.6;
+}
+
+.editorial-report .callout {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #64748b;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  margin: 1.75rem 0;
+  font-size: 0.95rem;
+  color: #334155;
+  line-height: 1.6;
+}
+
+.editorial-report .insight-box {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-left: 4px solid #22c55e;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  margin: 1.75rem 0;
+  font-size: 0.95rem;
+  color: #166534;
+  line-height: 1.6;
+}
+
+.editorial-report table.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0;
+  font-size: 0.9rem;
+}
+
+.editorial-report table.report-table th {
+  background-color: #f1f5f9;
+  border-bottom: 2px solid #cbd5e1;
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  text-align: left;
+  color: #1e293b;
+}
+
+.editorial-report table.report-table td {
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.75rem 1rem;
+  color: #334155;
+}
+
+.editorial-report ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.editorial-report li {
+  margin-bottom: 0.5rem;
+}
+
+.editorial-report sup {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #2563eb;
+  margin-left: 0.1rem;
+  user-select: none;
+}
+

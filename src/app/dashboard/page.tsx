@@ -806,6 +806,7 @@ export default function Dashboard() {
                   )}
 
                   <Studio
+                    userId={user?.uid}
                     sources={sources}
                     tone={activeTone}
                     language={activeLanguage}
