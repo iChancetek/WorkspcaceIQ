@@ -39,6 +39,14 @@ const Waveform = ({ isPlaying }: { isPlaying: boolean }) => {
   );
 };
 
+const POPULAR_LANGUAGES = [
+  { id: "English", label: "English 🇬🇧", code: "en" },
+  { id: "Spanish", label: "Spanish (Español) 🇪🇸", code: "es" },
+  { id: "French", label: "French (Français) 🇫🇷", code: "fr" },
+  { id: "German", label: "German (Deutsch) 🇩🇪", code: "de" },
+  { id: "Mandarin Chinese", label: "Mandarin (中文) 🇨🇳", code: "zh" },
+];
+
 export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
@@ -49,6 +57,13 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
   const [audioEl, setAudioEl] = useState<HTMLAudioElement | null>(null);
   const [inputMode, setInputMode] = useState<"sources" | "custom">("sources");
   const [customText, setCustomText] = useState("");
+  const [selectedLanguage, setSelectedLanguage] = useState<string>(() => {
+    if (language && POPULAR_LANGUAGES.some(l => l.id.toLowerCase() === language.toLowerCase())) {
+      const match = POPULAR_LANGUAGES.find(l => l.id.toLowerCase() === language.toLowerCase());
+      return match ? match.id : "English";
+    }
+    return "English";
+  });
   const abortRef = useRef<AbortController | null>(null);
 
   const cancelGeneration = () => {
@@ -96,7 +111,7 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
         body: JSON.stringify({
           sources: inputMode === "sources" ? sources.map((s) => ({ title: s.title, text: s.text })) : [],
           customText: inputMode === "custom" ? customText.trim() : undefined,
-          language,
+          language: selectedLanguage,
         }),
       });
 
@@ -143,10 +158,11 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
 
   const downloadAudio = () => {
     if (!audioBlob) return;
+    const langObj = POPULAR_LANGUAGES.find(l => l.id === selectedLanguage) || POPULAR_LANGUAGES[0];
     const url = URL.createObjectURL(audioBlob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "workspaceiq-deep-dive.mp3";
+    a.download = `workspaceiq-deep-dive-${langObj.code}.mp3`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -185,6 +201,29 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
 
         {!audioUrl && !isGenerating && (
           <div className="space-y-4 max-w-lg mx-auto">
+            {/* Top 5 Popular Languages Selector */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black uppercase tracking-wider text-foreground/50 dark:text-white/50">
+                Select Podcast Language (English Default):
+              </label>
+              <div className="flex items-center flex-wrap justify-center gap-1.5 bg-foreground/5 dark:bg-white/5 p-1.5 rounded-2xl border border-foreground/10 dark:border-white/10">
+                {POPULAR_LANGUAGES.map((lang) => (
+                  <button
+                    key={lang.id}
+                    onClick={() => setSelectedLanguage(lang.id)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5",
+                      selectedLanguage === lang.id
+                        ? "bg-purple-600 text-white shadow-md shadow-purple-600/30 scale-[1.02]"
+                        : "text-foreground/60 dark:text-white/60 hover:text-foreground dark:hover:text-white hover:bg-white/5"
+                    )}
+                  >
+                    <span>{lang.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Input Mode Selector */}
             <div className="flex items-center justify-center gap-2 bg-foreground/5 dark:bg-white/5 p-1 rounded-2xl border border-foreground/10 dark:border-white/10">
               <button
@@ -316,7 +355,7 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
                 className="px-6 py-2.5 text-sm font-semibold border border-foreground/10 dark:border-white/10 rounded-full hover:bg-foreground/5 dark:hover:bg-white/5 transition-colors flex items-center gap-2"
               >
                 <Download className="w-4 h-4" />
-                Download MP3
+                Download MP3 ({selectedLanguage})
               </button>
               <button
                 onClick={generateDeepDive}
@@ -327,8 +366,12 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
               </button>
             </div>
 
-            <p className="text-[10px] uppercase tracking-widest text-foreground/60 dark:text-white/60 font-bold">
-              Powered by GPT-5.4 · Chancellor & Sydney Voices
+            <p className="text-[10px] uppercase tracking-widest text-foreground/60 dark:text-white/60 font-bold flex items-center justify-center gap-2 flex-wrap">
+              <span>Powered by GPT-5.4</span>
+              <span>·</span>
+              <span>Chancellor & Sydney Voices</span>
+              <span>·</span>
+              <span className="text-purple-500 dark:text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20 font-black">{selectedLanguage}</span>
             </p>
           </div>
         )}

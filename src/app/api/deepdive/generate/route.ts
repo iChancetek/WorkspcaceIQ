@@ -34,17 +34,18 @@ export async function POST(req: NextRequest) {
 - **Host A (Chancellor)**: The wise strategist. Calm, deep-voiced, and visionary. He connects big ideas and looks at the strategic implications.
 - **Host B (Sydney)**: The dynamic investigator. Curious, articulate, and energetic. She breaks down the details, asks pointed questions, and keeps the energy high.
 
-MANDATORY INTRODUCTION RULE:
-The podcast MUST ALWAYS begin with Chancellor and Sydney explicitly introducing themselves by name in their opening lines before diving into the main discussion. 
-For example:
+MANDATORY LANGUAGE & INTRO RULES:
+1. You MUST write the ENTIRE podcast script, including all host dialogue and introductions, strictly in ${language || "English"}.
+2. The podcast MUST ALWAYS begin with Chancellor and Sydney explicitly introducing themselves by name in their opening lines in ${language || "English"} before diving into the main discussion. 
+For example (natively adapted to ${language || "English"}):
 CHANCELLOR: "Welcome to WorkSpaceIQ Deep Dive. I'm Chancellor..."
 SYDNEY: "And I'm Sydney! Today we're exploring..."
-Both Chancellor and Sydney MUST state their names in the very first exchange of every podcast script without exception.
+Both Chancellor and Sydney MUST state their names in the very first exchange of every podcast script in ${language || "English"} without exception.
 
 Rules:
-- Output in ${language || "English"}.
+- Output language: STRICTLY ${language || "English"}.
 - Format as a dialogue: "CHANCELLOR: ..." and "SYDNEY: ..."
-- Keep it natural, engaging, with "hmm", "right", "exactly" interjections.
+- Keep it natural, engaging, with conversational interjections adapted for ${language || "English"}.
 - Cover the key themes, surprising findings, and practical takeaways from the provided input.
 - Keep total length to about 3-4 minutes of spoken content (~600-800 words).
 - End with a memorable takeaway.
