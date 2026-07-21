@@ -34,6 +34,9 @@ Your goal is to conduct a multi-pass, highly rigorous research synthesis of the 
 
 Because this is a Deep Dive, you MUST run 5 logical reasoning passes in sequence, and output the thinking for each pass before writing the final report.
 
+CRITICAL LENGTH RULE FOR RESEARCH PASSES:
+To prevent hitting output token limits and cutting off prematurely, you MUST keep the content inside the <pass1_retrieval>, <pass2_grouping>, <pass3_cross_reference>, <pass4_inconsistencies>, and <pass5_strategic_insights> tags extremely brief and concise (maximum 2-3 bullet points or 1 very short paragraph per pass, under 80 words each). Save your full depth, detailed analysis, and length for the final publication-ready report inside <report_html>.
+
 OUTPUT FORMAT INSTRUCTIONS:
 You MUST output your response in this EXACT structured XML tag sequence. Do not skip any tags. Do not put any text outside these tags.
 

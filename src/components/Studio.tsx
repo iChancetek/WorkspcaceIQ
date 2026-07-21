@@ -393,6 +393,30 @@ function parseReportStream(rawText: string): ParsedReport {
     if (rawText.indexOf("<research_phase>") === -1) {
       result.reportHtml = rawText;
       result.currentPass = 6;
+    } else {
+      const phaseEnd = rawText.indexOf("</research_phase>");
+      const p5End = rawText.indexOf("</pass5_strategic_insights>");
+      if (phaseEnd !== -1) {
+        result.reportHtml = rawText.substring(phaseEnd + 17);
+        result.currentPass = 6;
+      } else if (p5End !== -1) {
+        result.reportHtml = rawText.substring(p5End + 28);
+        result.currentPass = 6;
+      }
+    }
+  }
+
+  // Fallback: If reportHtml is still empty but we have completed some passes, compile them into a live summary
+  if (!result.reportHtml.trim()) {
+    let fallbackContent = "";
+    if (result.pass1.trim()) fallbackContent += `<h2>1. Retrieved Evidence Outline</h2><p>${result.pass1.trim().replace(/\n/g, "<br/>")}</p>`;
+    if (result.pass2.trim()) fallbackContent += `<h2>2. Grouped Facts & categorizations</h2><p>${result.pass2.trim().replace(/\n/g, "<br/>")}</p>`;
+    if (result.pass3.trim()) fallbackContent += `<h2>3. Cross-Source Connections & Timelines</h2><p>${result.pass3.trim().replace(/\n/g, "<br/>")}</p>`;
+    if (result.pass4.trim()) fallbackContent += `<h2>4. Factual Contradictions & Gaps</h2><p>${result.pass4.trim().replace(/\n/g, "<br/>")}</p>`;
+    if (result.pass5.trim()) fallbackContent += `<h2>5. Strategic Insights & Opportunities</h2><p>${result.pass5.trim().replace(/\n/g, "<br/>")}</p>`;
+    
+    if (fallbackContent) {
+      result.reportHtml = `<h1>Research Synthesis In Progress...</h1><p class="subtitle">A live compilation of completed analytical passes.</p>${fallbackContent}`;
     }
   }
 
