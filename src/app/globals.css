@@ -20,16 +20,16 @@
 }
 
 :root {
-  --background: #f8fafc;
+  --background: #ffffff;
   --foreground: #0f172a;
   --primary: #2563eb;
   --primary-foreground: #ffffff;
-  --secondary: #f1f5f9;
+  --secondary: #f8fafc;
   --secondary-foreground: #0f172a;
   --accent: #4f46e5; 
   --accent-foreground: #ffffff;
   --border: #e2e8f0;
-  --card: rgba(255, 255, 255, 0.85);
+  --card: #ffffff;
 }
 
 .dark {
@@ -103,7 +103,38 @@
 /* ─── Editorial Report Custom Typography & Layout ─── */
 .editorial-report {
   line-height: 1.8;
-  color: #111827; /* Dark slate text */
+  color: #1e293b; /* High-contrast slate text in Light Mode */
+}
+
+.dark .editorial-report {
+  color: #f3f4f6; /* Crisp light text in Dark Mode */
+}
+
+.dark .editorial-report h1,
+.dark .editorial-report h2,
+.dark .editorial-report h3 {
+  color: #ffffff !important;
+}
+
+.dark .editorial-report .subtitle {
+  color: #9ca3af !important;
+}
+
+.dark .editorial-report .callout {
+  background-color: rgba(30, 26, 75, 0.6);
+  border-color: rgba(129, 140, 248, 0.25);
+  color: #e2e8f0;
+}
+
+.dark .editorial-report table.report-table th {
+  background-color: rgba(31, 27, 74, 0.8);
+  border-bottom: 2px solid rgba(129, 140, 248, 0.3);
+  color: #ffffff;
+}
+
+.dark .editorial-report table.report-table td {
+  border-bottom: 1px solid rgba(129, 140, 248, 0.15);
+  color: #cbd5e1;
 }
 
 /* Typography Overrides */
