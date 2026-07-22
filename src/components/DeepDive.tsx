@@ -197,18 +197,18 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
           )}
         </AnimatePresence>
 
-        <div className="relative z-10 w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-purple-500/10 to-accent/10 dark:from-purple-500/5 dark:to-accent/5 flex items-center justify-center shadow-lg dark:shadow-none">
+        <div className="relative z-10 w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-500/10 border border-cyan-500/30 flex items-center justify-center shadow-2xl shadow-cyan-500/10">
           <motion.div
             animate={isPlaying ? { scale: [1, 1.1, 1] } : {}}
             transition={{ repeat: Infinity, duration: 2 }}
           >
-            <Headphones className={cn("w-10 h-10 transition-colors", isPlaying ? "text-purple-600 dark:text-purple-500" : "text-purple-500/60")} />
+            <Headphones className={cn("w-10 h-10 transition-colors", isPlaying ? "text-cyan-400" : "text-cyan-500/60")} />
           </motion.div>
         </div>
 
         <div className="space-y-2">
           <h3 className="text-3xl font-serif italic text-foreground dark:text-white">Deep Dive</h3>
-          <p className="text-sm text-foreground/70 dark:text-white/70 max-w-md mx-auto">
+          <p className="text-sm text-foreground/70 dark:text-cyan-200/80 max-w-md mx-auto font-medium">
             Transform your uploaded sources or custom topic into an engaging AI podcast discussion between Chancellor & Sydney.
           </p>
         </div>
@@ -217,10 +217,10 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
           <div className="space-y-4 max-w-lg mx-auto">
             {/* Top 5 Popular Languages Selector */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black uppercase tracking-wider text-foreground/50 dark:text-white/50">
+              <label className="text-[10px] font-black uppercase tracking-wider text-foreground/50 dark:text-cyan-200/70">
                 Select Podcast Language (English Default):
               </label>
-              <div className="flex items-center flex-wrap justify-center gap-1.5 bg-foreground/5 dark:bg-white/5 p-1.5 rounded-2xl border border-foreground/10 dark:border-white/10">
+              <div className="flex items-center flex-wrap justify-center gap-1.5 bg-foreground/5 dark:bg-[#131033] p-1.5 rounded-2xl border border-foreground/10 dark:border-cyan-500/30">
                 {POPULAR_LANGUAGES.map((lang) => (
                   <button
                     key={lang.id}
@@ -228,8 +228,8 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
                     className={cn(
                       "px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5",
                       selectedLanguage === lang.id
-                        ? "bg-purple-600 text-white shadow-md shadow-purple-600/30 scale-[1.02]"
-                        : "text-foreground/60 dark:text-white/60 hover:text-foreground dark:hover:text-white hover:bg-white/5"
+                        ? "bg-blue-600 dark:bg-cyan-600 text-white shadow-md shadow-blue-600/30 dark:shadow-cyan-500/30 scale-[1.02]"
+                        : "text-foreground/60 dark:text-slate-200 hover:text-foreground dark:hover:text-white hover:bg-white/5"
                     )}
                   >
                     <span>{lang.label}</span>
@@ -239,14 +239,14 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
             </div>
 
             {/* Input Mode Selector */}
-            <div className="flex items-center justify-center gap-2 bg-foreground/5 dark:bg-white/5 p-1 rounded-2xl border border-foreground/10 dark:border-white/10">
+            <div className="flex items-center justify-center gap-2 bg-foreground/5 dark:bg-[#131033] p-1 rounded-2xl border border-foreground/10 dark:border-cyan-500/30">
               <button
                 onClick={() => setInputMode("sources")}
                 className={cn(
                   "flex-1 py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2",
                   inputMode === "sources"
-                    ? "bg-purple-600 text-white shadow-md shadow-purple-600/30"
-                    : "text-foreground/60 dark:text-white/60 hover:text-foreground dark:hover:text-white"
+                    ? "bg-blue-600 dark:bg-cyan-600 text-white shadow-md shadow-blue-600/30 dark:shadow-cyan-500/30"
+                    : "text-foreground/60 dark:text-slate-200 hover:text-foreground dark:hover:text-white"
                 )}
               >
                 <span>Uploaded Sources</span>
@@ -262,8 +262,8 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
                 className={cn(
                   "flex-1 py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2",
                   inputMode === "custom"
-                    ? "bg-purple-600 text-white shadow-md shadow-purple-600/30"
-                    : "text-foreground/60 dark:text-white/60 hover:text-foreground dark:hover:text-white"
+                    ? "bg-blue-600 dark:bg-cyan-600 text-white shadow-md shadow-blue-600/30 dark:shadow-cyan-500/30"
+                    : "text-foreground/60 dark:text-slate-200 hover:text-foreground dark:hover:text-white"
                 )}
               >
                 <span>Custom Text / Topic</span>
@@ -273,7 +273,7 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
             {/* Custom Textarea Input */}
             {inputMode === "custom" && (
               <div className="space-y-1.5 text-left">
-                <label className="text-[10px] font-black uppercase tracking-wider text-foreground/50 dark:text-white/50">
+                <label className="text-[10px] font-black uppercase tracking-wider text-foreground/50 dark:text-cyan-200/70">
                   Enter Podcast Topic or Custom Text Prompt:
                 </label>
                 <textarea
@@ -281,7 +281,7 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
                   onChange={(e) => setCustomText(e.target.value)}
                   placeholder="Type or paste any topic, article, notes, or custom prompt here for Chancellor and Sydney to discuss..."
                   rows={4}
-                  className="w-full p-4 rounded-2xl bg-foreground/5 dark:bg-white/5 border border-foreground/10 dark:border-white/10 text-xs text-foreground dark:text-white placeholder:text-foreground/30 dark:placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-purple-500/50 resize-none font-sans leading-relaxed"
+                  className="w-full p-4 rounded-2xl bg-foreground/5 dark:bg-[#131033] border border-foreground/10 dark:border-cyan-500/30 text-xs text-foreground dark:text-white placeholder:text-foreground/30 dark:placeholder:text-indigo-200/40 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 resize-none font-sans leading-relaxed"
                 />
               </div>
             )}
@@ -300,7 +300,7 @@ export function DeepDive({ sources, language, onTranscriptGenerated }: DeepDiveP
                   (inputMode === "custom" && !customText.trim())
                 }
                 className={cn(
-                  "w-full px-8 py-4 bg-primary text-white rounded-full font-semibold text-base transition-all shadow-lg shadow-black/10 hover:bg-primary/90 flex items-center justify-center gap-3",
+                  "w-full px-8 py-4 bg-blue-600 hover:bg-blue-700 dark:bg-cyan-600 dark:hover:bg-cyan-500 text-white border border-blue-500 dark:border-cyan-400 rounded-full font-bold text-base transition-all shadow-lg shadow-blue-600/20 dark:shadow-cyan-500/20 flex items-center justify-center gap-3",
                   ((inputMode === "sources" && sources.length === 0) ||
                     (inputMode === "custom" && !customText.trim())) &&
                     "opacity-40 cursor-not-allowed"

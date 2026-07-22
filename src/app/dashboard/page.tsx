@@ -595,8 +595,8 @@ export default function Dashboard() {
                 animate={{ opacity: 1, y: 0 }}
                 className="text-center space-y-4 max-w-2xl mx-auto"
               >
-                <div className="w-16 h-16 mx-auto rounded-3xl bg-blue-500/10 dark:bg-indigo-500/10 flex items-center justify-center border border-blue-500/20 dark:border-indigo-500/20 shadow-2xl shadow-blue-500/10">
-                  <Mic className="w-8 h-8 text-blue-500 dark:text-indigo-400" />
+                <div className="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-br from-cyan-500/20 to-blue-500/10 border border-cyan-500/30 flex items-center justify-center shadow-2xl shadow-cyan-500/10">
+                  <Mic className="w-8 h-8 text-cyan-400" />
                 </div>
                 <div className="space-y-2">
                   <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-foreground dark:text-white">Your Workspace</h2>
@@ -606,9 +606,9 @@ export default function Dashboard() {
               <StreamingAudioRecorder />
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="h-px flex-1 bg-blue-100 dark:bg-white/8" />
-                  <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-foreground/60 dark:text-white/40">Also available in WorkSpaceIQ</p>
-                  <div className="h-px flex-1 bg-blue-100 dark:bg-white/8" />
+                  <div className="h-px flex-1 bg-blue-100 dark:bg-indigo-500/20" />
+                  <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-foreground/60 dark:text-cyan-200/70">Also available in WorkSpaceIQ</p>
+                  <div className="h-px flex-1 bg-blue-100 dark:bg-indigo-500/20" />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {FEATURE_CARDS.map((card) => (
@@ -616,7 +616,7 @@ export default function Dashboard() {
                       key={card.title}
                       onClick={() => setActiveTab(card.tab)}
                       className={cn(
-                        "group text-left p-5 rounded-2xl border bg-white dark:bg-gradient-to-br border-blue-100 dark:border-white/10 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:border-blue-400 dark:hover:border-indigo-500",
+                        "group text-left p-5 rounded-2xl border bg-white dark:bg-[#1e1a4d] border-blue-100 dark:border-cyan-500/30 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:border-blue-400 dark:hover:border-cyan-400 shadow-md dark:shadow-xl",
                         card.bg, card.border
                       )}
                     >

@@ -186,10 +186,10 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 25 }: So
         onDrop={(e) => { e.preventDefault(); setDragActive(false); handleFiles(e.dataTransfer.files); }}
         onClick={() => fileInputRef.current?.click()}
         className={cn(
-          "border-2 border-dashed rounded-2xl p-6 sm:p-8 text-center cursor-pointer transition-all w-full max-w-full bg-white dark:bg-transparent",
+          "border-2 border-dashed rounded-2xl p-6 sm:p-8 text-center cursor-pointer transition-all w-full max-w-full bg-white dark:bg-[#1e1a4d] shadow-md dark:shadow-xl",
           dragActive
-            ? "border-blue-500 bg-blue-50/50 ring-4 ring-blue-500/10"
-            : "border-blue-200 dark:border-white/10 hover:border-blue-500 hover:bg-blue-50/30 dark:hover:bg-white/[0.04]",
+            ? "border-blue-500 bg-blue-50/50 dark:border-cyan-400 dark:bg-cyan-500/10 ring-4 ring-cyan-500/10"
+            : "border-blue-200 dark:border-cyan-500/30 hover:border-blue-500 dark:hover:border-cyan-400 hover:bg-blue-50/30 dark:hover:bg-cyan-500/5",
           sources.length >= maxSources && "opacity-50 cursor-not-allowed pointer-events-none"
         )}
       >
@@ -203,15 +203,15 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 25 }: So
         />
         <div className="flex flex-col items-center justify-center gap-3 text-center">
           {isUploading ? (
-            <Loader2 className="w-8 h-8 text-blue-600 dark:text-blue-400 animate-spin" />
+            <Loader2 className="w-8 h-8 text-blue-600 dark:text-cyan-400 animate-spin" />
           ) : (
-            <Upload className="w-8 h-8 text-blue-600 dark:text-white/70" />
+            <Upload className="w-8 h-8 text-blue-600 dark:text-cyan-400" />
           )}
           <div>
             <p className="text-sm font-bold text-foreground dark:text-white">
               {isUploading ? "Processing..." : "Drop files here or click to upload"}
             </p>
-            <p className="text-[10px] uppercase tracking-widest text-foreground/60 dark:text-white/80 mt-1 font-medium">
+            <p className="text-[10px] uppercase tracking-widest text-foreground/60 dark:text-cyan-200/70 mt-1 font-bold">
               PDF · DOCX · TXT · MP3 · WAV · MP4 · MOV · XLSX · CSV
             </p>
           </div>
@@ -226,23 +226,23 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 25 }: So
         </div>
       )}
 
-      {/* URL input */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full max-w-2xl mx-auto">
-        <div className="relative flex-1 group">
-          <Link2 className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/50 dark:text-white/40 group-focus-within:text-blue-600 transition-colors" />
+      {/* URL Extractor */}
+      <div className="flex items-center gap-2 rounded-xl bg-white dark:bg-[#1e1a4d] border border-blue-200 dark:border-cyan-500/30 p-1.5 focus-within:border-blue-500 dark:focus-within:border-cyan-400 shadow-md transition-all">
+        <div className="flex items-center gap-2 flex-1 px-3">
+          <Link2 className="w-4 h-4 text-foreground/40 dark:text-cyan-400 shrink-0" />
           <input
             type="url"
-            placeholder="Paste a website or YouTube URL..."
-            className="w-full bg-white dark:bg-white/[0.03] border border-blue-200 dark:border-white/8 rounded-xl pl-10 pr-4 py-2.5 text-sm text-foreground focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm dark:shadow-none"
             value={urlInput}
             onChange={(e) => setUrlInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleUrlSubmit()}
+            placeholder="Paste website or YouTube URL..."
+            className="w-full bg-transparent border-none text-xs font-semibold text-foreground dark:text-white focus:outline-none placeholder:text-foreground/40 dark:placeholder:text-indigo-200/50"
           />
         </div>
         <button
           onClick={handleUrlSubmit}
           disabled={isExtractingUrl || !urlInput.trim()}
-          className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white border border-blue-500 dark:border-indigo-500 rounded-xl text-sm font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-md shadow-blue-600/20 dark:shadow-indigo-600/20"
+          className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 dark:bg-cyan-600 dark:hover:bg-cyan-500 text-white border border-blue-500 dark:border-cyan-400 rounded-xl text-sm font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-md shadow-blue-600/20 dark:shadow-cyan-500/20"
         >
           {isExtractingUrl ? <Loader2 className="w-4 h-4 animate-spin" /> : "Add"}
         </button>
