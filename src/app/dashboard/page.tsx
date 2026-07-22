@@ -525,7 +525,7 @@ export default function Dashboard() {
               )}
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-1.5 text-xs text-white font-bold bg-blue-600 hover:bg-blue-700 transition-all px-3.5 py-1.5 rounded-xl shadow-sm border border-blue-500"
+                className="flex items-center gap-1.5 text-xs text-white font-bold bg-blue-600 hover:bg-blue-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 transition-all px-3.5 py-1.5 rounded-xl shadow-sm border border-blue-500 dark:border-indigo-500"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Sign out</span>
@@ -548,13 +548,13 @@ export default function Dashboard() {
                   "relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200",
                   activeTab === tab.id
                     ? "text-white dark:text-white shadow-lg"
-                    : "text-foreground dark:text-white hover:text-blue-600 dark:hover:text-white hover:bg-blue-50 dark:hover:bg-white/10"
+                    : "text-foreground dark:text-white hover:text-blue-600 dark:hover:text-indigo-400 hover:bg-blue-50 dark:hover:bg-white/10"
                 )}
               >
                 {activeTab === tab.id && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute inset-0 bg-blue-600 dark:bg-white/15 border border-blue-500/30 dark:border-white/20 rounded-xl -z-10 shadow-md shadow-blue-500/20 dark:shadow-[0_0_20px_rgba(255,255,255,0.05)]"
+                    className="absolute inset-0 bg-blue-600 dark:bg-indigo-600 border border-blue-500/30 dark:border-indigo-500/30 rounded-xl -z-10 shadow-md shadow-blue-500/20 dark:shadow-[0_0_20px_rgba(99,102,241,0.2)]"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -595,8 +595,8 @@ export default function Dashboard() {
                 animate={{ opacity: 1, y: 0 }}
                 className="text-center space-y-4 max-w-2xl mx-auto"
               >
-                <div className="w-16 h-16 mx-auto rounded-3xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20 shadow-2xl shadow-blue-500/10">
-                  <Mic className="w-8 h-8 text-blue-400" />
+                <div className="w-16 h-16 mx-auto rounded-3xl bg-blue-500/10 dark:bg-indigo-500/10 flex items-center justify-center border border-blue-500/20 dark:border-indigo-500/20 shadow-2xl shadow-blue-500/10">
+                  <Mic className="w-8 h-8 text-blue-500 dark:text-indigo-400" />
                 </div>
                 <div className="space-y-2">
                   <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-foreground dark:text-white">Your Workspace</h2>
@@ -616,7 +616,7 @@ export default function Dashboard() {
                       key={card.title}
                       onClick={() => setActiveTab(card.tab)}
                       className={cn(
-                        "group text-left p-5 rounded-2xl border bg-white dark:bg-gradient-to-br border-blue-100 dark:border-white/10 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:border-blue-400",
+                        "group text-left p-5 rounded-2xl border bg-white dark:bg-gradient-to-br border-blue-100 dark:border-white/10 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:border-blue-400 dark:hover:border-indigo-500",
                         card.bg, card.border
                       )}
                     >
@@ -629,7 +629,7 @@ export default function Dashboard() {
                           <p className="text-[11px] text-foreground/60 dark:text-white/45 leading-relaxed font-medium">{card.desc}</p>
                         </div>
                       </div>
-                      <div className={cn("mt-3 text-[11px] font-bold flex items-center gap-1 text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform")}>
+                      <div className={cn("mt-3 text-[11px] font-bold flex items-center gap-1 text-blue-600 dark:text-indigo-400 group-hover:translate-x-1 transition-transform")}>
                         {card.cta} <ArrowRight className="w-3 h-3" />
                       </div>
                     </button>
@@ -686,7 +686,7 @@ export default function Dashboard() {
                 <button
                   onClick={handleExportProject}
                   disabled={sources.length === 0}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white border border-blue-500 text-xs font-bold transition-all disabled:opacity-30 self-center md:self-auto shadow-md shadow-blue-600/20"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white border border-blue-500 dark:border-indigo-500 text-xs font-bold transition-all disabled:opacity-30 self-center md:self-auto shadow-md shadow-blue-600/20 dark:shadow-indigo-600/20"
                 >
                   <Download className="w-3.5 h-3.5" />
                   Export

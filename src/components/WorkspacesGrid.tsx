@@ -155,7 +155,7 @@ export function WorkspacesGrid({
               onClick={handleCreate}
               disabled={isCreating}
               aria-label="Create new WorkSpace"
-              className="w-full group relative flex flex-col justify-center items-center h-48 rounded-3xl bg-blue-600 border border-blue-500 text-white shadow-md shadow-blue-600/20 hover:bg-blue-700 hover:shadow-lg transition-all duration-300 overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60"
+              className="w-full group relative flex flex-col justify-center items-center h-48 rounded-3xl bg-blue-600 dark:bg-indigo-600 border border-blue-500 dark:border-indigo-500 text-white shadow-md shadow-blue-600/20 dark:shadow-indigo-600/20 hover:bg-blue-700 dark:hover:bg-indigo-700 hover:shadow-lg transition-all duration-300 overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60"
             >
               {isCreating ? (
                 <Loader2 className="w-8 h-8 text-white animate-spin mb-3" />

@@ -777,11 +777,11 @@ export function Studio({ userId, sources, tone, language, studioOutputs, onNavig
             <motion.button key={mode.id} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setActiveMode(mode.id)} disabled={mode.comingSoon}
               className={cn("group flex-shrink-0 flex flex-col items-center gap-1.5 px-4 py-3 rounded-2xl border transition-all duration-200 min-w-[95px] snap-start shadow-sm",
                 activeMode === mode.id
-                  ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/30 font-bold"
-                  : "bg-blue-500/10 dark:bg-blue-600/20 border-blue-500/30 text-blue-700 dark:text-blue-200 hover:bg-blue-600 hover:text-white hover:border-blue-600",
+                  ? "bg-blue-600 dark:bg-indigo-600 border-blue-500 dark:border-indigo-500 text-white shadow-lg shadow-blue-600/30 dark:shadow-indigo-600/30 font-bold"
+                  : "bg-blue-500/10 dark:bg-indigo-600/20 border-blue-500/30 dark:border-indigo-500/30 text-blue-700 dark:text-indigo-200 hover:bg-blue-600 dark:hover:bg-indigo-600 hover:text-white hover:border-blue-600 dark:hover:border-indigo-600",
                 mode.comingSoon && "opacity-40 cursor-not-allowed")}>
-              <mode.icon className={cn("w-5 h-5", activeMode === mode.id ? "text-white" : "text-blue-600 dark:text-blue-400 group-hover:text-white")} />
-              <span className={cn("text-[10px] font-bold uppercase tracking-wide", activeMode === mode.id ? "text-white" : "text-blue-700 dark:text-blue-200 group-hover:text-white")}>{mode.label}</span>
+              <mode.icon className={cn("w-5 h-5", activeMode === mode.id ? "text-white" : "text-blue-600 dark:text-indigo-400 group-hover:text-white")} />
+              <span className={cn("text-[10px] font-bold uppercase tracking-wide", activeMode === mode.id ? "text-white" : "text-blue-700 dark:text-indigo-200 group-hover:text-white")}>{mode.label}</span>
             </motion.button>
           ))}
         </motion.div>
@@ -801,16 +801,16 @@ export function Studio({ userId, sources, tone, language, studioOutputs, onNavig
             {hasOutput && !isGenerating && (
               <>
                 {activeMode === "report" && (
-                  <button onClick={copyToClipboard} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors group shadow-sm">
+                  <button onClick={copyToClipboard} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white text-xs font-bold transition-colors group shadow-sm">
                     {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                     {copied ? "Copied!" : "Copy for Substack"}
                   </button>
                 )}
-                <button onClick={onManualSave} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors group shadow-sm"><Save className="w-3.5 h-3.5" /> Save</button>
-                <button onClick={() => generate()} className="p-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm"><RefreshCw className="w-4 h-4" /></button>
+                <button onClick={onManualSave} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white text-xs font-bold transition-colors group shadow-sm"><Save className="w-3.5 h-3.5" /> Save</button>
+                <button onClick={() => generate()} className="p-2 rounded-xl bg-blue-600 hover:bg-blue-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white transition-colors shadow-sm"><RefreshCw className="w-4 h-4" /></button>
               </>
             )}
-            {streamText && !isGenerating && <button onClick={() => downloadReportOrText(streamText, `workspaceiq-${activeMode}.md`)} className="p-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm"><Download className="w-4 h-4" /></button>}
+            {streamText && !isGenerating && <button onClick={() => downloadReportOrText(streamText, `workspaceiq-${activeMode}.md`)} className="p-2 rounded-xl bg-blue-600 hover:bg-blue-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white transition-colors shadow-sm"><Download className="w-4 h-4" /></button>}
           </div>
         </div>
 
@@ -831,29 +831,29 @@ export function Studio({ userId, sources, tone, language, studioOutputs, onNavig
                       className={cn(
                         "flex-1 p-4 rounded-2xl border text-left transition-all",
                         selectedReportType === "standard"
-                          ? "bg-blue-600 text-white border-blue-500 shadow-md font-bold"
+                          ? "bg-blue-600 dark:bg-indigo-600 text-white border-blue-500 dark:border-indigo-500 shadow-md font-bold"
                           : "bg-card dark:bg-white/5 border-border dark:border-white/10 hover:bg-blue-50 dark:hover:bg-white/10 text-foreground dark:text-white"
                       )}
                     >
-                      <div className={cn("text-xs font-black uppercase tracking-wider mb-1", selectedReportType === "standard" ? "text-white" : "text-blue-600 dark:text-blue-400")}>Standard Report</div>
-                      <div className={cn("text-[10px] leading-normal font-medium", selectedReportType === "standard" ? "text-blue-100" : "text-foreground/70 dark:text-white/70")}>Quick, concise, professionally structured summary of source materials.</div>
+                      <div className={cn("text-xs font-black uppercase tracking-wider mb-1", selectedReportType === "standard" ? "text-white" : "text-blue-600 dark:text-indigo-400")}>Standard Report</div>
+                      <div className={cn("text-[10px] leading-normal font-medium", selectedReportType === "standard" ? "text-blue-100 dark:text-indigo-100" : "text-foreground/70 dark:text-white/70")}>Quick, concise, professionally structured summary of source materials.</div>
                     </button>
                     <button
                       onClick={() => setSelectedReportType("deep-dive")}
                       className={cn(
                         "flex-1 p-4 rounded-2xl border text-left transition-all",
                         selectedReportType === "deep-dive"
-                          ? "bg-blue-600 text-white border-blue-500 shadow-md font-bold"
+                          ? "bg-blue-600 dark:bg-indigo-600 text-white border-blue-500 dark:border-indigo-500 shadow-md font-bold"
                           : "bg-card dark:bg-white/5 border-border dark:border-white/10 hover:bg-blue-50 dark:hover:bg-white/10 text-foreground dark:text-white"
                       )}
                     >
                       <div className={cn("text-xs font-black uppercase tracking-wider mb-1", selectedReportType === "deep-dive" ? "text-white" : "text-purple-600 dark:text-purple-400")}>Deep Dive Report</div>
-                      <div className={cn("text-[10px] leading-normal font-medium", selectedReportType === "deep-dive" ? "text-blue-100" : "text-foreground/70 dark:text-white/70")}>GraphRAG-powered, multi-pass analysis, cross-source insights, timelines, and risks.</div>
+                      <div className={cn("text-[10px] leading-normal font-medium", selectedReportType === "deep-dive" ? "text-blue-100 dark:text-indigo-100" : "text-foreground/70 dark:text-white/70")}>GraphRAG-powered, multi-pass analysis, cross-source insights, timelines, and risks.</div>
                     </button>
                   </div>
                 )}
 
-                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => generate()} disabled={!sources.length || currentMode.comingSoon} className={cn("flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-sm transition-all shadow-lg bg-blue-600 hover:bg-blue-700 text-white border border-blue-500 shadow-blue-600/20", (!sources.length || currentMode.comingSoon) && "opacity-40 cursor-not-allowed")}><Sparkles className="w-4 h-4" /> Generate</motion.button>
+                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => generate()} disabled={!sources.length || currentMode.comingSoon} className={cn("flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-sm transition-all shadow-lg bg-blue-600 hover:bg-blue-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white border border-blue-500 dark:border-indigo-500 shadow-blue-600/20 dark:shadow-indigo-600/20", (!sources.length || currentMode.comingSoon) && "opacity-40 cursor-not-allowed")}><Sparkles className="w-4 h-4" /> Generate</motion.button>
               </motion.div>
             )}
 

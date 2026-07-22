@@ -47,7 +47,7 @@ export function BackButton({
         onClick={handleClick}
         aria-label="Go back"
         className={cn(
-          "group flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white border border-blue-500 text-sm font-bold shadow-md shadow-blue-600/20 transition-all duration-200",
+          "group flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white border border-blue-500 dark:border-indigo-500 text-sm font-bold shadow-md shadow-blue-600/20 dark:shadow-indigo-600/20 transition-all duration-200",
           className
         )}
       >
@@ -63,9 +63,9 @@ export function BackButton({
       aria-label="Go back"
       className={cn(
         "fixed top-5 left-5 z-[60] group flex items-center gap-2 px-4 py-2 rounded-full",
-        "bg-blue-600 hover:bg-blue-700 border border-blue-500",
+        "bg-blue-600 hover:bg-blue-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 border border-blue-500 dark:border-indigo-500",
         "text-white text-sm font-bold backdrop-blur-sm",
-        "transition-all duration-200 shadow-md shadow-blue-600/20",
+        "transition-all duration-200 shadow-md shadow-blue-600/20 dark:shadow-indigo-600/20",
         className
       )}
     >

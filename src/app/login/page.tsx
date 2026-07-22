@@ -211,7 +211,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isSubmitting || loading || resetSent}
-              className="w-full flex items-center justify-center gap-2 px-5 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-all duration-200 disabled:opacity-50 shadow-md shadow-blue-600/20 border border-blue-500 mt-2"
+              className="w-full flex items-center justify-center gap-2 px-5 py-3.5 bg-blue-600 hover:bg-blue-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white rounded-xl font-bold text-sm transition-all duration-200 disabled:opacity-50 shadow-md shadow-blue-600/20 dark:shadow-indigo-600/20 border border-blue-500 dark:border-indigo-500 mt-2"
             >
               {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <>{btnLabel[mode]} <ArrowRight className="w-4 h-4" /></>}
             </button>

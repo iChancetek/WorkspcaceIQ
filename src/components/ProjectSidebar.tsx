@@ -144,7 +144,7 @@ export function ProjectSidebar({
       <button
         onClick={handleCreate}
         disabled={isCreating}
-        className="group flex items-center justify-center lg:justify-start gap-2 px-3.5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-sm border border-blue-500 transition-all text-xs font-bold"
+        className="group flex items-center justify-center lg:justify-start gap-2 px-3.5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white shadow-sm border border-blue-500 dark:border-indigo-500 transition-all text-xs font-bold"
       >
         {isCreating
           ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
