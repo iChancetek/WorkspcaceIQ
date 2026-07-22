@@ -144,7 +144,7 @@ export function ProjectSidebar({
       <button
         onClick={handleCreate}
         disabled={isCreating}
-        className="group flex items-center justify-center lg:justify-start gap-2 px-3 py-2.5 rounded-xl bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20 hover:border-violet-500/40 text-violet-700 dark:text-violet-300 hover:text-violet-900 dark:hover:text-violet-200 transition-all text-xs font-bold"
+        className="group flex items-center justify-center lg:justify-start gap-2 px-3.5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-sm border border-blue-500 transition-all text-xs font-bold"
       >
         {isCreating
           ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -169,8 +169,8 @@ export function ProjectSidebar({
             className={cn(
               "group relative rounded-xl border transition-all duration-150",
               activeProjectId === project.id
-                ? "bg-violet-500/10 border-violet-500/30 shadow-sm"
-                : "bg-card dark:bg-foreground/[0.02] border-border dark:border-foreground/5 hover:bg-foreground/5 dark:hover:bg-foreground/[0.05]"
+                ? "bg-blue-50 dark:bg-violet-500/10 border-blue-300 dark:border-violet-500/30 shadow-sm"
+                : "bg-white dark:bg-foreground/[0.02] border-blue-100 dark:border-foreground/5 hover:bg-blue-50/50 dark:hover:bg-foreground/[0.05]"
             )}
           >
             {editingId === project.id ? (

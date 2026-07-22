@@ -525,7 +525,7 @@ export default function Dashboard() {
               )}
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-1.5 text-xs text-foreground/30 hover:text-foreground/70 transition-colors px-2 py-1 rounded-lg hover:bg-foreground/5"
+                className="flex items-center gap-1.5 text-xs text-white font-bold bg-blue-600 hover:bg-blue-700 transition-all px-3.5 py-1.5 rounded-xl shadow-sm border border-blue-500"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Sign out</span>
@@ -534,7 +534,7 @@ export default function Dashboard() {
           </header>
 
           {/* ── Tab Navigation ──────────────────────────────────────────────── */}
-          <nav className="flex items-center gap-1 p-1.5 bg-foreground/5 dark:bg-white/[0.04] rounded-2xl border border-foreground/10 dark:border-white/8 w-full overflow-x-auto scrollbar-none backdrop-blur-sm shadow-sm dark:shadow-none"
+          <nav className="flex items-center gap-1 p-1.5 bg-white dark:bg-white/[0.04] rounded-2xl border border-blue-100 dark:border-white/8 w-full overflow-x-auto scrollbar-none backdrop-blur-sm shadow-sm dark:shadow-none"
             style={{ scrollbarWidth: "none" }}
             aria-label="Main navigation"
           >
@@ -548,7 +548,7 @@ export default function Dashboard() {
                   "relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200",
                   activeTab === tab.id
                     ? "text-white dark:text-white shadow-lg"
-                    : "text-foreground dark:text-white hover:text-blue-600 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-white/10"
+                    : "text-foreground dark:text-white hover:text-blue-600 dark:hover:text-white hover:bg-blue-50 dark:hover:bg-white/10"
                 )}
               >
                 {activeTab === tab.id && (
@@ -606,9 +606,9 @@ export default function Dashboard() {
               <StreamingAudioRecorder />
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="h-px flex-1 bg-foreground/10 dark:bg-white/8" />
+                  <div className="h-px flex-1 bg-blue-100 dark:bg-white/8" />
                   <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-foreground/60 dark:text-white/40">Also available in WorkSpaceIQ</p>
-                  <div className="h-px flex-1 bg-foreground/10 dark:bg-white/8" />
+                  <div className="h-px flex-1 bg-blue-100 dark:bg-white/8" />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {FEATURE_CARDS.map((card) => (
@@ -616,20 +616,20 @@ export default function Dashboard() {
                       key={card.title}
                       onClick={() => setActiveTab(card.tab)}
                       className={cn(
-                        "group text-left p-5 rounded-2xl border bg-gradient-to-br transition-all duration-200 hover:scale-[1.02] hover:shadow-xl",
+                        "group text-left p-5 rounded-2xl border bg-white dark:bg-gradient-to-br border-blue-100 dark:border-white/10 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:border-blue-400",
                         card.bg, card.border
                       )}
                     >
                       <div className="flex items-start gap-3">
-                        <div className={cn("p-2 rounded-xl bg-foreground/5 dark:bg-white/5", card.color)}>
+                        <div className={cn("p-2 rounded-xl bg-blue-50 dark:bg-white/5", card.color)}>
                           <card.icon className="w-4 h-4" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-bold text-foreground dark:text-white mb-1">{card.title}</p>
-                          <p className="text-[11px] text-foreground/45 dark:text-white/45 leading-relaxed font-medium">{card.desc}</p>
+                          <p className="text-[11px] text-foreground/60 dark:text-white/45 leading-relaxed font-medium">{card.desc}</p>
                         </div>
                       </div>
-                      <div className={cn("mt-3 text-[11px] font-semibold flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity", card.color)}>
+                      <div className={cn("mt-3 text-[11px] font-bold flex items-center gap-1 text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform")}>
                         {card.cta} <ArrowRight className="w-3 h-3" />
                       </div>
                     </button>
@@ -686,7 +686,7 @@ export default function Dashboard() {
                 <button
                   onClick={handleExportProject}
                   disabled={sources.length === 0}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 border border-foreground/10 dark:border-white/10 text-xs font-bold text-foreground/40 dark:text-white/70 hover:text-foreground dark:hover:text-white transition-all disabled:opacity-30 self-center md:self-auto shadow-sm dark:shadow-none"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white border border-blue-500 text-xs font-bold transition-all disabled:opacity-30 self-center md:self-auto shadow-md shadow-blue-600/20"
                 >
                   <Download className="w-3.5 h-3.5" />
                   Export

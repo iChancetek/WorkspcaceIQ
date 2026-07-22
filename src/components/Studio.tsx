@@ -775,23 +775,25 @@ export function Studio({ userId, sources, tone, language, studioOutputs, onNavig
         <motion.div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x w-full justify-start items-center px-2">
           {MODES.map(mode => (
             <motion.button key={mode.id} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setActiveMode(mode.id)} disabled={mode.comingSoon}
-              className={cn("group flex-shrink-0 flex flex-col items-center gap-1.5 px-4 py-3 rounded-2xl border transition-all duration-200 min-w-[90px] snap-start",
-                activeMode === mode.id ? cn("bg-gradient-to-br shadow-lg", mode.bg, mode.border) : "border-foreground/10 dark:border-white/8 bg-foreground/5 dark:bg-white/[0.03] hover:bg-foreground/10 dark:hover:bg-white/[0.06]",
+              className={cn("group flex-shrink-0 flex flex-col items-center gap-1.5 px-4 py-3 rounded-2xl border transition-all duration-200 min-w-[95px] snap-start shadow-sm",
+                activeMode === mode.id
+                  ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/30 font-bold"
+                  : "bg-blue-500/10 dark:bg-blue-600/20 border-blue-500/30 text-blue-700 dark:text-blue-200 hover:bg-blue-600 hover:text-white hover:border-blue-600",
                 mode.comingSoon && "opacity-40 cursor-not-allowed")}>
-              <mode.icon className={cn("w-5 h-5", activeMode === mode.id ? "text-white" : "text-foreground/40 dark:text-white/60 group-hover:text-foreground/70 dark:group-hover:text-white/80")} />
-              <span className={cn("text-[10px] font-bold uppercase tracking-wide", activeMode === mode.id ? "text-white" : "text-foreground/60 dark:text-white/60")}>{mode.label}</span>
+              <mode.icon className={cn("w-5 h-5", activeMode === mode.id ? "text-white" : "text-blue-600 dark:text-blue-400 group-hover:text-white")} />
+              <span className={cn("text-[10px] font-bold uppercase tracking-wide", activeMode === mode.id ? "text-white" : "text-blue-700 dark:text-blue-200 group-hover:text-white")}>{mode.label}</span>
             </motion.button>
           ))}
         </motion.div>
       </div>
 
-      <motion.div layout={!isGenerating} className={cn("min-h-[320px] rounded-[2rem] md:rounded-3xl border bg-gradient-to-br p-4 md:p-6 flex flex-col w-full max-w-full relative", currentMode.bg, currentMode.border)}>
+      <motion.div layout={!isGenerating} className={cn("min-h-[320px] rounded-[2rem] md:rounded-3xl border bg-card dark:bg-gradient-to-br p-4 md:p-6 flex flex-col w-full max-w-full relative shadow-sm dark:shadow-none", currentMode.bg, currentMode.border)}>
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-5 text-center sm:text-left">
           <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col sm:flex-row items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-foreground/5 dark:bg-white/5"><currentMode.icon className={cn("w-5 h-5", currentMode.color)} /></div>
+            <div className="p-2 rounded-xl bg-blue-500/10 dark:bg-white/5"><currentMode.icon className={cn("w-5 h-5", currentMode.color)} /></div>
             <div>
               <p className="text-sm font-bold text-foreground dark:text-white">{currentMode.label}</p>
-              <p className="text-[10px] text-foreground/50 dark:text-white/70">{currentMode.desc}</p>
+              <p className="text-[10px] text-foreground/60 dark:text-white/70 font-medium">{currentMode.desc}</p>
             </div>
           </motion.div>
           <div className="flex items-center gap-2">
@@ -799,16 +801,16 @@ export function Studio({ userId, sources, tone, language, studioOutputs, onNavig
             {hasOutput && !isGenerating && (
               <>
                 {activeMode === "report" && (
-                  <button onClick={copyToClipboard} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 text-xs font-bold border border-emerald-500/30 transition-colors group">
+                  <button onClick={copyToClipboard} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors group shadow-sm">
                     {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                     {copied ? "Copied!" : "Copy for Substack"}
                   </button>
                 )}
-                <button onClick={onManualSave} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-violet-500/20 hover:bg-violet-500/30 text-violet-400 text-xs font-bold border border-violet-500/30 transition-colors group"><Save className="w-3.5 h-3.5" /> Save</button>
-                <button onClick={() => generate()} className="p-2 rounded-xl bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 text-foreground/40 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-colors"><RefreshCw className="w-4 h-4" /></button>
+                <button onClick={onManualSave} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors group shadow-sm"><Save className="w-3.5 h-3.5" /> Save</button>
+                <button onClick={() => generate()} className="p-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm"><RefreshCw className="w-4 h-4" /></button>
               </>
             )}
-            {streamText && !isGenerating && <button onClick={() => downloadReportOrText(streamText, `workspaceiq-${activeMode}.md`)} className="p-2 rounded-xl bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 text-foreground/40 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-colors"><Download className="w-4 h-4" /></button>}
+            {streamText && !isGenerating && <button onClick={() => downloadReportOrText(streamText, `workspaceiq-${activeMode}.md`)} className="p-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm"><Download className="w-4 h-4" /></button>}
           </div>
         </div>
 
@@ -816,10 +818,10 @@ export function Studio({ userId, sources, tone, language, studioOutputs, onNavig
           <AnimatePresence mode="wait">
             {!hasOutput && !isGenerating && (
               <motion.div key="empty" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="h-full flex flex-col items-center justify-center gap-4 text-center py-6">
-                <div className="p-4 rounded-2xl bg-foreground/5 dark:bg-white/5"><currentMode.icon className={cn("w-8 h-8", currentMode.color)} /></div>
+                <div className="p-4 rounded-2xl bg-blue-500/10 dark:bg-white/5"><currentMode.icon className={cn("w-8 h-8", currentMode.color)} /></div>
                 <div>
                   <p className="text-base font-bold text-foreground dark:text-white mb-1">Generate {currentMode.label}</p>
-                  <p className="text-xs text-foreground/50 dark:text-white/70 max-w-xs">{currentMode.desc} from your {sources.length} sources</p>
+                  <p className="text-xs text-foreground/60 dark:text-white/70 max-w-xs font-medium">{currentMode.desc} from your {sources.length} sources</p>
                 </div>
                 
                 {activeMode === "report" && (
@@ -829,29 +831,29 @@ export function Studio({ userId, sources, tone, language, studioOutputs, onNavig
                       className={cn(
                         "flex-1 p-4 rounded-2xl border text-left transition-all",
                         selectedReportType === "standard"
-                          ? "bg-blue-500/10 border-blue-500 text-blue-900 dark:text-blue-100"
-                          : "bg-foreground/5 dark:bg-white/5 border-foreground/10 dark:border-white/10 hover:bg-foreground/10 dark:hover:bg-white/10"
+                          ? "bg-blue-600 text-white border-blue-500 shadow-md font-bold"
+                          : "bg-card dark:bg-white/5 border-border dark:border-white/10 hover:bg-blue-50 dark:hover:bg-white/10 text-foreground dark:text-white"
                       )}
                     >
-                      <div className="text-xs font-black uppercase tracking-wider mb-1 text-blue-600 dark:text-blue-400">Standard Report</div>
-                      <div className="text-[10px] opacity-70 leading-normal text-foreground/70 dark:text-white/70">Quick, concise, professionally structured summary of source materials.</div>
+                      <div className={cn("text-xs font-black uppercase tracking-wider mb-1", selectedReportType === "standard" ? "text-white" : "text-blue-600 dark:text-blue-400")}>Standard Report</div>
+                      <div className={cn("text-[10px] leading-normal font-medium", selectedReportType === "standard" ? "text-blue-100" : "text-foreground/70 dark:text-white/70")}>Quick, concise, professionally structured summary of source materials.</div>
                     </button>
                     <button
                       onClick={() => setSelectedReportType("deep-dive")}
                       className={cn(
                         "flex-1 p-4 rounded-2xl border text-left transition-all",
                         selectedReportType === "deep-dive"
-                          ? "bg-purple-500/10 border-purple-500 text-purple-900 dark:text-purple-100"
-                          : "bg-foreground/5 dark:bg-white/5 border-foreground/10 dark:border-white/10 hover:bg-foreground/10 dark:hover:bg-white/10"
+                          ? "bg-blue-600 text-white border-blue-500 shadow-md font-bold"
+                          : "bg-card dark:bg-white/5 border-border dark:border-white/10 hover:bg-blue-50 dark:hover:bg-white/10 text-foreground dark:text-white"
                       )}
                     >
-                      <div className="text-xs font-black uppercase tracking-wider mb-1 text-purple-600 dark:text-purple-400">Deep Dive Report</div>
-                      <div className="text-[10px] opacity-70 leading-normal text-foreground/70 dark:text-white/70">GraphRAG-powered, multi-pass analysis, cross-source insights, timelines, and risks.</div>
+                      <div className={cn("text-xs font-black uppercase tracking-wider mb-1", selectedReportType === "deep-dive" ? "text-white" : "text-purple-600 dark:text-purple-400")}>Deep Dive Report</div>
+                      <div className={cn("text-[10px] leading-normal font-medium", selectedReportType === "deep-dive" ? "text-blue-100" : "text-foreground/70 dark:text-white/70")}>GraphRAG-powered, multi-pass analysis, cross-source insights, timelines, and risks.</div>
                     </button>
                   </div>
                 )}
 
-                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => generate()} disabled={!sources.length || currentMode.comingSoon} className={cn("flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-sm transition-all shadow-xl bg-foreground/5 dark:bg-white/10 hover:bg-foreground/10 text-foreground dark:text-white border border-foreground/10", (!sources.length || currentMode.comingSoon) && "opacity-40 cursor-not-allowed")}><Sparkles className="w-4 h-4" /> Generate</motion.button>
+                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => generate()} disabled={!sources.length || currentMode.comingSoon} className={cn("flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-sm transition-all shadow-lg bg-blue-600 hover:bg-blue-700 text-white border border-blue-500 shadow-blue-600/20", (!sources.length || currentMode.comingSoon) && "opacity-40 cursor-not-allowed")}><Sparkles className="w-4 h-4" /> Generate</motion.button>
               </motion.div>
             )}
 

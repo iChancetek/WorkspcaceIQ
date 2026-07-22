@@ -195,11 +195,12 @@ export function GraphVisualization({ nodes, edges, onNodeClick }: GraphVisualiza
         const to = layoutNodes.find((n) => n.id === edge.to);
         if (!from || !to) continue;
 
+        const isEdgeHovered = hoveredNodeRef.current === from.id || hoveredNodeRef.current === to.id;
         ctx.beginPath();
         ctx.moveTo(from.x, from.y);
         ctx.lineTo(to.x, to.y);
-        ctx.strokeStyle = "rgba(255,255,255,0.06)";
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = isEdgeHovered ? "rgba(165, 180, 252, 0.7)" : "rgba(165, 180, 252, 0.3)";
+        ctx.lineWidth = isEdgeHovered ? 1.5 : 1;
         ctx.stroke();
       }
 
@@ -210,25 +211,28 @@ export function GraphVisualization({ nodes, edges, onNodeClick }: GraphVisualiza
         // Glow effect
         if (isHovered) {
           ctx.beginPath();
-          ctx.arc(node.x, node.y, node.radius + 8, 0, Math.PI * 2);
-          ctx.fillStyle = node.color + "20";
+          ctx.arc(node.x, node.y, node.radius + 10, 0, Math.PI * 2);
+          ctx.fillStyle = node.color + "40";
           ctx.fill();
         }
 
         // Node circle
         ctx.beginPath();
         ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-        ctx.fillStyle = isHovered ? node.color : node.color + "90";
+        ctx.fillStyle = isHovered ? node.color : node.color + "ee";
+        ctx.strokeStyle = isHovered ? "#ffffff" : "rgba(255,255,255,0.4)";
+        ctx.lineWidth = 1.5;
         ctx.fill();
+        ctx.stroke();
 
         // Label
-        ctx.font = `${isHovered ? "bold " : ""}${Math.max(9, 11 - layoutNodes.length * 0.02)}px Inter, sans-serif`;
-        ctx.fillStyle = isHovered ? "#ffffff" : "rgba(255,255,255,0.5)";
+        ctx.font = `${isHovered ? "bold " : "600 "}${Math.max(10, 12 - layoutNodes.length * 0.02)}px Inter, sans-serif`;
+        ctx.fillStyle = isHovered ? "#ffffff" : "rgba(241, 245, 249, 0.95)";
         ctx.textAlign = "center";
         ctx.fillText(
           node.label.length > 18 ? node.label.slice(0, 16) + "..." : node.label,
           node.x,
-          node.y + node.radius + 14
+          node.y + node.radius + 15
         );
       }
 
@@ -349,7 +353,7 @@ export function GraphVisualization({ nodes, edges, onNodeClick }: GraphVisualiza
       {/* Canvas */}
       <div
         ref={containerRef}
-        className="dark-card overflow-hidden relative"
+        className="bg-[#12102b] border border-indigo-500/30 rounded-2xl shadow-xl overflow-hidden relative"
       >
         <canvas ref={canvasRef} className="w-full" />
 

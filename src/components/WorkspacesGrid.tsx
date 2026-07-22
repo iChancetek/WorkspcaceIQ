@@ -155,16 +155,16 @@ export function WorkspacesGrid({
               onClick={handleCreate}
               disabled={isCreating}
               aria-label="Create new WorkSpace"
-              className="w-full group relative flex flex-col justify-center items-center h-48 rounded-3xl bg-violet-500/10 dark:bg-violet-500/[0.05] border border-violet-500/30 dark:border-violet-500/20 hover:border-violet-500/60 dark:hover:border-violet-500/50 hover:bg-violet-500/15 dark:hover:bg-violet-500/[0.1] hover:shadow-[0_0_20px_rgba(139,92,246,0.15)] transition-all duration-300 overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+              className="w-full group relative flex flex-col justify-center items-center h-48 rounded-3xl bg-blue-600 border border-blue-500 text-white shadow-md shadow-blue-600/20 hover:bg-blue-700 hover:shadow-lg transition-all duration-300 overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60"
             >
               {isCreating ? (
-                <Loader2 className="w-8 h-8 text-violet-600 dark:text-violet-400 animate-spin mb-3" />
+                <Loader2 className="w-8 h-8 text-white animate-spin mb-3" />
               ) : (
-                <div className="w-12 h-12 rounded-full bg-violet-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                  <Plus className="w-6 h-6 text-violet-600 dark:text-violet-300" />
+                <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                  <Plus className="w-6 h-6 text-white" />
                 </div>
               )}
-              <span className="text-sm font-bold text-violet-700 dark:text-violet-300">
+              <span className="text-sm font-bold text-white">
                 {isCreating ? "Creating..." : "Create new WorkSpace"}
               </span>
             </button>
@@ -174,14 +174,14 @@ export function WorkspacesGrid({
           {projects.length === 0 && (
             <motion.div 
               variants={itemVariants}
-              className="hidden sm:flex col-span-1 sm:col-span-2 lg:col-span-2 xl:col-span-3 flex-col items-center justify-center h-48 rounded-3xl border border-dashed border-foreground/15 dark:border-white/10 text-center p-6 gap-3"
+              className="hidden sm:flex col-span-1 sm:col-span-2 lg:col-span-2 xl:col-span-3 flex-col items-center justify-center h-48 rounded-3xl border border-dashed border-blue-200 dark:border-white/10 text-center p-6 gap-3 bg-white dark:bg-transparent"
             >
-              <div className="w-10 h-10 rounded-2xl bg-foreground/5 dark:bg-white/5 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-foreground/40 dark:text-white/25" />
+              <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-white/5 flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-blue-500 dark:text-white/25" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-foreground/70 dark:text-white/40">No WorkSpaces yet</p>
-                <p className="text-xs text-foreground/50 dark:text-white/30 mt-1">
+                <p className="text-sm font-semibold text-foreground/80 dark:text-white/40">No WorkSpaces yet</p>
+                <p className="text-xs text-foreground/60 dark:text-white/30 mt-1">
                   Click "Create new WorkSpace" to upload research, PDFs, audio, and YouTube links.
                 </p>
               </div>
@@ -198,7 +198,7 @@ export function WorkspacesGrid({
                 <button
                   onClick={() => onSelectProject(project)}
                   aria-label={`Open workspace: ${project.name}`}
-                  className="w-full group flex flex-col text-left h-48 rounded-3xl bg-card dark:bg-white/[0.03] border border-border dark:border-white/10 hover:border-violet-500/40 dark:hover:border-white/20 hover:bg-foreground/[0.02] dark:hover:bg-white/[0.06] shadow-sm hover:shadow-md transition-all duration-300 p-5 relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                  className="w-full group flex flex-col text-left h-48 rounded-3xl bg-white dark:bg-white/[0.03] border border-blue-100 dark:border-white/10 hover:border-blue-500 dark:hover:border-white/20 hover:shadow-md transition-all duration-300 p-5 relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60"
                 >
                   {/* Icon row */}
                   <div className="flex items-start justify-between w-full mb-auto">

@@ -186,10 +186,10 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 25 }: So
         onDrop={(e) => { e.preventDefault(); setDragActive(false); handleFiles(e.dataTransfer.files); }}
         onClick={() => fileInputRef.current?.click()}
         className={cn(
-          "border-2 border-dashed rounded-2xl p-6 sm:p-8 text-center cursor-pointer transition-all w-full max-w-full",
+          "border-2 border-dashed rounded-2xl p-6 sm:p-8 text-center cursor-pointer transition-all w-full max-w-full bg-white dark:bg-transparent",
           dragActive
-            ? "border-violet-500 bg-violet-500/5 ring-4 ring-violet-500/10"
-            : "border-foreground/10 dark:border-white/10 hover:border-violet-500/50 hover:bg-foreground/5 dark:hover:bg-white/[0.04]",
+            ? "border-blue-500 bg-blue-50/50 ring-4 ring-blue-500/10"
+            : "border-blue-200 dark:border-white/10 hover:border-blue-500 hover:bg-blue-50/30 dark:hover:bg-white/[0.04]",
           sources.length >= maxSources && "opacity-50 cursor-not-allowed pointer-events-none"
         )}
       >
@@ -203,9 +203,9 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 25 }: So
         />
         <div className="flex flex-col items-center justify-center gap-3 text-center">
           {isUploading ? (
-            <Loader2 className="w-8 h-8 text-violet-600 dark:text-violet-400 animate-spin" />
+            <Loader2 className="w-8 h-8 text-blue-600 dark:text-blue-400 animate-spin" />
           ) : (
-            <Upload className="w-8 h-8 text-foreground/60 dark:text-white/70" />
+            <Upload className="w-8 h-8 text-blue-600 dark:text-white/70" />
           )}
           <div>
             <p className="text-sm font-bold text-foreground dark:text-white">
@@ -229,11 +229,11 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 25 }: So
       {/* URL input */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full max-w-2xl mx-auto">
         <div className="relative flex-1 group">
-          <Link2 className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/50 dark:text-white/40 group-focus-within:text-violet-500 transition-colors" />
+          <Link2 className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/50 dark:text-white/40 group-focus-within:text-blue-600 transition-colors" />
           <input
             type="url"
             placeholder="Paste a website or YouTube URL..."
-            className="w-full bg-card dark:bg-white/[0.03] border border-border dark:border-white/8 rounded-xl pl-10 pr-4 py-2.5 text-sm text-foreground focus:outline-none focus:border-violet-500/50 focus:ring-4 focus:ring-violet-500/5 transition-all shadow-sm dark:shadow-none"
+            className="w-full bg-white dark:bg-white/[0.03] border border-blue-200 dark:border-white/8 rounded-xl pl-10 pr-4 py-2.5 text-sm text-foreground focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm dark:shadow-none"
             value={urlInput}
             onChange={(e) => setUrlInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleUrlSubmit()}
@@ -242,7 +242,7 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 25 }: So
         <button
           onClick={handleUrlSubmit}
           disabled={isExtractingUrl || !urlInput.trim()}
-          className="px-6 py-2.5 bg-foreground dark:bg-white text-background dark:text-black rounded-xl text-sm font-bold hover:opacity-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-lg shadow-black/10 dark:shadow-none"
+          className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white border border-blue-500 rounded-xl text-sm font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-md shadow-blue-600/20"
         >
           {isExtractingUrl ? <Loader2 className="w-4 h-4 animate-spin" /> : "Add"}
         </button>
