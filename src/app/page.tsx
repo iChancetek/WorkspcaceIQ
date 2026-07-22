@@ -222,7 +222,7 @@ export default function Home() {
       <footer className="relative z-10 border-t border-white/6 max-w-6xl mx-auto px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 via-violet-400 to-emerald-400" />
-          <span className="text-sm text-white/30 font-medium">© {new Date().getFullYear()} | WorkSpaceIQ | Chancellor Minus | ChanceTEK LLC. All rights reserved.</span>
+          <span className="text-sm text-white/50 font-medium">© {new Date().getFullYear()} WorkSpaceIQ | Developed by Chancellor @ ChanceTEK LLC. All rights reserved.</span>
         </div>
         <div className="flex items-center gap-6">
           <Link href="/privacy" className="text-xs text-white/25 hover:text-white/60 transition-colors">Privacy</Link>

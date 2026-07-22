@@ -926,7 +926,7 @@ export default function Dashboard() {
 
           {/* Footer */}
           <footer className="pt-12 pb-8 border-t border-foreground/5 dark:border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-foreground/20 dark:text-white/20 font-medium">© {new Date().getFullYear()} WorkSpaceIQ | Chancellor Minus</p>
+            <p className="text-xs text-foreground/40 dark:text-white/40 font-medium">© {new Date().getFullYear()} WorkSpaceIQ | Developed by Chancellor @ ChanceTEK LLC</p>
             <div className="flex items-center gap-6">
               <Link href="/privacy" className="text-[10px] uppercase tracking-widest font-bold text-foreground/20 dark:text-white/20 hover:text-foreground/60 dark:hover:text-white/60 transition-colors">Privacy</Link>
               <Link href="/terms" className="text-[10px] uppercase tracking-widest font-bold text-foreground/20 dark:text-white/20 hover:text-foreground/60 dark:hover:text-white/60 transition-colors">Terms</Link>

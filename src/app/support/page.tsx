@@ -138,8 +138,8 @@ export default function SupportPage() {
 
       {/* ── Footer ── */}
       <footer className="relative z-10 border-t border-white/5 py-12 max-w-5xl mx-auto px-8 text-center sm:text-left">
-        <p className="text-xs text-white/20">
-          © {new Date().getFullYear()} WorkSpaceIQ | Chancellor Minus | ChanceTEK LLC. All rights reserved.
+        <p className="text-xs text-white/40">
+          © {new Date().getFullYear()} WorkSpaceIQ | Developed by Chancellor @ ChanceTEK LLC. All rights reserved.
         </p>
       </footer>
 
