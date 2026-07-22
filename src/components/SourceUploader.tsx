@@ -203,15 +203,15 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 25 }: So
         />
         <div className="flex flex-col items-center justify-center gap-3 text-center">
           {isUploading ? (
-            <Loader2 className="w-8 h-8 text-foreground/40 dark:text-white/50 animate-spin" />
+            <Loader2 className="w-8 h-8 text-violet-600 dark:text-violet-400 animate-spin" />
           ) : (
-            <Upload className="w-8 h-8 text-foreground/40 dark:text-white/50" />
+            <Upload className="w-8 h-8 text-foreground/60 dark:text-white/70" />
           )}
           <div>
-            <p className="text-sm font-semibold text-foreground/80 dark:text-white/80">
+            <p className="text-sm font-bold text-foreground dark:text-white">
               {isUploading ? "Processing..." : "Drop files here or click to upload"}
             </p>
-            <p className="text-[10px] uppercase tracking-widest text-foreground/70 dark:text-white/80 mt-1">
+            <p className="text-[10px] uppercase tracking-widest text-foreground/60 dark:text-white/80 mt-1 font-medium">
               PDF · DOCX · TXT · MP3 · WAV · MP4 · MOV · XLSX · CSV
             </p>
           </div>
@@ -229,11 +229,11 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 25 }: So
       {/* URL input */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full max-w-2xl mx-auto">
         <div className="relative flex-1 group">
-          <Link2 className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/30 dark:text-white/30 group-focus-within:text-violet-400 transition-colors" />
+          <Link2 className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/50 dark:text-white/40 group-focus-within:text-violet-500 transition-colors" />
           <input
             type="url"
             placeholder="Paste a website or YouTube URL..."
-            className="w-full bg-foreground/5 dark:bg-white/[0.03] border border-foreground/10 dark:border-white/8 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-violet-500/50 focus:ring-4 focus:ring-violet-500/5 transition-all"
+            className="w-full bg-card dark:bg-white/[0.03] border border-border dark:border-white/8 rounded-xl pl-10 pr-4 py-2.5 text-sm text-foreground focus:outline-none focus:border-violet-500/50 focus:ring-4 focus:ring-violet-500/5 transition-all shadow-sm dark:shadow-none"
             value={urlInput}
             onChange={(e) => setUrlInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleUrlSubmit()}
@@ -251,21 +251,21 @@ export function SourceUploader({ sources, onSourcesChange, maxSources = 25 }: So
       {/* Source cards */}
       {sources.length > 0 && (
         <div className="space-y-2">
-          <p className="text-[10px] uppercase tracking-widest font-bold text-foreground/60 dark:text-white/70 text-center sm:text-left">
+          <p className="text-[10px] uppercase tracking-widest font-bold text-foreground/70 dark:text-white/70 text-center sm:text-left">
             {sources.length} / {maxSources} Sources
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {sources.map((source) => (
               <div
                 key={source.id}
-                className="flex items-start gap-3 p-4 bg-foreground/5 dark:bg-white/[0.04] border border-foreground/10 dark:border-white/8 rounded-xl group hover:shadow-md transition-all"
+                className="flex items-start gap-3 p-4 bg-card dark:bg-white/[0.04] border border-border dark:border-white/8 rounded-xl group hover:shadow-md transition-all"
               >
                 <div className="p-2 bg-foreground/5 dark:bg-white/5 rounded-lg shrink-0 mt-0.5">
                   {typeIcons[source.type]}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-foreground/90 dark:text-white/90 truncate">{source.title}</p>
-                  <p className="text-[10px] text-foreground/75 dark:text-white/75 mt-0.5 line-clamp-2 leading-relaxed">
+                  <p className="text-xs font-bold text-foreground dark:text-white/90 truncate">{source.title}</p>
+                  <p className="text-[10px] text-foreground/70 dark:text-white/75 mt-0.5 line-clamp-2 leading-relaxed font-medium">
                     {source.text.substring(0, 120)}...
                   </p>
                 </div>

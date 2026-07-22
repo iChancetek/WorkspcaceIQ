@@ -272,13 +272,16 @@ export default function Dashboard() {
       // Auto-load most recently active project only once on initial mount
       if (!hasAutoLoadedRef.current && data.length > 0) {
         hasAutoLoadedRef.current = true;
-        const recent = data.sort((a, b) => b.updatedAt.toMillis() - a.updatedAt.toMillis())[0];
-        setActiveProjectId(recent.id);
-        setSources(recent.sources ?? []);
-        setActiveTone(recent.tone ?? "professional");
-        setActiveLanguage(recent.language ?? "English");
-        setAllStudioOutputs(recent.studioOutputs ?? {});
-        setDeepDiveTranscript(recent.deepDiveTranscript ?? null);
+        const getMs = (ts: any) => (ts && typeof ts.toMillis === "function" ? ts.toMillis() : ts && typeof ts.toDate === "function" ? ts.toDate().getTime() : 0);
+        const recent = [...data].sort((a, b) => getMs(b.updatedAt) - getMs(a.updatedAt))[0];
+        if (recent) {
+          setActiveProjectId(recent.id);
+          setSources(recent.sources ?? []);
+          setActiveTone(recent.tone ?? "professional");
+          setActiveLanguage(recent.language ?? "English");
+          setAllStudioOutputs(recent.studioOutputs ?? {});
+          setDeepDiveTranscript(recent.deepDiveTranscript ?? null);
+        }
       }
     });
   }, [user]);
@@ -603,9 +606,9 @@ export default function Dashboard() {
               <StreamingAudioRecorder />
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="h-px flex-1 bg-white/8" />
-                  <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/25">Also available in WorkSpaceIQ</p>
-                  <div className="h-px flex-1 bg-white/8" />
+                  <div className="h-px flex-1 bg-foreground/10 dark:bg-white/8" />
+                  <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-foreground/60 dark:text-white/40">Also available in WorkSpaceIQ</p>
+                  <div className="h-px flex-1 bg-foreground/10 dark:bg-white/8" />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {FEATURE_CARDS.map((card) => (
@@ -709,15 +712,15 @@ export default function Dashboard() {
                 <div className="flex-1 min-w-0 space-y-6">
 
                   {/* Active project status bar — interactive rename + delete */}
-                  <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-3 px-4 py-3 bg-white/[0.03] border border-white/8 rounded-2xl text-center sm:text-left w-full">
-                    <WorkspaceIcon workspaceId={activeProject?.id ?? ""} className="w-5 h-5 sm:w-4 sm:h-4 text-violet-400 shrink-0" />
+                  <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-3 px-4 py-3 bg-card dark:bg-white/[0.03] border border-border dark:border-white/8 rounded-2xl shadow-sm dark:shadow-none text-center sm:text-left w-full">
+                    <WorkspaceIcon workspaceId={activeProject?.id ?? ""} className="w-5 h-5 sm:w-4 sm:h-4 text-violet-600 dark:text-violet-400 shrink-0" />
 
                     {/* Name */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-foreground/70 dark:text-white/70 truncate">
+                      <p className="text-sm font-bold text-foreground dark:text-white/80 truncate">
                         {activeProject?.name ?? "No project active"}
                       </p>
-                      <p className="text-[10px] text-foreground/30 dark:text-white/25 font-bold uppercase tracking-wider">
+                      <p className="text-[10px] text-foreground/60 dark:text-white/40 font-bold uppercase tracking-wider">
                         {activeProject
                           ? `${sources.length} resource${sources.length !== 1 ? "s" : ""} · auto-saved`
                           : "Add a resource below to automatically create a workspace"}

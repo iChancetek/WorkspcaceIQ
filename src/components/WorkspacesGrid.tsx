@@ -70,13 +70,13 @@ function SkeletonCard() {
   return (
     <motion.div 
       variants={itemVariants}
-      className="flex flex-col h-48 rounded-3xl bg-white/[0.02] border border-white/8 p-5 animate-pulse"
+      className="flex flex-col h-48 rounded-3xl bg-foreground/5 dark:bg-white/[0.02] border border-foreground/10 dark:border-white/8 p-5 animate-pulse"
     >
-      <div className="w-9 h-9 rounded-xl bg-white/5 mb-auto" />
+      <div className="w-9 h-9 rounded-xl bg-foreground/10 dark:bg-white/5 mb-auto" />
       <div className="w-full space-y-2">
-        <div className="h-3.5 bg-white/8 rounded-full w-3/4" />
-        <div className="h-2.5 bg-white/5 rounded-full w-1/2" />
-        <div className="h-2 bg-white/5 rounded-full w-2/3" />
+        <div className="h-3.5 bg-foreground/10 dark:bg-white/8 rounded-full w-3/4" />
+        <div className="h-2.5 bg-foreground/5 dark:bg-white/5 rounded-full w-1/2" />
+        <div className="h-2 bg-foreground/5 dark:bg-white/5 rounded-full w-2/3" />
       </div>
     </motion.div>
   );
@@ -111,9 +111,9 @@ export function WorkspacesGrid({
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h2 className="text-2xl font-bold text-white tracking-tight">My WorkSpaces</h2>
+          <h2 className="text-2xl font-bold text-foreground dark:text-white tracking-tight">My WorkSpaces</h2>
           {isLoaded && (
-            <p className="text-xs text-white/35 mt-0.5">
+            <p className="text-xs text-foreground/60 dark:text-white/40 mt-0.5 font-medium">
               {projects.length === 0
                 ? "Create your first WorkSpace to get started"
                 : `${projects.length} workspace${projects.length !== 1 ? "s" : ""}`}
@@ -155,16 +155,16 @@ export function WorkspacesGrid({
               onClick={handleCreate}
               disabled={isCreating}
               aria-label="Create new WorkSpace"
-              className="w-full group relative flex flex-col justify-center items-center h-48 rounded-3xl bg-violet-500/[0.05] border border-violet-500/20 hover:border-violet-500/50 hover:bg-violet-500/[0.1] hover:shadow-[0_0_20px_rgba(139,92,246,0.1)] transition-all duration-300 overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+              className="w-full group relative flex flex-col justify-center items-center h-48 rounded-3xl bg-violet-500/10 dark:bg-violet-500/[0.05] border border-violet-500/30 dark:border-violet-500/20 hover:border-violet-500/60 dark:hover:border-violet-500/50 hover:bg-violet-500/15 dark:hover:bg-violet-500/[0.1] hover:shadow-[0_0_20px_rgba(139,92,246,0.15)] transition-all duration-300 overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
             >
               {isCreating ? (
-                <Loader2 className="w-8 h-8 text-violet-400 animate-spin mb-3" />
+                <Loader2 className="w-8 h-8 text-violet-600 dark:text-violet-400 animate-spin mb-3" />
               ) : (
                 <div className="w-12 h-12 rounded-full bg-violet-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                  <Plus className="w-6 h-6 text-violet-300" />
+                  <Plus className="w-6 h-6 text-violet-600 dark:text-violet-300" />
                 </div>
               )}
-              <span className="text-sm font-semibold text-violet-300">
+              <span className="text-sm font-bold text-violet-700 dark:text-violet-300">
                 {isCreating ? "Creating..." : "Create new WorkSpace"}
               </span>
             </button>
@@ -174,14 +174,14 @@ export function WorkspacesGrid({
           {projects.length === 0 && (
             <motion.div 
               variants={itemVariants}
-              className="hidden sm:flex col-span-1 sm:col-span-2 lg:col-span-2 xl:col-span-3 flex-col items-center justify-center h-48 rounded-3xl border border-dashed border-white/8 text-center p-6 gap-3"
+              className="hidden sm:flex col-span-1 sm:col-span-2 lg:col-span-2 xl:col-span-3 flex-col items-center justify-center h-48 rounded-3xl border border-dashed border-foreground/15 dark:border-white/10 text-center p-6 gap-3"
             >
-              <div className="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white/25" />
+              <div className="w-10 h-10 rounded-2xl bg-foreground/5 dark:bg-white/5 flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-foreground/40 dark:text-white/25" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-white/40">No WorkSpaces yet</p>
-                <p className="text-xs text-white/20 mt-1">
+                <p className="text-sm font-semibold text-foreground/70 dark:text-white/40">No WorkSpaces yet</p>
+                <p className="text-xs text-foreground/50 dark:text-white/30 mt-1">
                   Click "Create new WorkSpace" to upload research, PDFs, audio, and YouTube links.
                 </p>
               </div>
@@ -198,24 +198,24 @@ export function WorkspacesGrid({
                 <button
                   onClick={() => onSelectProject(project)}
                   aria-label={`Open workspace: ${project.name}`}
-                  className="w-full group flex flex-col text-left h-48 rounded-3xl bg-white/[0.03] border border-white/10 hover:border-white/20 hover:bg-white/[0.06] transition-all duration-300 p-5 relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                  className="w-full group flex flex-col text-left h-48 rounded-3xl bg-card dark:bg-white/[0.03] border border-border dark:border-white/10 hover:border-violet-500/40 dark:hover:border-white/20 hover:bg-foreground/[0.02] dark:hover:bg-white/[0.06] shadow-sm hover:shadow-md transition-all duration-300 p-5 relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
                 >
                   {/* Icon row */}
                   <div className="flex items-start justify-between w-full mb-auto">
-                    <div className="p-2 rounded-xl bg-white/5 text-white/50 group-hover:text-violet-400 transition-colors">
+                    <div className="p-2 rounded-xl bg-foreground/5 dark:bg-white/5 text-foreground/60 dark:text-white/50 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
                       <WorkspaceIcon workspaceId={project.id} className="w-5 h-5" />
                     </div>
                     <div className="flex items-center gap-1.5">
                       {hasAudio && (
                         <div
-                          className="p-1.5 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center"
+                          className="p-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center"
                           title="Deep Dive audio generated"
                         >
                           <Headphones className="w-3.5 h-3.5" />
                         </div>
                       )}
                       {sourceCount > 0 && (
-                        <span className="text-[10px] font-bold text-white/40 bg-white/5 px-2 py-1 rounded-full">
+                        <span className="text-[10px] font-bold text-foreground/70 dark:text-white/60 bg-foreground/5 dark:bg-white/10 border border-foreground/10 dark:border-white/10 px-2 py-1 rounded-full">
                           {sourceCount}
                         </span>
                       )}
@@ -224,16 +224,16 @@ export function WorkspacesGrid({
 
                   {/* Metadata */}
                   <div className="w-full">
-                    <h3 className="text-base font-bold text-white/90 line-clamp-2 mb-2 group-hover:text-white transition-colors">
+                    <h3 className="text-base font-bold text-foreground dark:text-white/90 line-clamp-2 mb-2 group-hover:text-violet-600 dark:group-hover:text-white transition-colors">
                       {project.name}
                     </h3>
                     {project.createdAt && (
-                      <div className="flex items-center gap-1 text-[10px] text-white/25 mb-1.5 font-medium">
+                      <div className="flex items-center gap-1 text-[10px] text-foreground/60 dark:text-white/40 mb-1.5 font-medium">
                         <Calendar className="w-3 h-3 shrink-0" />
                         <span>Created {formatCreatedAt(project.createdAt)}</span>
                       </div>
                     )}
-                    <div className="flex items-center gap-1.5 text-[11px] text-white/40 font-medium tracking-wide">
+                    <div className="flex items-center gap-1.5 text-[11px] text-foreground/60 dark:text-white/40 font-medium tracking-wide">
                       <span>Modified {formatShortDate(project.updatedAt)}</span>
                       <span>·</span>
                       <span>{sourceCount} resource{sourceCount !== 1 ? "s" : ""}</span>

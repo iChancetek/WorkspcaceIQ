@@ -74,10 +74,10 @@ export function WorkspaceHeader({ name, workspaceId, onSave }: WorkspaceHeaderPr
       ) : (
         <button
           onClick={() => { setDraft(name); setIsEditing(true); }}
-          className="group flex items-center gap-1.5 text-foreground/30 hover:text-foreground/60 transition-colors"
+          className="group flex items-center gap-1.5 text-foreground/80 dark:text-white/80 hover:text-foreground dark:hover:text-white transition-colors"
         >
           <span className="text-[11px] font-bold uppercase tracking-[0.18em]">{name}</span>
-          <Pencil className="w-2.5 h-2.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <Pencil className="w-2.5 h-2.5 opacity-60 group-hover:opacity-100 transition-opacity" />
         </button>
       )}
     </div>

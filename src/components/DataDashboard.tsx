@@ -205,7 +205,7 @@ export function DataDashboard({ sources, tone }: DataDashboardProps) {
             {currentBriefing.insights && (
               <ul className="space-y-1.5 mt-2">
                 {currentBriefing.insights.map((insight, i) => (
-                  <li key={i} className="flex items-start gap-2 text-xs text-white/70">
+                  <li key={i} className="flex items-start gap-2 text-xs text-foreground/80 dark:text-white/70 font-medium">
                     <span className={cn("font-bold mt-0.5", currentPersona.color)}>{i + 1}.</span>
                     {insight}
                   </li>
@@ -215,7 +215,7 @@ export function DataDashboard({ sources, tone }: DataDashboardProps) {
           </div>
         ) : (
           <div className="text-center py-4">
-            <p className="text-sm text-white/60">Add a spreadsheet source to generate your briefing.</p>
+            <p className="text-sm text-foreground/60 dark:text-white/60">Add a spreadsheet source to generate your briefing.</p>
           </div>
         )}
       </div>
@@ -223,11 +223,11 @@ export function DataDashboard({ sources, tone }: DataDashboardProps) {
       {/* Charts */}
       {chartData.length > 1 && numericHeaders.length > 0 && (
         <div className="space-y-4">
-          <p className="text-[10px] uppercase tracking-widest font-bold text-foreground/20 dark:text-white/25">Data Visualization</p>
+          <p className="text-[10px] uppercase tracking-widest font-bold text-foreground/40 dark:text-white/25">Data Visualization</p>
 
           {/* Bar Chart */}
-          <div className="p-4 bg-foreground/[0.02] dark:bg-white/[0.03] border border-foreground/10 dark:border-white/8 rounded-2xl shadow-sm dark:shadow-none">
-            <p className="text-xs font-bold text-foreground/40 dark:text-white/50 mb-4">Bar Chart — {numericHeaders[0]}</p>
+          <div className="p-4 bg-card dark:bg-white/[0.03] border border-border dark:border-white/8 rounded-2xl shadow-sm dark:shadow-none">
+            <p className="text-xs font-bold text-foreground/70 dark:text-white/50 mb-4">Bar Chart — {numericHeaders[0]}</p>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={chartData.slice(0, 12)}>
                 <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-foreground/5 dark:text-white/5" />
@@ -253,8 +253,8 @@ export function DataDashboard({ sources, tone }: DataDashboardProps) {
 
           {/* Line Chart (if multiple numeric columns) */}
           {numericHeaders.length > 1 && (
-            <div className="p-4 bg-white/[0.03] border border-white/8 rounded-2xl">
-              <p className="text-xs font-bold text-white/50 mb-4">Trend — {numericHeaders.slice(0, 2).join(" vs ")}</p>
+            <div className="p-4 bg-card dark:bg-white/[0.03] border border-border dark:border-white/8 rounded-2xl shadow-sm dark:shadow-none">
+              <p className="text-xs font-bold text-foreground/70 dark:text-white/50 mb-4">Trend — {numericHeaders.slice(0, 2).join(" vs ")}</p>
               <ResponsiveContainer width="100%" height={180}>
                 <LineChart data={chartData.slice(0, 12)}>
                   <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-foreground/10 dark:text-white/5" />
@@ -281,8 +281,8 @@ export function DataDashboard({ sources, tone }: DataDashboardProps) {
 
           {/* Pie Chart (if one label + one numeric column) */}
           {numericHeaders.length >= 1 && chartData.length <= 8 && (
-            <div className="p-4 bg-white/[0.03] border border-white/8 rounded-2xl">
-              <p className="text-xs font-bold text-white/50 mb-4">Distribution — {numericHeaders[0]}</p>
+            <div className="p-4 bg-card dark:bg-white/[0.03] border border-border dark:border-white/8 rounded-2xl shadow-sm dark:shadow-none">
+              <p className="text-xs font-bold text-foreground/70 dark:text-white/50 mb-4">Distribution — {numericHeaders[0]}</p>
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
                   <Pie

@@ -289,7 +289,7 @@ export function GraphVisualization({ nodes, edges, onNodeClick }: GraphVisualiza
   if (nodes.length === 0) {
     return (
       <div className="dark-card p-8 text-center">
-        <p className="text-xs text-foreground/30 dark:text-white/25">
+        <p className="text-xs text-foreground/60 dark:text-white/40 font-medium">
           No entities in your knowledge graph yet. Index some sources to see the graph.
         </p>
       </div>
@@ -303,7 +303,7 @@ export function GraphVisualization({ nodes, edges, onNodeClick }: GraphVisualiza
     <div className="space-y-3">
       {/* Controls */}
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-foreground/30 dark:text-white/25">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-foreground/60 dark:text-white/40">
           <Filter className="w-3 h-3 inline mr-1" />
           Filter:
         </span>
@@ -312,8 +312,8 @@ export function GraphVisualization({ nodes, edges, onNodeClick }: GraphVisualiza
           className={cn(
             "px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border transition-all",
             selectedType === "all"
-              ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400"
-              : "border-transparent text-foreground/30 dark:text-white/25 hover:text-foreground/50 dark:hover:text-white/40"
+              ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-600 dark:text-cyan-400"
+              : "border-transparent text-foreground/60 dark:text-white/40 hover:text-foreground dark:hover:text-white/70"
           )}
         >
           All ({nodes.length})
@@ -325,8 +325,8 @@ export function GraphVisualization({ nodes, edges, onNodeClick }: GraphVisualiza
             className={cn(
               "px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border transition-all",
               selectedType === type
-                ? "border-cyan-500/30 text-cyan-400"
-                : "border-transparent text-foreground/30 dark:text-white/25 hover:text-foreground/50 dark:hover:text-white/40"
+                ? "border-cyan-500/30 text-cyan-600 dark:text-cyan-400"
+                : "border-transparent text-foreground/60 dark:text-white/40 hover:text-foreground dark:hover:text-white/70"
             )}
             style={selectedType === type ? { backgroundColor: ENTITY_COLORS[type] + "15" } : {}}
           >
@@ -340,7 +340,7 @@ export function GraphVisualization({ nodes, edges, onNodeClick }: GraphVisualiza
 
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="ml-auto p-1.5 rounded-lg text-foreground/30 dark:text-white/25 hover:text-foreground/60 dark:hover:text-white/50 transition-colors"
+          className="ml-auto p-1.5 rounded-lg text-foreground/50 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-colors"
         >
           {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
         </button>

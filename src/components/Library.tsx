@@ -207,10 +207,10 @@ function ItemCard({
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
               rows={8}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white/80 leading-relaxed focus:outline-none focus:border-blue-400/50 resize-none"
+              className="w-full bg-foreground/5 dark:bg-white/5 border border-foreground/10 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-foreground/90 dark:text-white/80 leading-relaxed focus:outline-none focus:border-blue-500/50 resize-none"
             />
           ) : (
-            <p className="text-sm text-white/80 leading-relaxed whitespace-pre-wrap line-clamp-8">{item.content}</p>
+            <p className="text-sm text-foreground/85 dark:text-white/80 leading-relaxed whitespace-pre-wrap line-clamp-8">{item.content}</p>
           )}
         </div>
       )}
@@ -253,13 +253,13 @@ function ProjectCard({
 
   return (
     <div className={cn(
-      "group rounded-2xl border transition-all duration-200",
+      "group rounded-2xl border transition-all duration-200 shadow-sm dark:shadow-none",
       isTrash
         ? "bg-red-500/[0.03] border-red-500/10 hover:border-red-500/20"
-        : "bg-white/[0.03] border-white/8 hover:border-violet-500/20 hover:bg-violet-500/[0.03]"
+        : "bg-card dark:bg-white/[0.03] border-border dark:border-white/8 hover:border-violet-500/30 hover:bg-violet-500/[0.03]"
     )}>
       <div className="flex items-start gap-3 p-5">
-        <div className="w-8 h-8 rounded-xl bg-violet-500/10 border border-violet-500/15 flex items-center justify-center shrink-0 mt-0.5 text-violet-400">
+        <div className="w-8 h-8 rounded-xl bg-violet-500/10 border border-violet-500/15 flex items-center justify-center shrink-0 mt-0.5 text-violet-600 dark:text-violet-400">
           <FolderOpen className="w-4 h-4" />
         </div>
         <div className="flex-1 min-w-0">
@@ -269,25 +269,25 @@ function ProjectCard({
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") handleSave(); if (e.key === "Escape") setIsEditing(false); }}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm font-semibold text-white focus:outline-none focus:border-violet-400/50 mb-2"
+              className="w-full bg-foreground/5 dark:bg-white/5 border border-foreground/10 dark:border-white/10 rounded-lg px-3 py-1.5 text-sm font-semibold text-foreground dark:text-white focus:outline-none focus:border-violet-400/50 mb-2"
             />
           ) : (
-            <h4 className="text-sm font-semibold text-white truncate pr-2">{project.name}</h4>
+            <h4 className="text-sm font-semibold text-foreground dark:text-white truncate pr-2">{project.name}</h4>
           )}
           <div className="flex items-center gap-2 mt-1 flex-wrap">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-violet-400">Project</span>
-            <span className="text-[10px] text-white/40">·</span>
-            <span className="text-[10px] text-white/45">{sourceCount} source{sourceCount !== 1 ? "s" : ""}</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-violet-600 dark:text-violet-400">Project</span>
+            <span className="text-[10px] text-foreground/40 dark:text-white/40">·</span>
+            <span className="text-[10px] text-foreground/60 dark:text-white/45">{sourceCount} source{sourceCount !== 1 ? "s" : ""}</span>
             {outputCount > 0 && (
               <>
-                <span className="text-[10px] text-white/40">·</span>
-                <span className="text-[10px] text-white/45">{outputCount} output{outputCount !== 1 ? "s" : ""}</span>
+                <span className="text-[10px] text-foreground/40 dark:text-white/40">·</span>
+                <span className="text-[10px] text-foreground/60 dark:text-white/45">{outputCount} output{outputCount !== 1 ? "s" : ""}</span>
               </>
             )}
-            <span className="text-[10px] text-white/40">·</span>
-            <span className="text-[10px] text-white/40">{formatDate(project.updatedAt)}</span>
+            <span className="text-[10px] text-foreground/40 dark:text-white/40">·</span>
+            <span className="text-[10px] text-foreground/60 dark:text-white/40">{formatDate(project.updatedAt)}</span>
             {isTrash && days <= 3 && (
-              <span className="flex items-center gap-1 text-[10px] text-red-400/80">
+              <span className="flex items-center gap-1 text-[10px] text-red-500 dark:text-red-400/80">
                 <AlertTriangle className="w-3 h-3" /> {days}d left
               </span>
             )}
@@ -297,41 +297,41 @@ function ProjectCard({
           {!isTrash && onOpen && (
             <button
               onClick={() => onOpen(project)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 transition-all text-[10px] font-bold mr-1"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-500/10 text-violet-700 dark:text-violet-400 hover:bg-violet-500/20 transition-all text-[10px] font-bold mr-1"
             >
               <FolderOpen className="w-3 h-3" /> Open
             </button>
           )}
           {!isTrash && !isEditing && (
-            <button onClick={() => { setEditName(project.name); setIsEditing(true); }} className="p-1.5 rounded-lg hover:bg-white/8 text-white/30 hover:text-white/70 transition-colors">
+            <button onClick={() => { setEditName(project.name); setIsEditing(true); }} className="p-1.5 rounded-lg hover:bg-foreground/5 dark:hover:bg-white/8 text-foreground/40 dark:text-white/30 hover:text-foreground dark:hover:text-white/70 transition-colors">
               <Pencil className="w-3.5 h-3.5" />
             </button>
           )}
           {isEditing && (
             <>
-              <button onClick={handleSave} disabled={isSaving} className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors">
+              <button onClick={handleSave} disabled={isSaving} className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors">
                 {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
               </button>
-              <button onClick={() => setIsEditing(false)} className="p-1.5 rounded-lg hover:bg-white/8 text-white/30 transition-colors">
+              <button onClick={() => setIsEditing(false)} className="p-1.5 rounded-lg hover:bg-foreground/5 dark:hover:bg-white/8 text-foreground/40 dark:text-white/30 transition-colors">
                 <X className="w-3.5 h-3.5" />
               </button>
             </>
           )}
           {isTrash && onRecover && (
-            <button onClick={() => onRecover(project.id)} className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors" title="Recover">
+            <button onClick={() => onRecover(project.id)} className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors" title="Recover">
               <RotateCcw className="w-3.5 h-3.5" />
             </button>
           )}
           {!isEditing && !confirmDelete && (
-            <button onClick={() => setConfirmDelete(true)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-white/30 hover:text-red-400 transition-colors">
+            <button onClick={() => setConfirmDelete(true)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-foreground/40 dark:text-white/30 hover:text-red-500 dark:hover:text-red-400 transition-colors">
               <Trash2 className="w-3.5 h-3.5" />
             </button>
           )}
           {confirmDelete && (
             <div className="flex items-center gap-1">
-              <span className="text-[10px] text-red-400/80 font-medium">{isTrash ? "Delete forever?" : "Trash?"}</span>
-              <button onClick={() => { onDelete(project.id); setConfirmDelete(false); }} className="px-2 py-1 rounded-lg bg-red-500/20 text-red-400 text-[10px] font-bold hover:bg-red-500/30 transition-colors">Yes</button>
-              <button onClick={() => setConfirmDelete(false)} className="px-2 py-1 rounded-lg hover:bg-white/8 text-white/30 text-[10px] font-bold transition-colors">No</button>
+              <span className="text-[10px] text-red-500 dark:text-red-400/80 font-medium">{isTrash ? "Delete forever?" : "Trash?"}</span>
+              <button onClick={() => { onDelete(project.id); setConfirmDelete(false); }} className="px-2 py-1 rounded-lg bg-red-500/20 text-red-500 dark:text-red-400 text-[10px] font-bold hover:bg-red-500/30 transition-colors">Yes</button>
+              <button onClick={() => setConfirmDelete(false)} className="px-2 py-1 rounded-lg hover:bg-foreground/5 dark:hover:bg-white/8 text-foreground/50 dark:text-white/30 text-[10px] font-bold transition-colors">No</button>
             </div>
           )}
         </div>

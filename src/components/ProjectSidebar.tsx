@@ -120,7 +120,7 @@ export function ProjectSidebar({
       {/* Header row */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-foreground/30">Projects</p>
+          <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-foreground/60 dark:text-white/40">Projects</p>
           {/* Save status */}
           <span className={cn(
             "text-[9px] font-bold uppercase tracking-wider transition-colors",
@@ -133,7 +133,7 @@ export function ProjectSidebar({
         </div>
         <button
           onClick={() => setIsCollapsed(true)}
-          className="p-1 rounded-lg hover:bg-foreground/5 text-foreground/30 hover:text-foreground/60 transition-colors"
+          className="p-1 rounded-lg hover:bg-foreground/5 text-foreground/50 hover:text-foreground transition-colors"
           title="Collapse"
         >
           <ChevronLeft className="w-3 h-3" />
@@ -157,9 +157,9 @@ export function ProjectSidebar({
       <div className="flex flex-col gap-1 overflow-y-auto max-h-[70vh] pr-0.5">
         {projects.length === 0 && (
           <div className="text-center py-10 space-y-2">
-            <FolderOpen className="w-5 h-5 text-foreground/15 mx-auto" />
-            <p className="text-[11px] text-foreground/30">No projects yet</p>
-            <p className="text-[10px] text-foreground/15">Click Create WorkSpace to begin</p>
+            <FolderOpen className="w-5 h-5 text-foreground/30 mx-auto" />
+            <p className="text-[11px] text-foreground/60 dark:text-white/40 font-medium">No projects yet</p>
+            <p className="text-[10px] text-foreground/40 dark:text-white/30">Click Create WorkSpace to begin</p>
           </div>
         )}
 
@@ -169,8 +169,8 @@ export function ProjectSidebar({
             className={cn(
               "group relative rounded-xl border transition-all duration-150",
               activeProjectId === project.id
-                ? "bg-violet-500/10 border-violet-500/25 shadow-lg shadow-violet-500/5"
-                : "bg-foreground/[0.02] border-foreground/5 hover:bg-foreground/[0.05] hover:border-foreground/10"
+                ? "bg-violet-500/10 border-violet-500/30 shadow-sm"
+                : "bg-card dark:bg-foreground/[0.02] border-border dark:border-foreground/5 hover:bg-foreground/5 dark:hover:bg-foreground/[0.05]"
             )}
           >
             {editingId === project.id ? (
@@ -208,16 +208,16 @@ export function ProjectSidebar({
                 <div className="flex items-start gap-2">
                   <WorkspaceIcon workspaceId={project.id} className={cn(
                     "w-3.5 h-3.5 shrink-0 mt-0.5",
-                    activeProjectId === project.id ? "text-violet-500 dark:text-violet-400" : "text-foreground/30"
+                    activeProjectId === project.id ? "text-violet-600 dark:text-violet-400" : "text-foreground/50 dark:text-foreground/30"
                   )} />
                   <div className="flex-1 min-w-0">
                     <p className={cn(
                       "text-xs font-semibold truncate leading-tight",
-                      activeProjectId === project.id ? "text-violet-600 dark:text-violet-200" : "text-foreground/70"
+                      activeProjectId === project.id ? "text-violet-700 dark:text-violet-200" : "text-foreground dark:text-foreground/70"
                     )}>
                       {project.name}
                     </p>
-                    <p className="text-[9px] text-foreground/30 mt-0.5 leading-tight">
+                    <p className="text-[9px] text-foreground/60 dark:text-white/40 mt-0.5 leading-tight font-medium">
                       {(project.sources?.length ?? 0)} source{(project.sources?.length ?? 0) !== 1 ? "s" : ""}
                       {" · "}
                       {formatRelativeDate(project.updatedAt)}
