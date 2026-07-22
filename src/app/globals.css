@@ -66,15 +66,15 @@
 
 @layer utilities {
   .flow-glass {
-    @apply bg-card backdrop-blur-xl border border-border shadow-sm;
+    @apply bg-white dark:bg-[#1e1a4d] backdrop-blur-xl border border-blue-100 dark:border-indigo-500/30 shadow-md dark:shadow-xl;
   }
   
   .writing-pad {
-    @apply max-w-4xl mx-auto w-full bg-card shadow-none rounded-2xl border border-border p-4 md:p-10 backdrop-blur-sm;
+    @apply max-w-4xl mx-auto w-full bg-white dark:bg-[#1e1a4d] shadow-md dark:shadow-xl rounded-3xl border border-blue-100 dark:border-indigo-500/30 p-4 md:p-10 backdrop-blur-sm;
   }
 
   .dark-card {
-    @apply bg-card border border-border rounded-2xl backdrop-blur-sm transition-all duration-200;
+    @apply bg-white dark:bg-[#1e1a4d] border border-blue-100 dark:border-indigo-500/30 rounded-3xl backdrop-blur-sm transition-all duration-200 shadow-md dark:shadow-xl;
   }
 }
 

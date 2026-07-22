@@ -169,8 +169,8 @@ export function ProjectSidebar({
             className={cn(
               "group relative rounded-xl border transition-all duration-150",
               activeProjectId === project.id
-                ? "bg-blue-50 dark:bg-violet-500/10 border-blue-300 dark:border-violet-500/30 shadow-sm"
-                : "bg-white dark:bg-foreground/[0.02] border-blue-100 dark:border-foreground/5 hover:bg-blue-50/50 dark:hover:bg-foreground/[0.05]"
+                ? "bg-blue-50 dark:bg-indigo-600/30 border-blue-300 dark:border-indigo-500/50 shadow-sm text-slate-900 dark:text-white font-bold"
+                : "bg-white dark:bg-[#1e1a4d]/70 border-blue-100 dark:border-indigo-500/20 text-slate-700 dark:text-slate-200 font-bold hover:bg-blue-50 dark:hover:bg-indigo-600/20"
             )}
           >
             {editingId === project.id ? (

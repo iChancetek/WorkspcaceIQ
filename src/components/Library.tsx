@@ -114,13 +114,13 @@ function ItemCard({
 
   return (
     <div className={cn(
-      "group rounded-2xl border transition-all duration-200",
+      "group rounded-2xl border transition-all duration-200 shadow-md dark:shadow-xl",
       isTrash
-        ? "bg-red-500/[0.03] border-red-500/10 hover:border-red-500/20 shadow-sm dark:shadow-none"
-        : "bg-foreground/[0.02] dark:bg-white/[0.03] border-foreground/5 dark:border-white/8 hover:border-foreground/10 dark:hover:border-white/15 hover:bg-foreground/5 dark:hover:bg-white/[0.05] shadow-sm dark:shadow-none"
+        ? "bg-red-500/[0.03] dark:bg-red-950/20 border-red-500/20 dark:border-red-500/30 hover:border-red-500/40"
+        : "bg-white dark:bg-[#1e1a4d] border-blue-100 dark:border-indigo-500/30 hover:border-blue-500 dark:hover:border-indigo-400"
     )}>
       <div className="flex items-start gap-3 p-5">
-        <div className={cn("w-8 h-8 rounded-xl bg-foreground/5 dark:bg-white/5 border border-foreground/10 dark:border-white/8 flex items-center justify-center shrink-0 mt-0.5 shadow-sm dark:shadow-none", color)}>
+        <div className={cn("w-8 h-8 rounded-xl bg-blue-50 dark:bg-indigo-500/20 border border-blue-200 dark:border-indigo-500/30 flex items-center justify-center shrink-0 mt-0.5 shadow-sm", color)}>
           <Icon className="w-4 h-4" />
         </div>
         <div className="flex-1 min-w-0">
@@ -128,15 +128,15 @@ function ItemCard({
             <input
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
-              className="w-full bg-foreground/5 dark:bg-white/5 border border-foreground/10 dark:border-white/10 rounded-lg px-3 py-1.5 text-sm font-semibold text-foreground dark:text-white focus:outline-none focus:border-blue-500/50 dark:focus:border-blue-400/50 mb-2"
+              className="w-full bg-white dark:bg-white/10 border border-blue-200 dark:border-white/20 rounded-lg px-3 py-1.5 text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 mb-2"
             />
           ) : (
-            <h4 className="text-sm font-semibold text-foreground dark:text-white truncate pr-2">{item.title}</h4>
+            <h4 className="text-sm font-extrabold text-slate-900 dark:text-white truncate pr-2">{item.title}</h4>
           )}
           <div className="flex items-center gap-2 mt-1">
-            <span className={cn("text-[10px] font-bold uppercase tracking-widest", color)}>{TYPE_LABELS[item.type]}</span>
-            <span className="text-[10px] text-foreground/40 dark:text-white/40">·</span>
-            <span className="text-[10px] text-foreground/40 dark:text-white/45">{formatDate(item.updatedAt)}</span>
+            <span className={cn("text-[10px] font-extrabold uppercase tracking-widest", color)}>{TYPE_LABELS[item.type]}</span>
+            <span className="text-[10px] text-slate-400 dark:text-indigo-300">·</span>
+            <span className="text-[10px] text-slate-600 dark:text-indigo-200 font-bold">{formatDate(item.updatedAt)}</span>
             {isTrash && days <= 3 && (
               <span className="flex items-center gap-1 text-[10px] text-red-500 dark:text-red-400/80">
                 <AlertTriangle className="w-3 h-3" /> {days}d left

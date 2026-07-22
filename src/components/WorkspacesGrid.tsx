@@ -198,24 +198,24 @@ export function WorkspacesGrid({
                 <button
                   onClick={() => onSelectProject(project)}
                   aria-label={`Open workspace: ${project.name}`}
-                  className="w-full group flex flex-col text-left h-48 rounded-3xl bg-white dark:bg-white/[0.03] border border-blue-100 dark:border-white/10 hover:border-blue-500 dark:hover:border-white/20 hover:shadow-md transition-all duration-300 p-5 relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60"
+                  className="w-full group flex flex-col text-left h-48 rounded-3xl bg-white dark:bg-[#1e1a4d] border border-blue-100 dark:border-indigo-500/30 hover:border-blue-500 dark:hover:border-indigo-400 shadow-md dark:shadow-xl transition-all duration-300 p-5 relative overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60"
                 >
                   {/* Icon row */}
                   <div className="flex items-start justify-between w-full mb-auto">
-                    <div className="p-2 rounded-xl bg-foreground/5 dark:bg-white/5 text-foreground/60 dark:text-white/50 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+                    <div className="p-2 rounded-xl bg-blue-50 dark:bg-indigo-500/20 text-blue-600 dark:text-indigo-300 group-hover:scale-110 transition-transform">
                       <WorkspaceIcon workspaceId={project.id} className="w-5 h-5" />
                     </div>
                     <div className="flex items-center gap-1.5">
                       {hasAudio && (
                         <div
-                          className="p-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center"
+                          className="p-1.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 flex items-center justify-center border border-emerald-500/30"
                           title="Deep Dive audio generated"
                         >
                           <Headphones className="w-3.5 h-3.5" />
                         </div>
                       )}
                       {sourceCount > 0 && (
-                        <span className="text-[10px] font-bold text-foreground/70 dark:text-white/60 bg-foreground/5 dark:bg-white/10 border border-foreground/10 dark:border-white/10 px-2 py-1 rounded-full">
+                        <span className="text-[10px] font-bold text-slate-800 dark:text-indigo-100 bg-blue-50 dark:bg-indigo-500/30 border border-blue-200 dark:border-indigo-400/30 px-2 py-1 rounded-full shadow-sm">
                           {sourceCount}
                         </span>
                       )}
@@ -224,16 +224,16 @@ export function WorkspacesGrid({
 
                   {/* Metadata */}
                   <div className="w-full">
-                    <h3 className="text-base font-bold text-foreground dark:text-white/90 line-clamp-2 mb-2 group-hover:text-violet-600 dark:group-hover:text-white transition-colors">
+                    <h3 className="text-base font-extrabold text-slate-900 dark:text-white line-clamp-2 mb-2 group-hover:text-blue-600 dark:group-hover:text-indigo-300 transition-colors">
                       {project.name}
                     </h3>
                     {project.createdAt && (
-                      <div className="flex items-center gap-1 text-[10px] text-foreground/60 dark:text-white/40 mb-1.5 font-medium">
+                      <div className="flex items-center gap-1 text-[10px] text-slate-600 dark:text-indigo-200 mb-1.5 font-bold">
                         <Calendar className="w-3 h-3 shrink-0" />
                         <span>Created {formatCreatedAt(project.createdAt)}</span>
                       </div>
                     )}
-                    <div className="flex items-center gap-1.5 text-[11px] text-foreground/60 dark:text-white/40 font-medium tracking-wide">
+                    <div className="flex items-center gap-1.5 text-[11px] text-slate-600 dark:text-indigo-200 font-bold tracking-wide">
                       <span>Modified {formatShortDate(project.updatedAt)}</span>
                       <span>·</span>
                       <span>{sourceCount} resource{sourceCount !== 1 ? "s" : ""}</span>
@@ -241,7 +241,7 @@ export function WorkspacesGrid({
                   </div>
 
                   {/* Hover gradient */}
-                  <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-violet-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                  <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-indigo-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                 </button>
               </motion.div>
             );

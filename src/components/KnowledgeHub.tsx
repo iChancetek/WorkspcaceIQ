@@ -151,16 +151,16 @@ export function KnowledgeHub() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="flex items-center justify-center gap-6 text-[10px] font-bold uppercase tracking-widest"
+            className="flex items-center justify-center gap-6 text-[10px] font-extrabold uppercase tracking-widest"
           >
-            <span className="flex items-center gap-1.5 text-foreground/40 dark:text-white/30">
-              <Database className="w-3 h-3" /> {stats.sources} Sources
+            <span className="flex items-center gap-1.5 text-slate-700 dark:text-indigo-200">
+              <Database className="w-3 h-3 text-cyan-500" /> {stats.sources} Sources
             </span>
-            <span className="flex items-center gap-1.5 text-foreground/40 dark:text-white/30">
-              <Zap className="w-3 h-3" /> {stats.chunks} Chunks
+            <span className="flex items-center gap-1.5 text-slate-700 dark:text-indigo-200">
+              <Zap className="w-3 h-3 text-cyan-500" /> {stats.chunks} Chunks
             </span>
-            <span className="flex items-center gap-1.5 text-foreground/40 dark:text-white/30">
-              <TrendingUp className="w-3 h-3" /> {stats.entities} Entities
+            <span className="flex items-center gap-1.5 text-slate-700 dark:text-indigo-200">
+              <TrendingUp className="w-3 h-3 text-cyan-500" /> {stats.entities} Entities
             </span>
           </motion.div>
         )}
@@ -177,8 +177,8 @@ export function KnowledgeHub() {
             className={cn(
               "flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border shadow-sm dark:shadow-none",
               activeView === view.id
-                ? "bg-cyan-500/10 dark:bg-cyan-500/15 border-cyan-500/20 dark:border-cyan-500/30 text-cyan-700 dark:text-cyan-300"
-                : "border-transparent text-foreground/35 dark:text-white/30 hover:bg-foreground/5 dark:hover:bg-white/5 hover:text-foreground/50 dark:hover:text-white/50"
+                ? "bg-cyan-500/10 dark:bg-cyan-500/20 border-cyan-500/30 text-cyan-700 dark:text-cyan-300 font-extrabold shadow-sm"
+                : "border-blue-100 dark:border-indigo-500/20 text-slate-700 dark:text-slate-100 font-bold hover:bg-blue-50 dark:hover:bg-indigo-500/20 hover:text-cyan-600 dark:hover:text-white"
             )}
           >
             <view.icon className={cn("w-3.5 h-3.5", activeView === view.id ? view.color : "")} />
@@ -211,7 +211,7 @@ export function KnowledgeHub() {
             exit={{ opacity: 0, y: -10 }}
           >
             {isLoadingGraph ? (
-              <div className="dark-card p-12 flex items-center justify-center">
+              <div className="bg-white dark:bg-[#1e1a4d] border border-blue-100 dark:border-indigo-500/30 rounded-2xl p-12 flex items-center justify-center shadow-lg">
                 <Loader2 className="w-6 h-6 text-cyan-400 animate-spin" />
               </div>
             ) : (
@@ -235,9 +235,9 @@ export function KnowledgeHub() {
             className="space-y-3"
           >
             {knowledgeSources.length === 0 ? (
-              <div className="dark-card p-10 text-center">
-                <Database className="w-8 h-8 text-foreground/20 dark:text-white/15 mx-auto mb-3" />
-                <p className="text-xs text-foreground/30 dark:text-white/25">
+              <div className="bg-white dark:bg-[#1e1a4d] border border-blue-100 dark:border-indigo-500/30 rounded-2xl p-10 text-center shadow-lg">
+                <Database className="w-8 h-8 text-slate-400 dark:text-indigo-300 mx-auto mb-3" />
+                <p className="text-xs text-slate-600 dark:text-indigo-200 font-medium">
                   No sources indexed yet. Upload documents or add URLs in your Research workspace to start building your knowledge graph.
                 </p>
               </div>
@@ -250,13 +250,13 @@ export function KnowledgeHub() {
                       key={source.id}
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="dark-card p-4 flex items-start gap-3 hover:border-cyan-500/20 transition-all"
+                      className="bg-white dark:bg-[#1e1a4d] border border-blue-100 dark:border-indigo-500/30 rounded-2xl p-4 flex items-start gap-3 hover:border-cyan-500/40 transition-all shadow-md dark:shadow-xl"
                     >
-                      <div className="p-2 bg-foreground/5 dark:bg-white/5 rounded-lg shrink-0">
+                      <div className="p-2 bg-blue-50 dark:bg-indigo-500/20 rounded-xl shrink-0">
                         {TYPE_ICONS[source.type] || TYPE_ICONS.document}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-foreground/80 dark:text-white/80 truncate">
+                        <p className="text-xs font-extrabold text-slate-900 dark:text-white truncate">
                           {source.title}
                         </p>
                         <div className="flex items-center gap-2 mt-1">

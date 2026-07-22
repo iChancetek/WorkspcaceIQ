@@ -534,7 +534,7 @@ export default function Dashboard() {
           </header>
 
           {/* ── Tab Navigation ──────────────────────────────────────────────── */}
-          <nav className="flex items-center gap-1 p-1.5 bg-white dark:bg-white/[0.04] rounded-2xl border border-blue-100 dark:border-white/8 w-full overflow-x-auto scrollbar-none backdrop-blur-sm shadow-sm dark:shadow-none"
+          <nav className="flex items-center gap-1 p-1.5 bg-white dark:bg-[#131033] rounded-2xl border border-blue-100 dark:border-indigo-500/30 w-full overflow-x-auto scrollbar-none backdrop-blur-sm shadow-md"
             style={{ scrollbarWidth: "none" }}
             aria-label="Main navigation"
           >
@@ -548,18 +548,18 @@ export default function Dashboard() {
                   "relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200",
                   activeTab === tab.id
                     ? "text-white dark:text-white shadow-lg"
-                    : "text-foreground dark:text-white hover:text-blue-600 dark:hover:text-indigo-400 hover:bg-blue-50 dark:hover:bg-white/10"
+                    : "text-slate-700 dark:text-slate-100 hover:text-blue-600 dark:hover:text-white hover:bg-blue-50 dark:hover:bg-indigo-500/20 font-bold"
                 )}
               >
                 {activeTab === tab.id && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute inset-0 bg-blue-600 dark:bg-indigo-600 border border-blue-500/30 dark:border-indigo-500/30 rounded-xl -z-10 shadow-md shadow-blue-500/20 dark:shadow-[0_0_20px_rgba(99,102,241,0.2)]"
+                    className="absolute inset-0 bg-blue-600 dark:bg-indigo-600 border border-blue-500/30 dark:border-indigo-500/30 rounded-xl -z-10 shadow-md shadow-blue-500/20 dark:shadow-[0_0_20px_rgba(99,102,241,0.3)]"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
-                <tab.icon className={cn("w-4 h-4", activeTab === tab.id ? tab.color : "text-foreground/70 dark:text-white")} />
-                <span className="dark:text-white font-bold">{tab.label}</span>
+                <tab.icon className={cn("w-4 h-4", activeTab === tab.id ? tab.color : "text-slate-600 dark:text-indigo-300")} />
+                <span className="text-slate-900 dark:text-white font-extrabold">{tab.label}</span>
               </motion.button>
             ))}
           </nav>
