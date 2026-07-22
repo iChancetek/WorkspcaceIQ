@@ -108,7 +108,7 @@ function FeatureSection({
 
 export default function LearnMorePage() {
   return (
-    <div className="relative min-h-screen bg-[#050508] text-white overflow-x-hidden">
+    <div className="relative min-h-screen bg-background dark:bg-[#18153b] text-foreground dark:text-white overflow-x-hidden">
 
       {/* Aurora */}
       <div className="pointer-events-none fixed inset-0 z-0">
@@ -118,13 +118,13 @@ export default function LearnMorePage() {
       </div>
 
       {/* Nav */}
-      <nav className="relative z-10 flex items-center justify-between max-w-6xl mx-auto px-8 py-6 border-b border-white/5">
+      <nav className="relative z-10 flex items-center justify-between max-w-6xl mx-auto px-8 py-6 border-b border-blue-100 dark:border-white/5">
         <BrandIdentifier size={28} />
         <div className="flex items-center gap-4">
-          <Link href="/" className="flex items-center gap-1.5 text-sm text-white/70 hover:text-white transition-colors">
-            <ArrowLeft className="w-4 h-4" /> Back
+          <Link href="/" className="flex items-center gap-2 text-sm text-white font-bold bg-blue-600 hover:bg-blue-700 transition-all px-4 py-2 rounded-full border border-blue-500 shadow-md shadow-blue-600/20">
+            <ArrowLeft className="w-4 h-4 text-white" /> Back
           </Link>
-          <Link href="/dashboard" className="px-5 py-2 bg-[#1a73e8] hover:bg-[#1a73e8]/90 text-white text-sm font-semibold rounded-full transition-all shadow-lg shadow-blue-500/25">
+          <Link href="/dashboard" className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-full transition-all shadow-md shadow-blue-600/20 border border-blue-500">
             Get Started
           </Link>
         </div>

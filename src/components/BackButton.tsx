@@ -47,11 +47,11 @@ export function BackButton({
         onClick={handleClick}
         aria-label="Go back"
         className={cn(
-          "group flex items-center gap-1.5 text-sm text-white/40 hover:text-white/80 transition-all duration-200",
+          "group flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white border border-blue-500 text-sm font-bold shadow-md shadow-blue-600/20 transition-all duration-200",
           className
         )}
       >
-        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform text-white" />
         {label}
       </button>
     );
@@ -62,14 +62,14 @@ export function BackButton({
       onClick={handleClick}
       aria-label="Go back"
       className={cn(
-        "fixed top-5 left-5 z-[60] group flex items-center gap-2 px-3.5 py-2 rounded-full",
-        "bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 hover:border-white/20",
-        "text-white/50 hover:text-white text-sm font-medium backdrop-blur-sm",
-        "transition-all duration-200 shadow-sm",
+        "fixed top-5 left-5 z-[60] group flex items-center gap-2 px-4 py-2 rounded-full",
+        "bg-blue-600 hover:bg-blue-700 border border-blue-500",
+        "text-white text-sm font-bold backdrop-blur-sm",
+        "transition-all duration-200 shadow-md shadow-blue-600/20",
         className
       )}
     >
-      <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+      <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform text-white" />
       <span className="hidden sm:inline">{label}</span>
     </button>
   );

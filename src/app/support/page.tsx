@@ -24,7 +24,7 @@ const faqs = [
 
 export default function SupportPage() {
   return (
-    <div className="relative min-h-screen bg-[#050508] text-white overflow-x-hidden font-sans">
+    <div className="relative min-h-screen bg-background dark:bg-[#18153b] text-foreground dark:text-white overflow-x-hidden font-sans">
       
       {/* ── Background Auroras ── */}
       <div className="pointer-events-none fixed inset-0 z-0">
@@ -38,9 +38,9 @@ export default function SupportPage() {
         <BrandIdentifier size={28} />
         <Link 
           href="/"
-          className="flex items-center gap-1.5 text-sm text-white/40 hover:text-white transition-colors"
+          className="flex items-center gap-2 text-sm text-white font-bold bg-blue-600 hover:bg-blue-700 transition-all px-4 py-2 rounded-full border border-blue-500 shadow-md shadow-blue-600/20"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to home
+          <ArrowLeft className="w-4 h-4 text-white" /> Back to home
         </Link>
       </nav>
 

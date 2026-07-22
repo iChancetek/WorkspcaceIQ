@@ -82,7 +82,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#050508] text-white flex items-center justify-center overflow-hidden px-4">
+    <div className="relative min-h-screen bg-background dark:bg-[#18153b] text-foreground dark:text-white flex items-center justify-center overflow-hidden px-4">
 
       {/* Aurora backgrounds */}
       <div className="pointer-events-none fixed inset-0 z-0">
@@ -95,16 +95,16 @@ export default function LoginPage() {
         {/* Brand mark */}
         <div className="flex flex-col items-center mb-8">
           <BrandIdentifier size={40} className="mb-6 shadow-2xl shadow-blue-500/20" />
-          <h1 className="text-3xl font-bold tracking-tight text-white text-center">{titles[mode]}</h1>
-          <p className="text-white/40 text-sm mt-2 text-center">{subtitles[mode]}</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground dark:text-white text-center">{titles[mode]}</h1>
+          <p className="text-foreground/60 dark:text-white/60 text-sm mt-2 text-center font-medium">{subtitles[mode]}</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white/[0.03] border border-white/8 rounded-3xl p-8 backdrop-blur-sm shadow-2xl shadow-black/30">
+        <div className="bg-white dark:bg-white/[0.04] border border-blue-100 dark:border-white/10 rounded-3xl p-8 backdrop-blur-sm shadow-xl">
 
           {/* Error banner */}
           {error && (
-            <div className="flex items-start gap-3 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl mb-6 text-sm text-red-300">
+            <div className="flex items-start gap-3 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl mb-6 text-sm text-red-600 dark:text-red-300 font-medium">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               {error}
             </div>
@@ -112,7 +112,7 @@ export default function LoginPage() {
 
           {/* Reset password confirmation */}
           {resetSent && (
-            <div className="flex items-start gap-3 px-4 py-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl mb-6 text-sm text-emerald-300">
+            <div className="flex items-start gap-3 px-4 py-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl mb-6 text-sm text-emerald-600 dark:text-emerald-300 font-medium">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               Reset link sent! Check your inbox.
             </div>
@@ -124,7 +124,7 @@ export default function LoginPage() {
               <button
                 onClick={handleGoogle}
                 disabled={isSubmitting || loading}
-                className="w-full flex items-center justify-center gap-3 px-5 py-3.5 bg-white text-[#1c1c1c] rounded-xl font-semibold text-sm hover:bg-white/90 transition-all duration-200 disabled:opacity-50 shadow-sm"
+                className="w-full flex items-center justify-center gap-3 px-5 py-3.5 bg-blue-50 dark:bg-white/10 border border-blue-200 dark:border-white/20 text-blue-900 dark:text-white rounded-xl font-bold text-sm hover:bg-blue-100 dark:hover:bg-white/20 transition-all duration-200 disabled:opacity-50 shadow-sm"
               >
                 {isSubmitting ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -140,9 +140,9 @@ export default function LoginPage() {
               </button>
 
               <div className="flex items-center gap-4 my-5">
-                <div className="flex-1 h-px bg-white/8" />
-                <span className="text-xs text-white/25 font-medium">or continue with email</span>
-                <div className="flex-1 h-px bg-white/8" />
+                <div className="flex-1 h-px bg-blue-100 dark:bg-white/8" />
+                <span className="text-xs text-foreground/50 dark:text-white/40 font-medium">or continue with email</span>
+                <div className="flex-1 h-px bg-blue-100 dark:bg-white/8" />
               </div>
             </>
           )}
@@ -151,29 +151,29 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "signup" && (
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-white/40 uppercase tracking-wider">Full Name</label>
+                <label className="text-xs font-bold text-foreground/70 dark:text-white/60 uppercase tracking-wider">Full Name</label>
                 <input
                   type="text"
                   required
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   placeholder="John Doe"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-blue-400/50 focus:bg-white/8 transition-all"
+                  className="w-full bg-white dark:bg-white/5 border border-blue-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-foreground dark:text-white placeholder:text-foreground/40 dark:placeholder:text-white/30 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
                 />
               </div>
             )}
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-white/40 uppercase tracking-wider">Email</label>
+              <label className="text-xs font-bold text-foreground/70 dark:text-white/60 uppercase tracking-wider">Email</label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40 dark:text-white/40" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-blue-400/50 focus:bg-white/8 transition-all"
+                  className="w-full bg-white dark:bg-white/5 border border-blue-200 dark:border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-foreground dark:text-white placeholder:text-foreground/40 dark:placeholder:text-white/30 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
                 />
               </div>
             </div>
@@ -181,9 +181,9 @@ export default function LoginPage() {
             {mode !== "reset" && (
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-medium text-white/40 uppercase tracking-wider">Password</label>
+                  <label className="text-xs font-bold text-foreground/70 dark:text-white/60 uppercase tracking-wider">Password</label>
                   {mode === "signin" && (
-                    <button type="button" onClick={() => switchMode("reset")} className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
+                    <button type="button" onClick={() => switchMode("reset")} className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline transition-colors">
                       Forgot password?
                     </button>
                   )}
@@ -195,12 +195,12 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-11 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-blue-400/50 focus:bg-white/8 transition-all"
+                    className="w-full bg-white dark:bg-white/5 border border-blue-200 dark:border-white/10 rounded-xl px-4 py-3 pr-11 text-sm text-foreground dark:text-white placeholder:text-foreground/40 dark:placeholder:text-white/30 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/25 hover:text-white/60 transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground/40 dark:text-white/40 hover:text-foreground dark:hover:text-white transition-colors"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -211,7 +211,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isSubmitting || loading || resetSent}
-              className="w-full flex items-center justify-center gap-2 px-5 py-3.5 bg-[#1a73e8] hover:bg-[#1a73e8]/90 text-white rounded-xl font-semibold text-sm transition-all duration-200 disabled:opacity-50 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 mt-2"
+              className="w-full flex items-center justify-center gap-2 px-5 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-all duration-200 disabled:opacity-50 shadow-md shadow-blue-600/20 border border-blue-500 mt-2"
             >
               {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <>{btnLabel[mode]} <ArrowRight className="w-4 h-4" /></>}
             </button>

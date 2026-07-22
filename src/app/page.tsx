@@ -68,7 +68,7 @@ export default function Home() {
   const { user } = useAuth();
 
   return (
-    <div className="relative min-h-screen bg-[#050508] text-white overflow-x-hidden">
+    <div className="relative min-h-screen bg-background dark:bg-[#18153b] text-foreground dark:text-white overflow-x-hidden">
 
       {/* ── Background Video & Auroras ── */}
       <div className="pointer-events-none fixed inset-0 z-0">
