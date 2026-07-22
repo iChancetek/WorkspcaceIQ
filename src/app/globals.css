@@ -1,4 +1,7 @@
 @import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
 @import "@fontsource/eb-garamond/400.css";
 @import "@fontsource/eb-garamond/700.css";
 @import "@fontsource-variable/inter";
@@ -35,14 +38,14 @@
 .dark {
   --background: #18153b;
   --foreground: #f8fafc;
-  --primary: #818cf8;
+  --primary: #22d3ee;
   --primary-foreground: #18153b;
   --secondary: #1f1b4a;
   --secondary-foreground: #f8fafc;
-  --accent: #6366f1; 
-  --accent-foreground: #ffffff;
-  --border: rgba(129, 140, 248, 0.18);
-  --card: rgba(30, 26, 75, 0.65);
+  --accent: #22d3ee; 
+  --accent-foreground: #18153b;
+  --border: rgba(34, 211, 238, 0.3);
+  --card: #1e1a4d;
 }
 
 @layer base {
